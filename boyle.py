@@ -143,4 +143,5 @@ initial_values = np.concatenate((np.array([volume]), substrate,
 solution = scipy.integrate.odeint(model.standard, y0=initial_values,
                                   t=time_array,
                                   args=(loggers, constants_one, mu_max, xxval,
-                                        mu_max_t0, [k0_carbon, k0_prot]))
+                                        mu_max_t0, [k0_carbon, k0_prot],
+                                        [flow_in, flow_out], yield_c))
