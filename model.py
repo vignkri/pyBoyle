@@ -48,3 +48,12 @@ def standard(initial, time,
         ch4, co2, h2s, z, h2po4, a = substrate
     dead_cells = degraders[0]
     degraders = degraders[1:]
+
+    # Constant One Argument
+    ks, ks_nh3, pk_low, pk_high, ks_nh3, \
+        ki_carbon, ki_prot, ki_hac_hpr, ki_hac_hbut, \
+        ki_hac_hval, ki_nh3_hac, ki_lcfa = constant_ones
+
+    # Set up pH Computation
+    H = 1e-8
+    pH = -np.log10(H)
