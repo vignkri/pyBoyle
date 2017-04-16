@@ -104,7 +104,7 @@ def standard(initial, time,
     # -- LOGGING --
     muheader = logging_headers.get("mu")
     muvalues = dict(zip(muheader, mu.tolist()))
-    with open("./loggin/mu_values.log", "a") as muvallog:
+    with open("./logging/mu_values.log", "a") as muvallog:
         muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
         muwriter.writerow(muvalues)
 
