@@ -135,3 +135,41 @@ def standard(initial, time,
     molar_mass = np.array([14, 16, 44, 34])
     conc = np.array([nh3, ch4, co2, h2s]) / molar_mass
     dconc_dt = np.array([y_dot[[9, 14, 15, 16]]]) / molar_mass
+    # --
+    a = np.array([ka_nh4 / (H + ka_nh4),
+                  1,
+                  H * H / (H * (H + ka1_co2) + ka1_co2 * ka2_co2),
+                  H / (H + ka_h2s)]) / k_h
+    da_dH = np.array([
+        -ka_nh4 / (H + ka_nh4)**2,
+        0,
+        ka1_co2 * H * (H + 2 * ka2_co2) / (H * (H + ka1_co2) +
+                                           ka1_co2 * ka2_co2)**2,
+        ka_h2s / (H + ka_h2s)**2
+    ]) / k_h
+    # --
+    dH_dt = - (ka_hac / (ka_hac + H) * y_dot[9] / 60 +
+               ka_hpr / (ka_hac + H) * y_dot[10] / 74 +
+               ka_hbut / (ka_hac + H) * y_dot[11] / 88 +
+               ka_hval / (ka_hac + H) * y_dot[12] / 102 +
+               y_dot[18] / 35.5 -
+               y_dot[16] / 39 +
+               (1 + ka_h2po4 / (ka_h2po4 - H)) * y_dot[17] / 31) / \
+        (
+            ((ka1_co2 - 1) * ka2_co2 - H * H) * co2 / 44 /
+            (H * (H + ka1_co2) + ka1_co2 * ka2_co2)**2 +
+            ka_hac / (ka_hac + H)**2 * hac / 60 +
+            ka_hpr / (ka_hac + H)**2 * hpr / 74 +
+            ka_hbut / (ka_hac + H)**2 * hbut / 88 +
+            ka_hval / (ka_hac + H)**2 * hval / 102 -
+            kw / (H * H) - 1 +
+            ka_h2po4 / (ka_h2po4 + H)**2 * h2po4 / 31 +
+            ka_nh4 / (ka_nh4 + H)**2 * nh3 / 14)
+    # --
+    gasflow = np.sum(a * dconc_dt + da_dH * dH_dt * conc) / \
+        a.dot(np.sum(a * a * conc)) * conc
+    gasloss = gasflow * molar_mass
+    gasflow = (gasflow.dot(volume)).dot(22.4)
+    # reshape arrays to multidimensional
+    gasloss = gasloss.reshape(-1, 1)
+    gasflow = gasflow.reshape(-1, 1)
