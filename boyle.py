@@ -2,7 +2,7 @@
 
 import csv
 import numpy as np
-import scipy as sp
+import scipy.integrate
 
 import model
 
@@ -126,5 +126,7 @@ with open("./logging/dydt.log", "w") as dydt_log:
 
 # Set up integrator
 time_array = np.linspace(start_time, end_time, end_time*2)
-initial_values = [volume, substrate, degraders, gas_conc]
-solution = sp.integrate.odeint(model.standard, y0=initial_values, t=time_array)
+initial_values = np.concatenate((np.array([volume]), substrate,
+                                 degraders, gas_conc))
+solution = scipy.integrate.odeint(model.standard, y0=initial_values,
+                                  t=time_array)
