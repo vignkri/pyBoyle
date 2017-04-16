@@ -1,0 +1,34 @@
+% Initial state concentrations (g/l) %
+
+363525  % Volume
+
+2.8810  % Carbo.is
+13.0561 % Carbo.in
+0.0343  % Carbon
+0.0033  % Lipids
+0.0063  % LCFA
+0.6197  % Prot.is
+1.1233  % Prot.in
+0.2251  % Amino
+2.6330  % NH3
+0.1028  % HAc
+0.1062  % HPr
+0.0532  % HBut
+0.0586  % HVal
+0.0120  % CH4
+13.5719 % CO2
+0.0021  % H2S
+6.7500  % Z+
+0.5500  % H2PO4
+0.0000  % A-
+
+0.4482  % Dead cell mass
+0.2904  % Carbonhydrate degraders
+0.0505  % Amino acid degraders
+0.0093  % Lipids degraders
+0.1708  % LCFA degraders
+0.4339  % Propionate degraders
+0.2607  % Butyrate degraders
+0.0071  % Valerate degraders
+0.7369  % Acetate degraders
+

@@ -1,0 +1,20 @@
+%% Temperature dependency of acid constants, Henry's constants and Pw %%
+%% X(T) = X(T0) + a*(T-T0) + b*(T-T0)^2 + c*(T-T0)^3
+
+% X(T0)  T0(oC)     a        b         c
+   4.85    0        0        0         0      % pKa LCFA
+   52.9    0    -1.454    0.021    -1.13E-4   % K_H NH3
+  10.05    0    -0.0333   2.43E-5   7.43E-7   % pKa NH4+
+   4.76    0        0        0         0      % pKa Acetate
+   4.89    0        0        0         0      % pKa Propionate
+   4.89    0        0        0         0      % pKa Butyrate
+   4.89    0        0        0         0      % pKa Valerate
+0.00112    0        0        0         0      % K_H CH4
+ 0.0697    0    -0.002   2.56E-5   -1.21E-7   % K_H CO2
+  6.539    0    -0.01    1.01E-4       0      % pKa1 CO2
+ 10.619    0    -0.014   1.01E-4       0      % pKa2 CO2
+ 0.0621    0        0        0         0      % K_H H2S
+    7.1    0        0        0         0      % pKa H2S
+   7.21    0        0        0         0      % pKa H2PO4-
+  13.35   47   -0.027    8.5E-5        0      % pKw
+  0.005    0     9E-4     -2E-5      1E-6     % Pw
