@@ -10,7 +10,7 @@ Standard Computation Model
 
 def standard(initial, time,
              logging_headers, constant_ones, mu_max, xxval, mu_max_t0,
-             k0_zeros, flow, yieldc):
+             k0_zeros, flow, yieldc, inflow):
     """Standard Integrator Model
 
     PARAMETERS
@@ -127,3 +127,6 @@ def standard(initial, time,
     y_dot = np.zeros((33, 1))
     y_dot[0] = flow_in - flow_out
     y_dot[1:17] = yieldc.transpose().dot(z)
+    y_dot[20] = np.sum(cell_death) - cell_decay
+    y_dot[21:29] = z[3:] - cell_death
+    y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y_dot[1:29])/ volume
