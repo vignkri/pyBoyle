@@ -94,3 +94,10 @@ def standard(initial, time,
     mu[7, 0] = mu[7, 0] * hac * nh3 * ki_lcfa[7] * ki_nh3_hac / \
         ((ks[7] + hac) * (ks_nh3[7] + nh3) * (lcfa + ki_lcfa[7]) *
          (nh3 * ka_nh4 / (H + ka_nh4) + ki_nh3_hac))
+
+    # -- LOGGING --
+    muheader = logging_headers.get("mu")
+    muvalues = dict(zip(muheader, mu.tolist()))
+    with open("./loggin/mu_values.log", "a") as muvallog:
+        muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
+        muwriter.writerow(muvalues)
