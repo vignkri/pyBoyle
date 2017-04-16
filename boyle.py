@@ -124,9 +124,14 @@ with open("./logging/dydt.log", "w") as dydt_log:
     dydt_writer = csv.DictWriter(dydt_log, fieldnames=dydt_header)
     dydt_writer.writeheader()
 
+# Logging Headers Argument
+loggers = {"substrate": substrate_header,
+           "degrader": degrader_header,
+           "dydt": dydt_header,
+           "mu": mu_header}
 # Set up integrator
 time_array = np.linspace(start_time, end_time, end_time*2)
 initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
 solution = scipy.integrate.odeint(model.standard, y0=initial_values,
-                                  t=time_array)
+                                  t=time_array, args=(loggers))
