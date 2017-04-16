@@ -129,4 +129,4 @@ def standard(initial, time,
     y_dot[1:17] = yieldc.transpose().dot(z)
     y_dot[20] = np.sum(cell_death) - cell_decay
     y_dot[21:29] = z[3:] - cell_death
-    y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y_dot[1:29])/ volume
+    y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y_dot[1:29]) / volume
