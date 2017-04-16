@@ -7,7 +7,8 @@ Standard Computation Model
 """
 
 
-def standard(initial, time):
+def standard(initial, time,
+             logging_headers):
     """Standard Integrator Model
 
     PARAMETERS
@@ -22,3 +23,8 @@ def standard(initial, time):
     OTHER PARAMETERS
     ----------------
     """
+    # -- set up parts of values
+    volume = initial[0]
+    substrate = initial[1:20]
+    degraders = initial[20:29]
+    gas_conc = initial[-4:]
