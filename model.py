@@ -10,7 +10,7 @@ Standard Computation Model
 
 def standard(initial, time,
              logging_headers, constant_ones, mu_max, xxval, mu_max_t0,
-             k0_zeros):
+             k0_zeros, flow, yieldc):
     """Standard Integrator Model
 
     PARAMETERS
@@ -121,3 +121,9 @@ def standard(initial, time,
     ])
     z_two = (mu * np.atleast_2d(degraders).T).reshape(-1)
     z = np.concatenate((z, z_two))
+
+    # Computation of Gasflow
+    flow_in, flow_out = flow
+    y_dot = np.zeros((33, 1))
+    y_dot[0] = flow_in - flow_out
+    y_dot[1:17] = yieldc.transpose().dot(z)
