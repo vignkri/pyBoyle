@@ -9,7 +9,7 @@ Standard Computation Model
 
 
 def standard(initial, time,
-             logging_headers, constant_ones, mu_max):
+             logging_headers, constant_ones, mu_max, xxval):
     """Standard Integrator Model
 
     PARAMETERS
@@ -53,6 +53,10 @@ def standard(initial, time,
     ks, ks_nh3, pk_low, pk_high, ks_nh3, \
         ki_carbon, ki_prot, ki_hac_hpr, ki_hac_hbut, \
         ki_hac_hval, ki_nh3_hac, ki_lcfa = constant_ones
+
+    # XXVal Argument
+    k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2, \
+        ka2_co2, ka_h2s, ka_h2po4, kw = xxval
 
     # Set up pH Computation
     H = 1e-8
