@@ -2,6 +2,9 @@
 
 import csv
 import numpy as np
+import scipy as sp
+
+import model
 
 """
 Boyle Python
@@ -120,3 +123,8 @@ dydt_header = substrate_header + degrader_header[1:]
 with open("./logging/dydt.log", "w") as dydt_log:
     dydt_writer = csv.DictWriter(dydt_log, fieldnames=dydt_header)
     dydt_writer.writeheader()
+
+# Set up integrator
+time_array = np.linspace(start_time, end_time, end_time*2)
+initial_values = [volume, substrate, degraders, gas_conc]
+solution = sp.integrate.odeint(model.standard, y0=initial_values, t=time_array)
