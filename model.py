@@ -88,7 +88,7 @@ def standard(initial, time,
          (hac + ki_hac_hbut))
     #
     mu[6, 0] = mu[6, 0] * hval * nh3 * ki_lcfa[6] + ki_hac_hval / \
-        ((ks[6] + hval) * (ks_nh3[6, 0] + nh3) * (lcfa + ki_lcfa[6]) *
+        ((ks[6] + hval) * (ks_nh3[6] + nh3) * (lcfa + ki_lcfa[6]) *
          (hac + ki_hac_hval))
     #
     mu[7, 0] = mu[7, 0] * hac * nh3 * ki_lcfa[7] * ki_nh3_hac / \
