@@ -22,3 +22,8 @@ volume = initial[0]
 substrate = initial[1:20]
 degraders = initial[20:29]
 gas_conc = np.zeros((4,))
+
+# Set up regulation
+start_time = 0
+end_time = regulate[0]
+step_size = 0.5
