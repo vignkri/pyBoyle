@@ -77,3 +77,17 @@ mu_max = mu_max[2:]
 delta_temp = temp - const2[:, 1]
 henry_constants = const2[:, 1] + delta_temp * const2[:, 3] + \
     delta_temp**2 * const2[:, 4] + delta_temp**3 * const2[:, 5]
+# --
+k_h = henry_constants[[1, 7, 8, 11]]
+# -- log inverse values
+ka1_lcfa = 10**(-henry_constants[0])
+ka_nh4 = 10**(-henry_constants[2])
+ka_hac = 10**(-henry_constants[3])
+ka_hpr = 10**(-henry_constants[4])
+ka_hbut = 10**(-henry_constants[5])
+ka_hval = 10**(-henry_constants[6])
+ka1_co2 = 10**(-henry_constants[9])
+ka2_co2 = 10**(-henry_constants[10])
+ka_h2s = 10**(-henry_constants[12])
+ka_h2po4 = 10**(-henry_constants[13])
+kw = 10**(-henry_constants[14])
