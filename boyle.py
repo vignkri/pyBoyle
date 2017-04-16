@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
+import csv
 import numpy as np
-
 
 """
 Boyle Python
@@ -91,3 +91,11 @@ ka2_co2 = 10**(-henry_constants[10])
 ka_h2s = 10**(-henry_constants[12])
 ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
+
+# Create Logging Parameters
+# Logging for mu
+mu_header = ["time", "mu_one", "mu_two", "mu_three", "mu_four",
+             "mu_five", "mu_six", "mu_seven", "mu_eight"]
+with open("./logging/mu_values.log", "w") as mu_val_log:
+    mu_writer = csv.DictWriter(mu_val_log, fieldnames=mu_header)
+    mu_writer.writeheader()
