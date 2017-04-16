@@ -9,7 +9,7 @@ Standard Computation Model
 
 
 def standard(initial, time,
-             logging_headers, constant_ones, mu_max, xxval):
+             logging_headers, constant_ones, mu_max, xxval, mu_max_t0):
     """Standard Integrator Model
 
     PARAMETERS
@@ -101,3 +101,7 @@ def standard(initial, time,
     with open("./loggin/mu_values.log", "a") as muvallog:
         muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
         muwriter.writerow(muvalues)
+
+    # Calculate growth, death and reaction rates
+    cell_death = mu_max_t0 * degraders * kd0
+    cell_decay = 0.01 * dead_cells

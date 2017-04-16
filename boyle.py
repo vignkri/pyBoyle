@@ -142,4 +142,5 @@ initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
 solution = scipy.integrate.odeint(model.standard, y0=initial_values,
                                   t=time_array,
-                                  args=(loggers, constants_one, mu_max, xxval))
+                                  args=(loggers, constants_one, mu_max, xxval,
+                                        mu_max_t0))
