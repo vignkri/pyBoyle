@@ -65,3 +65,10 @@ ki_hac_hbut = const1[7, 7]
 ki_hac_hval = const1[8, 7]
 ki_nh3_hac = const1[9, 8]
 ki_lcfa = const1[2:, 8]
+
+# Define reaction rates and growth factors
+k0_carbon = mu_max[0, 0]
+k0_prot = mu_max[1, 0]
+# --
+mu_max_t0 = mu_max_t0[2:]
+mu_max = mu_max[2:]
