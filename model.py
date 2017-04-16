@@ -31,7 +31,7 @@ def standard(initial, time,
     gas_conc = initial[-4:]
     # -- LOGGER --
     subheader = logging_headers.get("substrate")
-    subvalues = dict(zip(subheader, substrate))
+    subvalues = dict(zip(subheader, initial[0:20]))
     with open("./logging/substrate.log", "a") as sublog:
         sublogwriter = csv.DictWriter(sublog, fieldnames=subheader)
         sublogwriter.writerow(subvalues)
