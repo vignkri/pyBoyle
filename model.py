@@ -9,7 +9,7 @@ Standard Computation Model
 
 
 def standard(initial, time,
-             logging_headers, constant_ones):
+             logging_headers, constant_ones, mu_max):
     """Standard Integrator Model
 
     PARAMETERS
@@ -57,3 +57,8 @@ def standard(initial, time,
     # Set up pH Computation
     H = 1e-8
     pH = -np.log10(H)
+
+    # Calculation of growth rates
+    f_ph = (1 + 2 * 10**(0.5 * (pk_low - pk_high))) / \
+        (1 + 10**(pH - pk_high) + 10**(pk_low - pH))
+    mu = mu_max * np.atleast_2d(f_ph).T
