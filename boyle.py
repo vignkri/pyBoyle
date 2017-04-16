@@ -56,7 +56,7 @@ kd0 = 0.05
 ks = const1[2:, 5]
 ks_nh3 = const1[2:, 6]
 pk_low = const1[2:, 9]
-pk_high = const1[2:, 11]
+pk_high = const1[2:, 10]
 # --
 ki_carbon = const1[0, 7]
 ki_prot = const1[1, 7]
