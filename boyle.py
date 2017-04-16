@@ -115,3 +115,8 @@ degrader_header = ["time", "deadcell", "carb_degr", "amino_degr", "lipid_degr",
 with open("./logging/degraders.log", "w") as degrader_log:
     degs_writer = csv.DictWriter(degrader_log, fieldnames=degrader_header)
     degs_writer.writeheader()
+# Loggin for Change values
+dydt_header = substrate_header + degrader_header[1:]
+with open("./logging/dydt.log", "w") as dydt_log:
+    dydt_writer = csv.DictWriter(dydt_log, fieldnames=dydt_header)
+    dydt_writer.writeheader()
