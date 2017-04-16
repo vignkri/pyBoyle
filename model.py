@@ -130,3 +130,8 @@ def standard(initial, time,
     y_dot[20] = np.sum(cell_death) - cell_decay
     y_dot[21:29] = z[3:] - cell_death
     y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y_dot[1:29]) / volume
+
+    # Calculation of gasflow
+    molar_mass = np.array([14, 16, 44, 34])
+    conc = np.array([nh3, ch4, co2, h2s]) / molar_mass
+    dconc_dt = np.array([y_dot[[9, 14, 15, 16]]]) / molar_mass
