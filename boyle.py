@@ -72,3 +72,8 @@ k0_prot = mu_max[1, 0]
 # --
 mu_max_t0 = mu_max_t0[2:]
 mu_max = mu_max[2:]
+
+# Defining Henry Constant Values
+delta_temp = temp - const2[:, 1]
+henry_constants = const2[:, 1] + delta_temp * const2[:, 3] + \
+    delta_temp**2 * const2[:, 4] + delta_temp**3 * const2[:, 5]
