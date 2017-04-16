@@ -129,9 +129,13 @@ loggers = {"substrate": substrate_header,
            "degrader": degrader_header,
            "dydt": dydt_header,
            "mu": mu_header}
+# Constant One Argument
+constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
+                 ki_carbon, ki_prot, ki_hac_hpr, ki_hac_hbut,
+                 ki_hac_hval, ki_nh3_hac, ki_lcfa]
 # Set up integrator
 time_array = np.linspace(start_time, end_time, end_time*2)
 initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
 solution = scipy.integrate.odeint(model.standard, y0=initial_values,
-                                  t=time_array, args=(loggers))
+                                  t=time_array, args=(loggers, constants_one))
