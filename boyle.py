@@ -99,3 +99,12 @@ mu_header = ["time", "mu_one", "mu_two", "mu_three", "mu_four",
 with open("./logging/mu_values.log", "w") as mu_val_log:
     mu_writer = csv.DictWriter(mu_val_log, fieldnames=mu_header)
     mu_writer.writeheader()
+# Logging for Substrate Values
+substrate_header = ["time", "volume",
+                    "carbo_is", "carbo_in", "carbon",
+                    "lipids", "lcfa", "prot_is", "prot_in", "amino",
+                    "nh3", "hac", "hpr", "hbut", "hval", "ch4", "co2",
+                    "h2s", "zplus", "h2po4", "aminus"]
+with open("./logging/substrates.log", "w") as substrate_log:
+    subs_writer = csv.DictWriter(substrate_log, fieldnames=substrate_header)
+    subs_writer.writeheader()
