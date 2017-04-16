@@ -109,7 +109,7 @@ def standard(initial, time,
         muwriter.writerow(muvalues)
 
     # Calculate growth, death and reaction rates
-    cell_death = mu_max_t0 * degraders * kd0
+    cell_death = (mu_max_t0 * degraders.reshape(-1, 1)) * kd0
     cell_decay = 0.01 * dead_cells
     # -- column of z
     z = np.array([
@@ -126,10 +126,12 @@ def standard(initial, time,
     flow_in, flow_out = flow
     y_dot = np.zeros((33, 1))
     y_dot[0] = flow_in - flow_out
-    y_dot[1:17] = yieldc.transpose().dot(z)
+    y_dot[1:17] = (yieldc.transpose().dot(z)).reshape(-1, 1)
     y_dot[20] = np.sum(cell_death) - cell_decay
-    y_dot[21:29] = z[3:] - cell_death
-    y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y_dot[1:29]) / volume
+    y_dot[21:29] = z[3:].reshape(-1, 1) - cell_death
+    y_dot[1:29] = y_dot[1:29] + (inflow.reshape(-1, 1) - flow_in *
+                                 y_dot[1:29])  \
+        / volume
 
     # Calculation of gasflow
     molar_mass = np.array([14, 16, 44, 34])
