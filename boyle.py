@@ -50,3 +50,18 @@ for index in range(0, 10):
         mu_max[index] = (mu_max_t0[index] + alpha * (t_opt - t0)) * \
             (t_max - temp) / (t_max - t_opt)
 # --
+
+# Set up Const1 Parameters
+kd0 = 0.05
+ks = const1[2:, 5]
+ks_nh3 = const1[2:, 6]
+pk_low = const1[2:, 9]
+pk_high = const1[2:, 11]
+# --
+ki_carbon = const1[0, 7]
+ki_prot = const1[1, 7]
+ki_hac_hpr = const1[6, 7]
+ki_hac_hbut = const1[7, 7]
+ki_hac_hval = const1[8, 7]
+ki_nh3_hac = const1[9, 8]
+ki_lcfa = const1[2:, 8]
