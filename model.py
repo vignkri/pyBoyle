@@ -173,3 +173,19 @@ def standard(initial, time,
     # reshape arrays to multidimensional
     gasloss = gasloss.reshape(-1, 1)
     gasflow = gasflow.reshape(-1, 1)
+    # --
+    y_dot[-4:] = gasflow
+    y_dot[9] = y_dot[9] - gasloss[0]
+    y_dot[[14, 15, 16]] = y_dot[[14, 15, 16]] - gasloss[[1, 2, 3]]
+    # --
+    y_dot = y_dot.reshape(-1)
+
+    # -- LOGGING --
+    dydtheader = logging_headers.get("dydt")
+    dydtvalues = dict(zip(dydtheader, y_dot))
+    with open("./logging/dydt.log", "a") as dylog:
+        dylogwriter = csv.DictWriter(dylog, fieldnames=dydtheader)
+        dylogwriter.writerow(dydtvalues)
+    # --
+
+    return y_dot
