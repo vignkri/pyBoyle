@@ -27,3 +27,9 @@ gas_conc = np.zeros((4,))
 start_time = 0
 end_time = regulate[0]
 step_size = 0.5
+
+# Substrate Conditions
+temp = regulate[1]
+flow_in = regulate[2]
+flow_out = regulate[3]
+substrate_inflow = flow_in * regulate[4:]
