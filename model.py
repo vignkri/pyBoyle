@@ -119,4 +119,5 @@ def standard(initial, time,
         prot_is * k0_prot * ki_prot / (ki_prot + hac + 0.811 * hpr +
                                        0.659 * hbut)
     ])
-    z = np.concatenate((z, mu * degraders))
+    z_two = (mu * np.atleast_2d(degraders).T).reshape(-1)
+    z = np.concatenate((z, z_two))
