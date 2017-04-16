@@ -111,3 +111,12 @@ def standard(initial, time,
     # Calculate growth, death and reaction rates
     cell_death = mu_max_t0 * degraders * kd0
     cell_decay = 0.01 * dead_cells
+    # -- column of z
+    z = np.array([
+        cell_decay,
+        carbo_is / k0_carbon * ki_carbon / (ki_carbon + hac + 0.811 * hpr +
+                                            0.659 * hbut),
+        prot_is * k0_prot * ki_prot / (ki_prot + hac + 0.811 * hpr +
+                                       0.659 * hbut)
+    ])
+    z = np.concatenate((z, mu * degraders))
