@@ -81,6 +81,9 @@ celerybeat-schedule
 # virtualenv
 .venv/
 
+# Exclude ipython notebooks
+*.ipynb
+
 # Spyder project settings
 .spyderproject
 
