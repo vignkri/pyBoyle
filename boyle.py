@@ -33,3 +33,20 @@ temp = regulate[1]
 flow_in = regulate[2]
 flow_out = regulate[3]
 substrate_inflow = flow_in * regulate[4:]
+
+# Compute Temperature Dependent Constants
+mu_max = np.zeros((10, 1))
+mu_max_t0 = np.zeros((10, 1))
+for index in range(0, 10):
+    mu_max_t0[index] = const1[index, 0]
+    alpha = const1[index, 1]
+    t0 = const1[index, 2]
+    t_opt = const1[index, 3]
+    t_max = const1[index, 4]
+    #
+    if temp < t_opt:
+        mu_max[index] = mu_max_t0[index] + alpha * (temp - t0)
+    else:
+        mu_max[index] = (mu_max_t0[index] + alpha * (t_opt - t0)) * \
+            (t_max - temp) / (t_max - t_opt)
+# --
