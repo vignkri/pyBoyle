@@ -62,3 +62,31 @@ def standard(initial, time,
     f_ph = (1 + 2 * 10**(0.5 * (pk_low - pk_high))) / \
         (1 + 10**(pH - pk_high) + 10**(pk_low - pH))
     mu = mu_max * np.atleast_2d(f_ph).T
+    # --
+    mu[0, 0] = mu[0, 0] * carbon * nh3 * ki_lcfa[0] / \
+        ((ks[0] + carbon) * (ks_nh3[0] + nh3) * (lcfa + ki_lcfa[0]))
+    #
+    mu[1, 0] = mu[1, 0] * amino * ki_lcfa[1] / \
+        ((ks[1] + amino) * (lcfa + ki_lcfa[1]))
+    #
+    mu[2, 0] = mu[2, 0] * lipids * nh3 * ki_lcfa[2] / \
+        ((ks[2] + lipids) * (ks_nh3[2] + nh3) * (lcfa + ki_lcfa[2]))
+    #
+    mu[3, 0] = mu[3, 0] * nh3 * lcfa / \
+        ((lcfa + ks[3] + lcfa * lcfa / ki_lcfa[3]) * (ks_nh3[3] + nh3))
+    #
+    mu[4, 0] = mu[4, 0] * hpr * nh3 * ki_lcfa[4] * ki_hac_hpr / \
+        ((ks[4] + hpr) * (ks_nh3[4] + nh3) * (lcfa + ki_lcfa[4]) *
+         (hac + ki_hac_hpr))
+    #
+    mu[5, 0] = mu[5, 0] * hbut * nh3 * ki_lcfa[5] * ki_hac_hbut / \
+        ((ks[5] + hbut) * (ks_nh3[5] + nh3) * (lcfa + ki_lcfa[5]) *
+         (hac + ki_hac_hbut))
+    #
+    mu[6, 0] = mu[6, 0] * hval * nh3 * ki_lcfa[6] + ki_hac_hval / \
+        ((ks[6] + hval) * (ks_nh3[6, 0] + nh3) * (lcfa + ki_lcfa[6]) *
+         (hac + ki_hac_hval))
+    #
+    mu[7, 0] = mu[7, 0] * hac * nh3 * ki_lcfa[7] * ki_nh3_hac / \
+        ((ks[7] + hac) * (ks_nh3[7] + nh3) * (lcfa + ki_lcfa[7]) *
+         (nh3 * ka_nh4 / (H + ka_nh4) + ki_nh3_hac))
