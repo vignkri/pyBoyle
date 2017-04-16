@@ -34,13 +34,13 @@ def standard(initial, time,
     gas_conc = initial[-4:]
     # -- LOGGER --
     subheader = logging_headers.get("substrate")
-    subvalues = dict(zip(subheader, initial[0:20]))
+    subvalues = dict(zip(subheader, [time] + initial[0:20].tolist()))
     with open("./logging/substrates.log", "a") as sublog:
         sublogwriter = csv.DictWriter(sublog, fieldnames=subheader)
         sublogwriter.writerow(subvalues)
     # -- LOGGER --
     degrheader = logging_headers.get("degrader")
-    degrvalues = dict(zip(degrheader, degraders))
+    degrvalues = dict(zip(degrheader, [time] + degraders.tolist()))
     with open("./logging/degraders.log", "a") as degrlog:
         degrlogwriter = csv.DictWriter(degrlog, fieldnames=degrheader)
         degrlogwriter.writerow(degrvalues)
@@ -103,7 +103,7 @@ def standard(initial, time,
 
     # -- LOGGING --
     muheader = logging_headers.get("mu")
-    muvalues = dict(zip(muheader, mu.tolist()))
+    muvalues = dict(zip(muheader, [time] + mu.tolist()))
     with open("./logging/mu_values.log", "a") as muvallog:
         muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
         muwriter.writerow(muvalues)
@@ -184,7 +184,7 @@ def standard(initial, time,
 
     # -- LOGGING --
     dydtheader = logging_headers.get("dydt")
-    dydtvalues = dict(zip(dydtheader, y_dot))
+    dydtvalues = dict(zip(dydtheader, [time] + y_dot.tolist()))
     with open("./logging/dydt.log", "a") as dylog:
         dylogwriter = csv.DictWriter(dylog, fieldnames=dydtheader)
         dylogwriter.writerow(dydtvalues)
