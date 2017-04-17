@@ -146,13 +146,3 @@ xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
 time_array = np.linspace(start_time, end_time, (start_time-end_time)/step_size)
 initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
-solution = scipy.integrate.odeint(model.standard, y0=initial_values,
-                                  t=time_array, rtol=1e-4, atol=1e-8,
-                                  args=(loggers, constants_one, mu_max, xxval,
-                                        mu_max_t0, [k0_carbon, k0_prot],
-                                        [flow_in, flow_out], yield_c,
-                                        substrate_inflow),
-                                  full_output=True)
-# -- Output Logger --
-output = DataFrame.from_records(solution[1])
-output.to_csv("./logging/solution.log")
