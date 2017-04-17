@@ -146,3 +146,15 @@ xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
 time_array = np.linspace(start_time, end_time, (start_time-end_time)/step_size)
 initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
+
+solver = scipy.integrate.ode(model.standard) \
+    .set_integrator("vode", method="bdf", order=1, rtol=1e-4, atol=1e-8,
+                    nsteps=2)
+solver.set_initial_value(y=initial_values, t=start_time)
+solver.set_f_params(loggers, constants_one, mu_max, xxval, mu_max_t0,
+                    [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
+                    substrate_inflow)
+# -- List of outputs
+while solver.successful() and solver.t < 1000:
+    print(solver.t)
+    y_dot = solver.integrate(solver.t + 0.5, step=True)
