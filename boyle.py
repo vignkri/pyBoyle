@@ -145,4 +145,5 @@ solution = scipy.integrate.odeint(model.standard, y0=initial_values,
                                   args=(loggers, constants_one, mu_max, xxval,
                                         mu_max_t0, [k0_carbon, k0_prot],
                                         [flow_in, flow_out], yield_c,
-                                        substrate_inflow))
+                                        substrate_inflow),
+                                  tcrit=np.arange(0, len(time_array), 1))
