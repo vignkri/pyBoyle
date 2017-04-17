@@ -72,6 +72,14 @@ def standard(initial, time,
     f_ph = (1 + 2 * 10**(0.5 * (pk_low - pk_high))) / \
         (1 + 10**(pH - pk_high) + 10**(pk_low - pH))
     mu = mu_max * np.atleast_2d(f_ph).T
+
+    # -- LOGGING --
+    muheader = logging_headers.get("mu")
+    muvalues = dict(zip(muheader, [time] + mu[:, 0].tolist() + [False]))
+    with open("./logging/mu_values.log", "a") as muvallog:
+        muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
+        muwriter.writerow(muvalues)
+
     # --
     mu[0, 0] = mu[0, 0] * carbon * nh3 * ki_lcfa[0] / \
         ((ks[0] + carbon) * (ks_nh3[0] + nh3) * (lcfa + ki_lcfa[0]))
@@ -103,7 +111,7 @@ def standard(initial, time,
 
     # -- LOGGING --
     muheader = logging_headers.get("mu")
-    muvalues = dict(zip(muheader, [time] + mu[:, 0].tolist()))
+    muvalues = dict(zip(muheader, [time] + mu[:, 0].tolist() + [True]))
     with open("./logging/mu_values.log", "a") as muvallog:
         muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
         muwriter.writerow(muvalues)
