@@ -3,6 +3,7 @@
 import csv
 import numpy as np
 import scipy.integrate
+from pandas import DataFrame
 
 import model
 
@@ -148,3 +149,6 @@ solution = scipy.integrate.odeint(model.standard, y0=initial_values,
                                         [flow_in, flow_out], yield_c,
                                         substrate_inflow),
                                   full_output=True)
+# -- Output Logger --
+output = DataFrame.from_records(solution[1])
+output.to_csv("./logging/solution.log")
