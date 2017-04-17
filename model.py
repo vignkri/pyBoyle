@@ -70,7 +70,9 @@ def standard(initial, time,
     # Calculation of growth rates
     f_ph = (1 + 2 * 10**(0.5 * (pk_low - pk_high))) / \
         (1 + 10**(pH - pk_high) + 10**(pk_low - pH))
-    mu = mu_max * np.atleast_2d(f_ph).T
+    f_ph = f_ph.reshape(-1, 1)
+
+    mu = mu_max * f_ph
 
     # -- LOGGING --
     muheader = logging_headers.get("mu")
