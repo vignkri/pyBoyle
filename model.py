@@ -128,19 +128,18 @@ def standard(initial, time,
         prot_is * k0_prot * ki_prot / (ki_prot + hac + 0.811 * hpr +
                                        0.659 * hbut)
     ])
-    z_two = (mu * np.atleast_2d(degraders).T).reshape(-1)
+    z_two = (mu * degraders.reshape(-1, 1)).reshape(-1)
     z = np.concatenate((z, z_two))
 
     # Computation of Gasflow
     flow_in, flow_out = flow
-    y_dot = np.zeros((33, 1))
+    y_dot = np.zeros((33,))
     y_dot[0] = flow_in - flow_out
-    y_dot[1:17] = (yieldc.transpose().dot(z)).reshape(-1, 1)
+    y_dot[1:17] = (yieldc.transpose().dot(z))
     y_dot[20] = np.sum(cell_death) - cell_decay
-    y_dot[21:29] = z[3:].reshape(-1, 1) - cell_death
-    y_dot[1:29] = y_dot[1:29] + (inflow.reshape(-1, 1) - flow_in *
-                                 y_dot[1:29])  \
-        / volume
+    y_dot[21:29] = z[3:] - cell_death.reshape(-1)
+    y_dot[1:29] = y_dot[1:29] + (inflow - flow_in *
+                                 y_dot[1:29]) / volume
 
     # Calculation of gasflow
     molar_mass = np.array([14, 16, 44, 34])
@@ -181,9 +180,6 @@ def standard(initial, time,
         a.dot(np.sum(a * a * conc)) * conc
     gasloss = gasflow * molar_mass
     gasflow = (gasflow.dot(volume)).dot(22.4)
-    # reshape arrays to multidimensional
-    gasloss = gasloss.reshape(-1, 1)
-    gasflow = gasflow.reshape(-1, 1)
     # --
     y_dot[-4:] = gasflow
     y_dot[9] = y_dot[9] - gasloss[0]
