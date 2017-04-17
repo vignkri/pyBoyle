@@ -177,7 +177,7 @@ def standard(y0, time,
             ka_nh4 / (ka_nh4 + H)**2 * nh3 / 14)
     # --
     gasflow = np.sum(a * dconc_dt + da_dH * dH_dt * conc) / \
-        a.dot(np.sum(a * a * conc)) * conc
+        np.dot(np.sum(a * a * conc), a) * conc
     gasloss = gasflow * molar_mass
     gasflow = (gasflow.dot(volume)).dot(22.4)
     # --
