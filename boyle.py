@@ -143,8 +143,7 @@ constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
 xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
          ka2_co2, ka_h2s, ka_h2po4, kw]
 # Set up integrator
-time_array = np.linspace(start_time, end_time,
-                         (end_time - start_time)/step_size)
+time_array = np.linspace(start_time, end_time, (start_time-end_time)/step_size)
 initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
 solution = scipy.integrate.odeint(model.standard, y0=initial_values,
