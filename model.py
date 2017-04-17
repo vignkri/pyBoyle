@@ -29,9 +29,9 @@ def standard(initial, time,
     kd0 = 0.05
     # -- set up parts of values
     volume = initial[0]
+    degraders = initial[21:29]
     substrate = initial[1:20]
-    degraders = initial[20:29]
-    gas_conc = initial[-4:]
+
     # -- LOGGER --
     subheader = logging_headers.get("substrate")
     subvalues = dict(zip(subheader, [time] + initial[0:20].tolist()))
@@ -49,8 +49,7 @@ def standard(initial, time,
     carbo_is, carbo_in, carbon, lipids, lcfa, \
         prot_is, prot_in, amino, nh3, hac, hpr, hbut, hval, \
         ch4, co2, h2s, z, h2po4, a = substrate
-    dead_cells = degraders[0]
-    degraders = degraders[1:]
+    dead_cells = initial[20]
 
     # Constant One Argument
     ks, ks_nh3, pk_low, pk_high, ks_nh3, \
