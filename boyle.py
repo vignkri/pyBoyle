@@ -141,7 +141,7 @@ time_array = np.linspace(start_time, end_time, end_time*2)
 initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
 solution = scipy.integrate.odeint(model.standard, y0=initial_values,
-                                  t=time_array,
+                                  t=time_array, rtol=1e-4, atol=1e-8,
                                   args=(loggers, constants_one, mu_max, xxval,
                                         mu_max_t0, [k0_carbon, k0_prot],
                                         [flow_in, flow_out], yield_c,
