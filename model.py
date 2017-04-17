@@ -8,7 +8,7 @@ Standard Computation Model
 """
 
 
-def standard(y0, time,
+def standard(time, y0,
              logging_headers, constant_ones, mu_max, xxval, mu_max_t0,
              k0_zeros, flow, yieldc, inflow):
     """Standard Integrator Model
@@ -44,6 +44,12 @@ def standard(y0, time,
     with open("./logging/degraders.log", "a") as degrlog:
         degrlogwriter = csv.DictWriter(degrlog, fieldnames=degrheader)
         degrlogwriter.writerow(degrvalues)
+    # -- LOGGER ALL VALUES --
+    allheader = subheader + degrheader[1:] + ["g1", "g2", "g3", "g4"]
+    subvalues = dict(zip(allheader, [time] + y0.tolist()))
+    with open("./logging/all.log", "a") as initlog:
+        initwriter = csv.DictWriter(initlog, fieldnames=allheader)
+        initwriter.writerow(subvalues)
 
     # y0 Chemical Concentrations
     carbo_is, carbo_in, carbon, lipids, lcfa, \
