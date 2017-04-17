@@ -8,7 +8,7 @@ Standard Computation Model
 """
 
 
-def standard(initial, time,
+def standard(y0, time,
              logging_headers, constant_ones, mu_max, xxval, mu_max_t0,
              k0_zeros, flow, yieldc, inflow):
     """Standard Integrator Model
@@ -28,13 +28,13 @@ def standard(initial, time,
     # Constants
     kd0 = 0.05
     # -- set up parts of values
-    volume = initial[0]
-    degraders = initial[21:29]
-    substrate = initial[1:20]
+    volume = y0[0]
+    degraders = y0[21:29]
+    substrate = y0[1:20]
 
     # -- LOGGER --
     subheader = logging_headers.get("substrate")
-    subvalues = dict(zip(subheader, [time] + initial[0:20].tolist()))
+    subvalues = dict(zip(subheader, [time] + y0[0:20].tolist()))
     with open("./logging/substrates.log", "a") as sublog:
         sublogwriter = csv.DictWriter(sublog, fieldnames=subheader)
         sublogwriter.writerow(subvalues)
@@ -45,11 +45,11 @@ def standard(initial, time,
         degrlogwriter = csv.DictWriter(degrlog, fieldnames=degrheader)
         degrlogwriter.writerow(degrvalues)
 
-    # Initial Chemical Concentrations
+    # y0 Chemical Concentrations
     carbo_is, carbo_in, carbon, lipids, lcfa, \
         prot_is, prot_in, amino, nh3, hac, hpr, hbut, hval, \
         ch4, co2, h2s, z, h2po4, a = substrate
-    dead_cells = initial[20]
+    dead_cells = y0[20]
 
     # Constant One Argument
     ks, ks_nh3, pk_low, pk_high, ks_nh3, \
