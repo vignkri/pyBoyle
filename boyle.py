@@ -112,7 +112,7 @@ with open("./logging/substrates.log", "w") as substrate_log:
     subs_writer = csv.DictWriter(substrate_log, fieldnames=substrate_header)
     subs_writer.writeheader()
 # Logging for Degrader Values
-degrader_header = ["time", "deadcell", "carb_degr", "amino_degr", "lipid_degr",
+degrader_header = ["time", "carb_degr", "amino_degr", "lipid_degr",
                    "lcfa_degr", "prop_degr", "butyr_degr", "valer_degr",
                    "acet_degr"]
 with open("./logging/degraders.log", "w") as degrader_log:
