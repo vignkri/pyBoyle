@@ -3,7 +3,6 @@
 import csv
 import numpy as np
 import scipy.integrate
-from pandas import DataFrame
 
 import model
 
