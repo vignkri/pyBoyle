@@ -155,6 +155,6 @@ solver.set_f_params(loggers, constants_one, mu_max, xxval, mu_max_t0,
                     [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
                     substrate_inflow)
 # -- List of outputs
-while solver.successful() and solver.t < 1000:
+while solver.successful() and solver.t < end_time:
     print(solver.t)
-    y_dot = solver.integrate(solver.t + 0.5, step=True)
+    y_dot = solver.integrate(solver.t + step_size, step=True)
