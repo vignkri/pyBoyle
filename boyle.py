@@ -2,6 +2,7 @@
 
 import csv
 import numpy as np
+import pandas as pd
 import scipy.integrate
 
 import model
@@ -154,7 +155,14 @@ solver.set_initial_value(y=initial_values, t=start_time)
 solver.set_f_params(loggers, constants_one, mu_max, xxval, mu_max_t0,
                     [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
                     substrate_inflow)
+
 # -- List of outputs
+results_ = []
 while solver.successful() and solver.t < end_time:
-    print(solver.t)
+    print("Computation Time: %.2f" % solver.t)
     y_dot = solver.integrate(solver.t + step_size, step=True)
+    result = dict(zip(all_header, np.append(solver.t, y_dot)))
+    results_.append(result)
+
+resultFrame = pd.DataFrame.from_records(results_)
+resultFrame.to_csv("./logging/results.log")
