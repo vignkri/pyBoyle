@@ -108,7 +108,7 @@ def standard(time, y0,
         ((ks[5] + hbut) * (ks_nh3[5] + nh3) * (lcfa + ki_lcfa[5]) *
          (hac + ki_hac_hbut))
     #
-    mu[6, 0] = mu[6, 0] * hval * nh3 * ki_lcfa[6] + ki_hac_hval / \
+    mu[6, 0] = mu[6, 0] * hval * nh3 * ki_lcfa[6] * ki_hac_hval / \
         ((ks[6] + hval) * (ks_nh3[6] + nh3) * (lcfa + ki_lcfa[6]) *
          (hac + ki_hac_hval))
     #
@@ -141,7 +141,7 @@ def standard(time, y0,
     flow_in, flow_out = flow
     y_dot = np.zeros((33,))
     y_dot[0] = flow_in - flow_out
-    y_dot[1:17] = (yieldc.conj().transpose().dot(z))
+    y_dot[1:17] = (yieldc.conj().transpose()).dot(z)
     y_dot[20] = np.sum(cell_death) - cell_decay
     y_dot[21:29] = z[3:] - cell_death.reshape(-1)
     y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y0[1:29]) / volume
