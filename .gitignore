@@ -78,6 +78,9 @@ celerybeat-schedule
 # dotenv
 .env
 
+# simulation logs
+logs/
+
 # virtualenv
 .venv/
 
