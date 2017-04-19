@@ -103,28 +103,6 @@ mu_header = ["time", "mu_one", "mu_two", "mu_three", "mu_four",
 with open("./logging/mu_values.log", "w") as mu_val_log:
     mu_writer = csv.DictWriter(mu_val_log, fieldnames=mu_header)
     mu_writer.writeheader()
-# Logging for Substrate Values
-substrate_header = ["time", "volume",
-                    "carbo_is", "carbo_in", "carbon",
-                    "lipids", "lcfa", "prot_is", "prot_in", "amino",
-                    "nh3", "hac", "hpr", "hbut", "hval", "ch4", "co2",
-                    "h2s", "zplus", "h2po4", "aminus"]
-with open("./logging/substrates.log", "w") as substrate_log:
-    subs_writer = csv.DictWriter(substrate_log, fieldnames=substrate_header)
-    subs_writer.writeheader()
-# Logging for Degrader Values
-degrader_header = ["time", "carb_degr", "amino_degr", "lipid_degr",
-                   "lcfa_degr", "prop_degr", "butyr_degr", "valer_degr",
-                   "acet_degr"]
-with open("./logging/degraders.log", "w") as degrader_log:
-    degs_writer = csv.DictWriter(degrader_log, fieldnames=degrader_header)
-    degs_writer.writeheader()
-# Logging for All Values
-all_header = substrate_header + ["deadcell"] + degrader_header[1:] + \
-    ["g1", "g2", "g3", "g4"]
-with open("./logging/all.log", "w") as all_log:
-    all_writer = csv.DictWriter(all_log, fieldnames=all_header)
-    all_writer.writeheader()
 # Loggin for Change values
 dydt_header = substrate_header + degrader_header[1:]
 with open("./logging/dydt.log", "w") as dydt_log:
