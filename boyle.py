@@ -98,24 +98,8 @@ ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
 
 # Create Logging Parameters
-simlogger = simlog.Simulog("./simulation_logs")
-# Logging for mu
-mu_header = ["time", "mu_one", "mu_two", "mu_three", "mu_four",
-             "mu_five", "mu_six", "mu_seven", "mu_eight", "after_flag"]
-with open("./logging/mu_values.log", "w") as mu_val_log:
-    mu_writer = csv.DictWriter(mu_val_log, fieldnames=mu_header)
-    mu_writer.writeheader()
-# Loggin for Change values
-dydt_header = substrate_header + degrader_header[1:]
-with open("./logging/dydt.log", "w") as dydt_log:
-    dydt_writer = csv.DictWriter(dydt_log, fieldnames=dydt_header)
-    dydt_writer.writeheader()
+simlogger = simlog.Simulog("./logs")
 
-# Logging Headers Argument
-loggers = {"substrate": substrate_header,
-           "degrader": degrader_header,
-           "dydt": dydt_header,
-           "mu": mu_header}
 # Constant One Argument
 constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
                  ki_carbon, ki_prot, ki_hac_hpr, ki_hac_hbut,
@@ -133,7 +117,7 @@ solver = scipy.integrate.ode(model.standard) \
     .set_integrator("vode", method="bdf", order=1, rtol=1e-4, atol=1e-8,
                     nsteps=2)
 solver.set_initial_value(y=initial_values, t=start_time)
-solver.set_f_params(loggers, constants_one, mu_max, xxval, mu_max_t0,
+solver.set_f_params(constants_one, mu_max, xxval, mu_max_t0,
                     [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
                     substrate_inflow, simlogger)
 

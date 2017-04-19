@@ -9,7 +9,7 @@ Standard Computation Model
 
 
 def standard(time, y0,
-             logging_headers, constant_ones, mu_max, xxval, mu_max_t0,
+             constant_ones, mu_max, xxval, mu_max_t0,
              k0_zeros, flow, yieldc, inflow, simlog):
     """Standard Integrator Model
 
