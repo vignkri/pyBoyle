@@ -34,3 +34,12 @@ class Simulog:
                        "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
                        "gfnh3", "gfch4", "gfco2", "gfh2s"]
         }
+
+    def _create_files(self, path, fnames):
+        """Create files with custom headers."""
+        try:
+            with open(path, "w") as open_log_file:
+                dwriter = csv.DictWriter(open_log_file, fieldnames=fnames)
+                dwriter.writeheader()
+        except:
+            raise
