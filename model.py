@@ -32,24 +32,6 @@ def standard(time, y0,
     degraders = y0[21:29]
     substrate = y0[1:20]
 
-    # -- LOGGER --
-    subheader = logging_headers.get("substrate")
-    subvalues = dict(zip(subheader, [time] + y0[0:20].tolist()))
-    with open("./logging/substrates.log", "a") as sublog:
-        sublogwriter = csv.DictWriter(sublog, fieldnames=subheader)
-        sublogwriter.writerow(subvalues)
-    # -- LOGGER --
-    degrheader = logging_headers.get("degrader")
-    degrvalues = dict(zip(degrheader, [time] + degraders.tolist()))
-    with open("./logging/degraders.log", "a") as degrlog:
-        degrlogwriter = csv.DictWriter(degrlog, fieldnames=degrheader)
-        degrlogwriter.writerow(degrvalues)
-    # -- LOGGER ALL VALUES --
-    allheader = subheader + degrheader[1:] + ["g1", "g2", "g3", "g4"]
-    subvalues = dict(zip(allheader, [time] + y0.tolist()))
-    with open("./logging/all.log", "a") as initlog:
-        initwriter = csv.DictWriter(initlog, fieldnames=allheader)
-        initwriter.writerow(subvalues)
 
     # y0 Chemical Concentrations
     carbo_is, carbo_in, carbon, lipids, lcfa, \
@@ -81,11 +63,6 @@ def standard(time, y0,
     mu = mu_max * f_ph
 
     # -- LOGGING --
-    muheader = logging_headers.get("mu")
-    muvalues = dict(zip(muheader, [time] + mu[:, 0].tolist() + [False]))
-    with open("./logging/mu_values.log", "a") as muvallog:
-        muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
-        muwriter.writerow(muvalues)
 
     # --
     mu[0, 0] = mu[0, 0] * carbon * nh3 * ki_lcfa[0] / \
@@ -117,11 +94,6 @@ def standard(time, y0,
          (nh3 * ka_nh4 / (H + ka_nh4) + ki_nh3_hac))
 
     # -- LOGGING --
-    muheader = logging_headers.get("mu")
-    muvalues = dict(zip(muheader, [time] + mu[:, 0].tolist() + [True]))
-    with open("./logging/mu_values.log", "a") as muvallog:
-        muwriter = csv.DictWriter(muvallog, fieldnames=muheader)
-        muwriter.writerow(muvalues)
 
     # Calculate growth, death and reaction rates
     cell_death = (mu_max_t0 * degraders.reshape(-1, 1)) * kd0
@@ -191,13 +163,5 @@ def standard(time, y0,
     y_dot[[14, 15, 16]] = y_dot[[14, 15, 16]] - gasloss[[1, 2, 3]]
     # --
     y_dot = y_dot.reshape(-1)
-
-    # -- LOGGING --
-    dydtheader = logging_headers.get("dydt")
-    dydtvalues = dict(zip(dydtheader, [time] + y_dot.tolist()))
-    with open("./logging/dydt.log", "a") as dylog:
-        dylogwriter = csv.DictWriter(dylog, fieldnames=dydtheader)
-        dylogwriter.writerow(dydtvalues)
     # --
-
     return y_dot
