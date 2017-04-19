@@ -98,7 +98,7 @@ ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
 
 # Create Logging Parameters
-simlogger = logger.Simulog("./logs")
+simlogger = logger.Simulog()
 
 # Constant One Argument
 constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
