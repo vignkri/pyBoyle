@@ -51,3 +51,15 @@ class Simulog:
                     dwriter.writeheader()
             except:
                 raise
+
+    def _append_values(self, sim_locn, values):
+        """Append values to the files from the dataset"""
+        _header = self.__headers.get(sim_locn)
+        file_path = self.__file_names.get(sim_locn)
+        a_values = dict(zip(_header, values))
+        try:
+            with open(file_path, "a") as open_log_file:
+                dwriter = csv.DictWriter(open_log_file, fieldnames=_header)
+                dwriter.writerow(a_values)
+        except:
+            raise
