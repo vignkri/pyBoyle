@@ -6,6 +6,7 @@ import pandas as pd
 import scipy.integrate
 
 import model
+import simlog
 
 """
 Boyle Python
@@ -97,6 +98,7 @@ ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
 
 # Create Logging Parameters
+simlogger = simlog.Simulog("./simulation_logs")
 # Logging for mu
 mu_header = ["time", "mu_one", "mu_two", "mu_three", "mu_four",
              "mu_five", "mu_six", "mu_seven", "mu_eight", "after_flag"]
@@ -133,7 +135,7 @@ solver = scipy.integrate.ode(model.standard) \
 solver.set_initial_value(y=initial_values, t=start_time)
 solver.set_f_params(loggers, constants_one, mu_max, xxval, mu_max_t0,
                     [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
-                    substrate_inflow)
+                    substrate_inflow, simlogger)
 
 # -- List of outputs
 results_ = []
