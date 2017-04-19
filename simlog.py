@@ -34,6 +34,11 @@ class Simulog:
                        "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
                        "gfnh3", "gfch4", "gfco2", "gfh2s"]
         }
+        # Create file names
+        self.__file_names = {"mu": self._path + "/mu.dat",
+                             "substrates": self._path + "/substrates.dat",
+                             "degraders": self._path + "/degraders.dat",
+                             "results": self._path + "/result.dat"}
 
     def _create_files(self, path, fnames):
         """Create files with custom headers."""
