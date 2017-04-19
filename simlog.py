@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import os
 import csv
 
 """
@@ -15,6 +16,10 @@ class Simulog:
     def __init__(self, path):
         """Initialize data logging folder path."""
         self._path = path
+        if not os.path.exists(self._path):
+            os.mkdir(self._path)
+        else:
+            self._path = path
         # Create internally useful headers
         self.__headers = {
             "mu": ["time", "mu_one", "mu_two", "mu_three", "mu_four",
