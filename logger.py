@@ -2,6 +2,8 @@
 
 import os
 import csv
+import time
+from string import Template
 
 """
 Simulation Logging Framework
@@ -18,8 +20,6 @@ class Simulog:
         self._path = "./logs"
         if not os.path.exists(self._path):
             os.mkdir(self._path)
-        else:
-            self._path = path
         # Create internally useful headers
         self.__headers = {
             "mu": ["time", "mu_one", "mu_two", "mu_three", "mu_four",
