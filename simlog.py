@@ -40,11 +40,14 @@ class Simulog:
                              "degraders": self._path + "/degraders.dat",
                              "results": self._path + "/result.dat"}
 
-    def _create_files(self, path, fnames):
+    def __create_files(self):
         """Create files with custom headers."""
-        try:
-            with open(path, "w") as open_log_file:
-                dwriter = csv.DictWriter(open_log_file, fieldnames=fnames)
-                dwriter.writeheader()
-        except:
-            raise
+        for key in self.__file_names.keys():
+            file_path = self.__file_names.get(key)
+            fnames = self.__headers.get(key)
+            try:
+                with open(file_path, "w") as open_log_file:
+                    dwriter = csv.DictWriter(open_log_file, fieldnames=fnames)
+                    dwriter.writeheader()
+            except:
+                raise
