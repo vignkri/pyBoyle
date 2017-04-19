@@ -38,7 +38,9 @@ class Simulog:
         self.__file_names = {"mu": self._path + "/mu.dat",
                              "substrates": self._path + "/substrates.dat",
                              "degraders": self._path + "/degraders.dat",
-                             "results": self._path + "/result.dat"}
+                             "result": self._path + "/result.dat"}
+        # Initialize creation of files
+        self.__create_files()
 
     def __create_files(self):
         """Create files with custom headers."""
