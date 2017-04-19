@@ -70,3 +70,20 @@ class Simulog:
                 dwriter.writerow(a_values)
         except:
             raise
+
+
+class InternalLog:
+    def __init__(self):
+        """Create internal logs for operational statuses"""
+        self._path = "./logs/"
+        if not os.path.exists(self._path):
+            os.mkdir(self._path)
+        # --
+        self.itime = time.localtime()
+        self.experiment_directory = Template(
+            "${path}/${year}${mon}${day}_${h}${m}.ilog").substitute(
+                path=self._path, year=self.itime.tm_year,
+                mon=self.itime.tm_mon, day=self.itime.tm_mday,
+                h=self.itime.tm_hour, m=self.itime.tm_min)
+        if not os.path.exists(self.experiment_directory):
+            os.mkdir(self.experiment_directory)
