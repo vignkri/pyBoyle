@@ -13,9 +13,9 @@ further analysis.
 
 
 class Simulog:
-    def __init__(self, path):
+    def __init__(self):
         """Initialize data logging folder path."""
-        self._path = path
+        self._path = "./logs"
         if not os.path.exists(self._path):
             os.mkdir(self._path)
         else:

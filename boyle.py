@@ -6,7 +6,7 @@ import pandas as pd
 import scipy.integrate
 
 import model
-import simlog
+import logger
 
 """
 Boyle Python
@@ -98,7 +98,7 @@ ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
 
 # Create Logging Parameters
-simlogger = simlog.Simulog("./logs")
+simlogger = logger.Simulog("./logs")
 
 # Constant One Argument
 constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
@@ -121,13 +121,6 @@ solver.set_f_params(constants_one, mu_max, xxval, mu_max_t0,
                     [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
                     substrate_inflow, simlogger)
 
-# -- List of outputs
-results_ = []
 while solver.successful() and solver.t < end_time:
     print("Computation Time: %.2f" % solver.t)
     y_dot = solver.integrate(solver.t + step_size, step=True)
-    result = dict(zip(all_header, np.append(solver.t, y_dot)))
-    results_.append(result)
-
-resultFrame = pd.DataFrame.from_records(results_)
-resultFrame.to_csv("./logging/results.log")
