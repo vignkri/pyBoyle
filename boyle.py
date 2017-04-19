@@ -120,7 +120,8 @@ with open("./logging/degraders.log", "w") as degrader_log:
     degs_writer = csv.DictWriter(degrader_log, fieldnames=degrader_header)
     degs_writer.writeheader()
 # Logging for All Values
-all_header = substrate_header + degrader_header[1:] + ["g1", "g2", "g3", "g4"]
+all_header = substrate_header + ["deadcell"] + degrader_header[1:] + \
+    ["g1", "g2", "g3", "g4"]
 with open("./logging/all.log", "w") as all_log:
     all_writer = csv.DictWriter(all_log, fieldnames=all_header)
     all_writer.writeheader()
