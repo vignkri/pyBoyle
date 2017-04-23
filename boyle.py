@@ -1,8 +1,6 @@
 #!/usr/bin/python
 
-import csv
 import numpy as np
-import pandas as pd
 import scipy.integrate
 
 import model
