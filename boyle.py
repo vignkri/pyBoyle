@@ -4,7 +4,8 @@ import numpy as np
 import scipy.integrate
 
 import model
-import logger
+import export
+from scribe import logger
 
 """
 Boyle Python
@@ -12,13 +13,13 @@ Boyle Python
 Simulation agent for Biogas Production
 """
 
-
 # Import datasets
 initial = np.loadtxt("./sample/Initial", comments="%")
 yield_c = np.loadtxt("./sample/yc", comments="%")
 regulate = np.loadtxt("./sample/regulate", comments="%")
 const1 = np.loadtxt("./sample/Const1", comments="%")
 const2 = np.loadtxt("./sample/Const2", comments="%")
+logger.info("Input data loaded.")
 
 # Set up initial values
 volume = initial[0]
@@ -94,9 +95,12 @@ ka2_co2 = 10**(-henry_constants[10])
 ka_h2s = 10**(-henry_constants[12])
 ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
+# --
+logger.info("Finished setting up constants.")
 
 # Create Logging Parameters
-simlogger = logger.Simulog()
+simport = export.Simulog()
+logger.info("Create simulation data exporter.")
 
 # Constant One Argument
 constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
@@ -117,8 +121,10 @@ solver = scipy.integrate.ode(model.standard) \
 solver.set_initial_value(y=initial_values, t=start_time)
 solver.set_f_params(constants_one, mu_max, xxval, mu_max_t0,
                     [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
-                    substrate_inflow, simlogger)
+                    substrate_inflow, simport)
+logger.info("Set up integrator.")
 
+logger.info("Starting Integration.")
 while solver.successful() and solver.t < end_time:
-    print("Computation Time: %.2f" % solver.t)
+    logger.info("Computation Time %.2f" % solver.t)
     y_dot = solver.integrate(solver.t + step_size, step=True)
