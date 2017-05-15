@@ -99,7 +99,7 @@ kw = 10**(-henry_constants[14])
 logger.info("Finished setting up constants.")
 
 # Create Logging Parameters
-simport = export.Simulog()
+simport = export.Simulation()
 logger.info("Create simulation data exporter.")
 
 # Constant One Argument
@@ -128,3 +128,4 @@ logger.info("Starting Integration.")
 while solver.successful() and solver.t < end_time:
     logger.info("Computation Time %.2f" % solver.t)
     y_dot = solver.integrate(solver.t + step_size, step=True)
+    simport._append_values("result", [solver.t] + list(y_dot))

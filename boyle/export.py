@@ -3,7 +3,6 @@
 import os
 import csv
 import time
-from string import Template
 
 """
 Simulation Logging Framework
@@ -14,7 +13,7 @@ further analysis.
 """
 
 
-class Simulog:
+class Simulation:
     def __init__(self):
         """Initialize data logging folder path."""
         self._path = "./logs"
