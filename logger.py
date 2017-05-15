@@ -10,9 +10,7 @@ Simulation Logging Framework
 
 A custom framework to handle the creation
 of log files, data files during simulation for
-further analysis.
-"""
-
+further analysis.  """
 
 class Simulog:
     def __init__(self):
@@ -20,6 +18,8 @@ class Simulog:
         self._path = "./logs"
         if not os.path.exists(self._path):
             os.mkdir(self._path)
+        # Log date as folder
+        self.itime = time.gmtime()
         # Create internally useful headers
         self.__headers = {
             "mu": ["time", "mu_one", "mu_two", "mu_three", "mu_four",
@@ -70,20 +70,3 @@ class Simulog:
                 dwriter.writerow(a_values)
         except:
             raise
-
-
-class InternalLog:
-    def __init__(self):
-        """Create internal logs for operational statuses"""
-        self._path = "./logs/"
-        if not os.path.exists(self._path):
-            os.mkdir(self._path)
-        # --
-        self.itime = time.localtime()
-        self.experiment_directory = Template(
-            "${path}/${year}${mon}${day}_${h}${m}.ilog").substitute(
-                path=self._path, year=self.itime.tm_year,
-                mon=self.itime.tm_mon, day=self.itime.tm_mday,
-                h=self.itime.tm_hour, m=self.itime.tm_min)
-        if not os.path.exists(self.experiment_directory):
-            os.mkdir(self.experiment_directory)
