@@ -92,6 +92,8 @@ def standard(time, y0,
 
     mu = mu_max * f_ph
 
+    simlog._append_values("ph", [time, pH])
+
     # -- LOGGING --
     simlog._append_values("mu", [time] + mu[:, 0].tolist() + [False])
 

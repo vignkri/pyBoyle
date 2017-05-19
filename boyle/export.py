@@ -38,13 +38,15 @@ class Simulation:
                        "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
                        "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
                        "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
-                       "gfnh3", "gfch4", "gfco2", "gfh2s"]
+                       "gfnh3", "gfch4", "gfco2", "gfh2s"],
+            "ph": ["time", "ph"]
         }
         # Create file names
         self.__file_names = {"mu": self._path + "/mu.dat",
                              "substrates": self._path + "/substrates.dat",
                              "degraders": self._path + "/degraders.dat",
-                             "result": self._path + "/result.dat"}
+                             "result": self._path + "/result.dat",
+                             "ph": self._path + "/ph.dat"}
         # Initialize creation of files
         self.__create_files()
 
