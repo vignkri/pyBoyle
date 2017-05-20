@@ -31,10 +31,6 @@ def standard(time, y0,
     degraders = y0[21:29]
     substrate = y0[1:20]
 
-    # Using Simlogger
-    simlog._append_values("substrates", [time] + y0[0:20].tolist())
-    simlog._append_values("degraders", [time] + degraders.tolist())
-
     # y0 Chemical Concentrations
     carbo_is, carbo_in, carbon, lipids, lcfa, \
         prot_is, prot_in, amino, nh3, hac, hpr, hbut, hval, \
@@ -91,10 +87,6 @@ def standard(time, y0,
 
     mu = mu_max * f_ph
 
-    # -- LOGGING --
-    simlog._append_values("ph", [time, pH])
-    simlog._append_values("mu", [time] + mu[:, 0].tolist() + [False])
-
     # --
     mu[0, 0] = mu[0, 0] * carbon * nh3 * ki_lcfa[0] / \
         ((ks[0] + carbon) * (ks_nh3[0] + nh3) * (lcfa + ki_lcfa[0]))
@@ -123,9 +115,6 @@ def standard(time, y0,
     mu[7, 0] = mu[7, 0] * hac * nh3 * ki_lcfa[7] * ki_nh3_hac / \
         ((ks[7] + hac) * (ks_nh3[7] + nh3) * (lcfa + ki_lcfa[7]) *
          (nh3 * ka_nh4 / (H + ka_nh4) + ki_nh3_hac))
-
-    # -- LOGGING --
-    simlog._append_values("mu", [time] + mu[:, 0].tolist() + [True])
 
     # Calculate growth, death and reaction rates
     cell_death = (mu_max_t0 * degraders.reshape(-1, 1)) * kd0
@@ -193,5 +182,12 @@ def standard(time, y0,
     y_dot[[29, 30, 31, 32]] = gasflow
     y_dot[9] = y_dot[9] - gasloss[0]
     y_dot[[14, 15, 16]] = y_dot[[14, 15, 16]] - gasloss[[1, 2, 3]]
-    # --
+
+    # -- Logging --
+    simlog._append_values("substrates", [time] + y0[0:20].tolist())
+    simlog._append_values("degraders", [time] + degraders.tolist())
+    simlog._append_values("ph", [time, pH])
+    simlog._append_values("mu", [time] + mu[:, 0].tolist() + [False])
+    simlog._append_values("mu", [time] + mu[:, 0].tolist() + [True])
+
     return y_dot
