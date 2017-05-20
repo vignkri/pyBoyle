@@ -167,13 +167,13 @@ def standard(time, y0,
         ka_h2s / (H + ka_h2s)**2
     ]) / k_h
     # --
-    dH_dt = - (ka_hac / (ka_hac + H) * y_dot[9] / 60 +
-               ka_hpr / (ka_hac + H) * y_dot[10] / 74 +
-               ka_hbut / (ka_hac + H) * y_dot[11] / 88 +
-               ka_hval / (ka_hac + H) * y_dot[12] / 102 +
-               y_dot[18] / 35.5 -
-               y_dot[16] / 39 +
-               (1 + ka_h2po4 / (ka_h2po4 - H)) * y_dot[17] / 31) / \
+    dH_dt = - (ka_hac / (ka_hac + H) * y_dot[10] / 60 +
+               ka_hpr / (ka_hac + H) * y_dot[11] / 74 +
+               ka_hbut / (ka_hac + H) * y_dot[12] / 88 +
+               ka_hval / (ka_hac + H) * y_dot[13] / 102 +
+               y_dot[19] / 35.5 -
+               y_dot[17] / 39 +
+               (1 + ka_h2po4 / (ka_h2po4 - H)) * y_dot[18] / 31) / \
         (
             ((ka1_co2 - 1) * ka2_co2 - H * H) * co2 / 44 /
             (H * (H + ka1_co2) + ka1_co2 * ka2_co2)**2 +
