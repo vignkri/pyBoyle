@@ -202,7 +202,8 @@ def standard(time, y0,
     gasflow = np.sum(a * dconc_dt + da_dH * dH_dt * conc) / \
         np.dot(np.sum(a * a * conc), a) * conc
     gasloss = gasflow * molar_mass
-    gasflow = (gasflow.dot(volume)).dot(22.4)
+    gasflow = gasflow.dot(22.4)
+
     # --
     y_dot[[29, 30, 31, 32]] = gasflow
     y_dot[9] = y_dot[9] - gasloss[0]
