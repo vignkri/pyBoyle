@@ -24,6 +24,12 @@ def standard(time, y0,
     OTHER PARAMETERS
     ----------------
     """
+    # ---------------------------------------------------
+    #
+    #       Section 1: Variable Data Preprocessing
+    #
+    # ---------------------------------------------------
+
     # Constants
     kd0 = 0.05
     # -- set up parts of values
@@ -49,7 +55,12 @@ def standard(time, y0,
     # K_zeros
     k0_carbon, k0_prot = k0_zeros
 
-    # Set up pH Computation
+    # ---------------------------------------------------
+    #
+    #       Section 2: pH Computation
+    #
+    # ---------------------------------------------------
+
     H = 1e-8
     Hfunc = 1
     # --
@@ -80,7 +91,12 @@ def standard(time, y0,
     # --
     pH = -np.log10(H)
 
-    # Calculation of growth rates
+    # ---------------------------------------------------
+    #
+    #       Section 3: Growth Rate Computation
+    #
+    # ---------------------------------------------------
+
     f_ph = (1 + 2 * 10**(0.5 * (pk_low - pk_high))) / \
         (1 + 10**(pH - pk_high) + 10**(pk_low - pH))
     f_ph = f_ph.reshape(-1, 1)
@@ -116,7 +132,12 @@ def standard(time, y0,
         ((ks[7] + hac) * (ks_nh3[7] + nh3) * (lcfa + ki_lcfa[7]) *
          (nh3 * ka_nh4 / (H + ka_nh4) + ki_nh3_hac))
 
-    # Calculate growth, death and reaction rates
+    # ---------------------------------------------------
+    #
+    #       Section 4: Death, Growth rate Computation
+    #
+    # ---------------------------------------------------
+
     cell_death = (mu_max_t0 * degraders.reshape(-1, 1)) * kd0
     cell_decay = 0.01 * dead_cells
     # -- column of z
@@ -129,8 +150,7 @@ def standard(time, y0,
     ])
     z_two = (mu * degraders.reshape(-1, 1)).reshape(-1)
     z = np.concatenate((z, z_two))
-
-    # Computation of Gasflow
+    # -- flow in y_value
     flow_in, flow_out = flow
     y_dot = np.zeros((33,))
     y_dot[0] = flow_in - flow_out
@@ -139,7 +159,12 @@ def standard(time, y0,
     y_dot[21:29] = z[3:] - cell_death.reshape(-1)
     y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y0[1:29]) / volume
 
-    # Calculation of gasflow
+    # --------------------------------------------
+    #
+    #       Section 5: Gasflow Calculation
+    #
+    # --------------------------------------------
+
     molar_mass = np.array([14, 16, 44, 34])
     conc = np.array([nh3, ch4, co2, h2s]) / molar_mass
     dconc_dt = [y_dot[[9, 14, 15, 16]]] / molar_mass
@@ -183,7 +208,12 @@ def standard(time, y0,
     y_dot[9] = y_dot[9] - gasloss[0]
     y_dot[[14, 15, 16]] = y_dot[[14, 15, 16]] - gasloss[[1, 2, 3]]
 
-    # -- Logging --
+    # --------------------------------------------
+    #
+    #       Appendix A: Data Logging
+    #
+    # --------------------------------------------
+
     simlog._append_values("substrates", [time] + y0[0:20].tolist())
     simlog._append_values("degraders", [time] + degraders.tolist())
     simlog._append_values("ph", [time, pH])
