@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import csv
 import numpy as np
 
 """
@@ -92,9 +91,8 @@ def standard(time, y0,
 
     mu = mu_max * f_ph
 
-    simlog._append_values("ph", [time, pH])
-
     # -- LOGGING --
+    simlog._append_values("ph", [time, pH])
     simlog._append_values("mu", [time] + mu[:, 0].tolist() + [False])
 
     # --
@@ -155,7 +153,7 @@ def standard(time, y0,
     # Calculation of gasflow
     molar_mass = np.array([14, 16, 44, 34])
     conc = np.array([nh3, ch4, co2, h2s]) / molar_mass
-    dconc_dt = np.array([y_dot[[9, 14, 15, 16]]]) / molar_mass
+    dconc_dt = [y_dot[[9, 14, 15, 16]]] / molar_mass
     # --
     a = np.array([ka_nh4 / (H + ka_nh4),
                   1,
@@ -192,10 +190,8 @@ def standard(time, y0,
     gasloss = gasflow * molar_mass
     gasflow = (gasflow.dot(volume)).dot(22.4)
     # --
-    y_dot[-4:] = gasflow
+    y_dot[[29, 30, 31, 32]] = gasflow
     y_dot[9] = y_dot[9] - gasloss[0]
     y_dot[[14, 15, 16]] = y_dot[[14, 15, 16]] - gasloss[[1, 2, 3]]
-    # --
-    y_dot = y_dot.reshape(-1)
     # --
     return y_dot
