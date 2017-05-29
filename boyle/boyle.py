@@ -123,9 +123,16 @@ solver.set_f_params(constants_one, mu_max, xxval, mu_max_t0,
                     [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
                     substrate_inflow, simport)
 logger.info("Set up integrator.")
-
 logger.info("Starting Integration.")
+
+result_set = []
 while solver.successful() and solver.t < end_time:
     logger.info("Computation Time %.2f" % solver.t)
     y_dot = solver.integrate(solver.t + step_size, step=True)
     simport._append_values("result", [solver.t] + list(y_dot))
+    result_set.append(np.append(np.array([solver.t]), (y_dot)))
+
+for idx in reversed(list(range(1, len(result_set)))):
+    result_set[idx][29:] = (result_set[idx][29:] - result_set[idx-1][29:]) / (
+        result_set[idx][0] - result_set[idx-1][0]
+    ) / 1000
