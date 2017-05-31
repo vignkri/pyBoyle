@@ -19,8 +19,8 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
     h2po4, ka_h2po4 = kwargs.get("h2po4")
     nh3, ka_nh4 = kwargs.get("NH3")
     # --
-    Hfunc = co2 / 44 * ka1_co2 * (H + 2 * ka2_co2) / \
-        (H * (H + ka1_co2) + ka1_co2 * ka2_co2) + \
+    Hfunc = co2 / 44 * ka1_co2 * (H + 2 * ka2_co2) / (H * (H + ka1_co2) +
+                                                      ka1_co2 * ka2_co2) + \
         hac / 60 * ka_hac / (H + ka_hac) + \
         hpr / 74 * ka_hpr / (H + ka_hpr) + \
         hbut / 88 * ka_hbut / (H + ka_hbut) + \
@@ -32,13 +32,13 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
         kw / H
     # --
     dhfunc_dh = - co2 / 44 * ka1_co2 * (H * (H + 4 * ka2_co2) + ka1_co2 *
-                                        ka2_co2) / \
-        (H * (H + ka1_co2) + ka1_co2 * ka2_co2)**2 - \
+                                        ka2_co2) / (H * (H + ka1_co2) +
+                                                    ka1_co2 * ka2_co2)**2 - \
         hac / 60 * ka_hac / (H + ka_hac)**2 - \
         hpr / 74 * ka_hpr / (H + ka_hpr)**2 - \
         hbut / 88 * ka_hbut / (H + ka_hbut)**2 - \
         hval / 102 * ka_hval / (H + ka_hval)**2 - \
-        kw / (H * H) - \
+        kw / (H**2) - \
         h2po4 / 31 * ka_h2po4 / (H + ka_h2po4)**2 - \
         nh3 / 14 * ka_nh4 / (H + ka_nh4)**2
     # --
