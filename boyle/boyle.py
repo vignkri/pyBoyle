@@ -136,3 +136,4 @@ for idx in reversed(list(range(1, len(result_set)))):
     result_set[idx][29:] = (result_set[idx][29:] - result_set[idx-1][29:]) / (
         result_set[idx][0] - result_set[idx-1][0]
     ) / 1000
+    simport._append_values("processed", result_set[idx])
