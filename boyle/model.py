@@ -195,8 +195,8 @@ def standard(time, y0,
 
     molar_mass = np.array([14, 16, 44, 34])
     conc = np.array([nh3, ch4, co2, h2s]) / molar_mass
-    dconc_dt = [y_dot[[9, 14, 15, 16]]] / molar_mass
-    # --
+    dconc_dt = y_dot[[9, 14, 15, 16]] / molar_mass
+    # -- alpha and beta functions
     a = np.array([ka_nh4 / (H + ka_nh4),
                   1,
                   H * H / (H * (H + ka1_co2) + ka1_co2 * ka2_co2),
@@ -228,9 +228,10 @@ def standard(time, y0,
             ka_nh4 / (ka_nh4 + H)**2 * nh3 / 14)
     # --
     gasflow = np.sum(a * dconc_dt + da_dH * dH_dt * conc) / \
-        np.dot(np.sum(a * a * conc), a) * conc
+        np.dot(np.sum(a**2 * conc), a) * conc
     gasloss = gasflow * molar_mass
     gasflow = gasflow.dot(22.4)
+    gasflow = gasflow.dot(volume)
 
     # --
     y_dot[[29, 30, 31, 32]] = gasflow
