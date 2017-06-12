@@ -39,14 +39,22 @@ class Simulation:
                        "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
                        "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
                        "gfnh3", "gfch4", "gfco2", "gfh2s"],
-            "ph": ["time", "ph"]
+            "ph": ["time", "ph"],
+            "processed": ["time", "volume", "carbois", "carboin", "carbon",
+                          "lipids", "lcfa", "protis", "protin", "amino",
+                          "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                          "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
+                          "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
+                          "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
+                          "gfnh3", "gfch4", "gfco2", "gfh2s"],
         }
         # Create file names
         self.__file_names = {"mu": self._path + "/mu.dat",
                              "substrates": self._path + "/substrates.dat",
                              "degraders": self._path + "/degraders.dat",
                              "result": self._path + "/result.dat",
-                             "ph": self._path + "/ph.dat"}
+                             "ph": self._path + "/ph.dat",
+                             "processed": self._path + "/processed.dat"}
         # Initialize creation of files
         self.__create_files()
 
