@@ -5,7 +5,7 @@ import scipy.integrate
 
 import model
 import export
-from scribe import logger
+from logger import logger
 
 """
 Boyle Python
