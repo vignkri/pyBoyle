@@ -13,7 +13,7 @@ further analysis.
 """
 
 
-class Simulation:
+class Export:
     def __init__(self):
         """Initialize data logging folder path."""
         self._path = "./logs"
