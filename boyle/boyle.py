@@ -1,11 +1,10 @@
 #!/usr/bin/python
 
 import numpy as np
-import scipy.integrate
 
 import model
-import export
-from logger import logger
+from logger import boyle_logger
+from manager import Manager
 
 """
 Boyle Python
@@ -19,7 +18,7 @@ yield_c = np.loadtxt("./sample/yc", comments="%")
 regulate = np.loadtxt("./sample/regulate", comments="%")
 const1 = np.loadtxt("./sample/Const1", comments="%")
 const2 = np.loadtxt("./sample/Const2", comments="%")
-logger.info("Input data loaded.")
+boyle_logger.info("Input data loaded.")
 
 # Set up initial values
 volume = initial[0]
@@ -96,11 +95,7 @@ ka_h2s = 10**(-henry_constants[12])
 ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
 # --
-logger.info("Finished setting up constants.")
-
-# Create Logging Parameters
-exporter = export.Export()
-logger.info("Create simulation data exporter.")
+boyle_logger.info("Finished setting up constants.")
 
 # Constant One Argument
 constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
@@ -115,25 +110,25 @@ time_array = np.linspace(start_time, end_time,
 initial_values = np.concatenate((np.array([volume]), substrate,
                                  degraders, gas_conc))
 
-solver = scipy.integrate.ode(model.standard) \
-    .set_integrator("vode", method="bdf", order=1, rtol=1e-4, atol=1e-8,
-                    nsteps=2)
-solver.set_initial_value(y=initial_values, t=start_time)
-solver.set_f_params(constants_one, mu_max, xxval, mu_max_t0,
-                    [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
-                    substrate_inflow, exporter)
-logger.info("Set up integrator.")
-logger.info("Starting Integration.")
+parameters = [constants_one, mu_max, xxval, mu_max_t0,
+              [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
+              substrate_inflow]
 
-result_set = []
-while solver.successful() and solver.t < end_time:
-    logger.info("Computation Time %.2f" % solver.t)
-    y_dot = solver.integrate(solver.t + step_size, step=True)
-    exporter._append_values("result", [solver.t] + list(y_dot))
-    result_set.append(np.append(np.array([solver.t]), (y_dot)))
-
-for idx in reversed(list(range(1, len(result_set)))):
-    result_set[idx][29:] = (result_set[idx][29:] - result_set[idx-1][29:]) / (
-        result_set[idx][0] - result_set[idx-1][0]
-    ) / 1000
-    exporter._append_values("processed", result_set[idx])
+solver = Manager(model.standard,
+                 config=dict(
+                     initial=initial_values,
+                     start_time=0,
+                     end_time=1000,
+                     step=step_size,
+                     metadata="test_3"
+                 ))
+solver.initialize_solver(iname="vode",
+                         i_params=dict(
+                             method="bdf",
+                             order=1,
+                             rtol=1e-4,
+                             atol=1e-8,
+                             nsteps=2
+                         ))
+solver.function_parameters(parameters=parameters)
+solver.start()
