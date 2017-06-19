@@ -49,12 +49,28 @@ class Manager:
             self._solver.set_initial_value(y=self._initial_value,
                                            t=self._initial_time)
 
+    def post_process(self, result):
+        for idx in reversed(list(range(1, len(result)))):
+            result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
+                result[idx][0] - result[idx-1][0]
+            ) / 1000
+            self._data_exporter._append_values("processed", result[idx])
+        # --
+        manager_logger.info("Post processing of data finished.")
+
     def __solver_start(self):
         """Start the solver"""
         manager_logger.info("Starting the solver")
+        result = []
         while self._solver.successful() and self._solver.t < self._end_time:
-            self._forecast = self._solver.integrate(self._solver.t + self._step,
-                                                    step=True)
+            y_dot = self._solver.integrate(self._solver.t + self._step,
+                                           step=True)
+            self._data_exporter._append_values("result",
+                                               [self._solver.t] + list(y_dot))
+            result.append(y_dot)
+        # --
+        manager_logger.info("Starting post-process of result data.")
+        self.post_process(result=result)
 
     def function_parameters(self, parameters):
         """Pass function parameters to the simulator"""
