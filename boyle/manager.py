@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import scipy.integrate
+from export import Export
 from logger import manager_logger
 
 """
@@ -34,7 +35,8 @@ class Manager:
             print("Message: ", e)
             raise
         else:
-            manager_logger.info("Setting up model. %s" % self._meta)
+            manager_logger.info("Finished setting up model. %s" % self._meta)
+            self._data_exporter = Export()
 
     def initialize_solver(self, iname, i_params):
         """Initialize the solver for computation"""
@@ -56,8 +58,13 @@ class Manager:
 
     def function_parameters(self, parameters):
         """Pass function parameters to the simulator"""
-        self._solver.set_f_params(*parameters)
-        manager_logger.info("Set parameter values for the model.")
+        try:
+            parameters.append(self._data_exporter)
+            self._solver.set_f_params(*parameters)
+        except:
+            raise
+        finally:
+            manager_logger.info("Function parameters set in model.")
 
     def start(self):
         manager_logger.info("Starting the simulation.")
