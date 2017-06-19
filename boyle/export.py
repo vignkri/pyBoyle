@@ -37,6 +37,17 @@ class BoyleOutput(object):
                   "gfnh3", "gfch4", "gfco2", "gfh2s"]
         ph = ["time", "ph"]
 
+    def _update(self, attrib, value):
+        """Update the attribute if the value exists"""
+        try:
+            getattr(self, attrib)
+        except AttributeError as e:
+            setattr(self, attrib, [value])
+            print(e)
+        else:
+            getattr(self, attrib).append(value)
+
+
 class Export:
     def __init__(self, meta):
         """Initialize data logging folder path."""
