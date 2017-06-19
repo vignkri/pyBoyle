@@ -8,8 +8,8 @@ Data Logging
 Toolset for logging Simulation and Experiment Setup
 """
 
-logger = logging.getLogger("boyle")
-logger.setLevel(logging.DEBUG)
+boyle_logger = logging.getLogger("boyle")
+boyle_logger.setLevel(logging.DEBUG)
 
 manager_logger = logging.getLogger("manager")
 manager_logger.setLevel(logging.DEBUG)
@@ -26,8 +26,8 @@ formatter = logging.Formatter('%(asctime)s-%(levelname)s-%(name)s %(message)s')
 fh.setFormatter(formatter)
 ch.setFormatter(formatter)
 # --
-logger.addHandler(fh)
-logger.addHandler(ch)
+boyle_logger.addHandler(fh)
+boyle_logger.addHandler(ch)
 # --
 manager_logger.addHandler(fh)
 manager_logger.addHandler(ch)
