@@ -13,6 +13,30 @@ further analysis.
 """
 
 
+class BoyleOutput(object):
+    """Resultant export object from the simulation."""
+    def __init__(self, exp_name):
+        self._name = exp_name
+        self._run_date = time.gmtime()
+        # result key_list
+        mu = ["time", "one", "two", "three", "four", "five", "six", "seven",
+              "eight", "PostFlag"]
+        substrates = ["time", "volume", "carbo_is", "carbo_in", "carbon",
+                      "lipids", "lcfa", "prot_is", "prot_in", "amino",
+                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                      "co2", "h2s", "zplus", "h2po4", "aminus"]
+        degraders = ["time", "carb_degr", "amino_degr", "lipid_degr",
+                     "lcfa_degr", "prop_degr", "butyr_degr",
+                     "valer_degr", "acet_degr"]
+        result = ["time", "volume", "carbois", "carboin", "carbon",
+                  "lipids", "lcfa", "protis", "protin", "amino",
+                  "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                  "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
+                  "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
+                  "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
+                  "gfnh3", "gfch4", "gfco2", "gfh2s"]
+        ph = ["time", "ph"]
+
 class Export:
     def __init__(self, meta):
         """Initialize data logging folder path."""
