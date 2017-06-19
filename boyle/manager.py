@@ -12,16 +12,22 @@ to the main application.
 
 
 class Manager:
-    def __init__(self, model, ival, itime, end_time, step, name):
-        """Initialize manager for creating a simulation"""
-        self._model = model
-        self._initial_value = ival
-        self._initial_time = itime
-        self._endtime = end_time
-        self._step = step
-        self._name = name
+    def __init__(self, model, config):
+        """Initialize manager for creating a simulation
 
-    def initialize_solver(self, iname, **i_params):
+        PARAMETERS
+        ----------
+        model : str
+        config : dict
+        """
+        self._model = model
+        self._initial_value = config.get("initial")
+        self._initial_time = config.get("start_time")
+        self._end_time = config.get("end_time")
+        self._step = config.get("step")
+        self._meta = config.get("metadata")
+
+    def initialize_solver(self, iname, i_params):
         """Initialize the solver for computation"""
         self._solver = scipy.integrate.ode(self._model) \
             .set_integrator(iname, **i_params)
@@ -30,13 +36,13 @@ class Manager:
 
     def __solver_start(self):
         """Start the solver"""
-        while self._solver.successful() and self._solver.t < self._endtime:
+        while self._solver.successful() and self._solver.t < self._end_time:
             self._forecast = self._solver.integrate(self._solver.t + self._step,
                                                     step=True)
 
-    def function_parameters(self, **parameters):
+    def function_parameters(self, parameters):
         """Pass function parameters to the simulator"""
-        self._solver.set_f_params(**parameters)
+        self._solver.set_f_params(*parameters)
 
     def start(self):
         try:
