@@ -14,11 +14,17 @@ further analysis.
 
 
 class Export:
-    def __init__(self):
+    def __init__(self, meta):
         """Initialize data logging folder path."""
-        self._path = "./logs"
-        if not os.path.exists(self._path):
-            os.mkdir(self._path)
+        try:
+            base_path = "./logs"
+            if not os.path.exists(base_path):
+                os.mkdir(base_path)
+            self._path = os.path.join(base_path, meta)
+            if not os.path.exists(self._path):
+                os.mkdir(os.path.join(base_path, meta))
+        except:
+            raise
         # Log date as folder
         self.itime = time.gmtime()
         # Create internally useful headers
@@ -49,12 +55,14 @@ class Export:
                           "gfnh3", "gfch4", "gfco2", "gfh2s"],
         }
         # Create file names
-        self.__file_names = {"mu": self._path + "/mu.dat",
-                             "substrates": self._path + "/substrates.dat",
-                             "degraders": self._path + "/degraders.dat",
-                             "result": self._path + "/result.dat",
-                             "ph": self._path + "/ph.dat",
-                             "processed": self._path + "/processed.dat"}
+        self.__file_names = {
+            "mu": os.path.join(self._path, "mu.dat"),
+            "substrates": os.path.join(self._path, "substrates.dat"),
+            "degraders": os.path.join(self._path, "degraders.dat"),
+            "result": os.path.join(self._path, "result.dat"),
+            "ph": os.path.join(self._path, "ph.dat"),
+            "processed": os.path.join(self._path, "processed.dat")
+        }
         # Initialize creation of files
         self.__create_files()
 
