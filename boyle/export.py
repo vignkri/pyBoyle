@@ -2,6 +2,7 @@
 
 import os
 import csv
+import dill
 import time
 
 """
@@ -38,6 +39,23 @@ class BoyleOutput(object):
                     "gfnh3", "gfch4", "gfco2", "gfh2s"],
             ph=["time", "ph"]
         )
+        try:
+            base_path = "./logs"
+            if not os.path.exists(base_path):
+                os.mkdir(base_path)
+            self._path = os.path.join(base_path, self._name)
+            if not os.path.exists(self._path):
+                os.mkdir(os.path.join(base_path, self._name))
+        except:
+            raise
+
+    def as_pickle(self):
+        """Store the data as a pickle."""
+        try:
+            with open(os.path.join(self._path, "output.pkl"), "wb") as _file:
+                dill.dump(self, _file)
+        except:
+            raise
 
     def _update(self, attrib, value):
         """Update the attribute if the value exists"""
