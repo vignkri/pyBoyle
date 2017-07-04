@@ -19,31 +19,33 @@ class BoyleOutput(object):
         self._name = exp_name
         self._run_date = time.gmtime()
         # result key_list
-        mu = ["time", "one", "two", "three", "four", "five", "six", "seven",
-              "eight", "PostFlag"]
-        substrates = ["time", "volume", "carbo_is", "carbo_in", "carbon",
-                      "lipids", "lcfa", "prot_is", "prot_in", "amino",
-                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
-                      "co2", "h2s", "zplus", "h2po4", "aminus"]
-        degraders = ["time", "carb_degr", "amino_degr", "lipid_degr",
-                     "lcfa_degr", "prop_degr", "butyr_degr",
-                     "valer_degr", "acet_degr"]
-        result = ["time", "volume", "carbois", "carboin", "carbon",
-                  "lipids", "lcfa", "protis", "protin", "amino",
-                  "nh3", "hac", "hpr", "hbut", "hval", "ch4",
-                  "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
-                  "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
-                  "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
-                  "gfnh3", "gfch4", "gfco2", "gfh2s"]
-        ph = ["time", "ph"]
+        self.__available_headers = dict(
+            mu=["time", "one", "two", "three", "four", "five", "six", "seven",
+                "eight", "PostFlag"],
+            substrates=["time", "volume", "carbo_is", "carbo_in", "carbon",
+                        "lipids", "lcfa", "prot_is", "prot_in", "amino",
+                        "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                        "co2", "h2s", "zplus", "h2po4", "aminus"],
+            degraders=["time", "carb_degr", "amino_degr", "lipid_degr",
+                       "lcfa_degr", "prop_degr", "butyr_degr",
+                       "valer_degr", "acet_degr"],
+            result=["time", "volume", "carbois", "carboin", "carbon",
+                    "lipids", "lcfa", "protis", "protin", "amino",
+                    "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                    "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
+                    "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
+                    "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
+                    "gfnh3", "gfch4", "gfco2", "gfh2s"],
+            ph=["time", "ph"]
+        )
 
     def _update(self, attrib, value):
         """Update the attribute if the value exists"""
         try:
             getattr(self, attrib)
         except AttributeError as e:
-            setattr(self, attrib, [value])
-            print(e)
+            setattr(self, attrib, [self.__available_headers.get(attrib)])
+            # -- log the error in the logging file.
         else:
             getattr(self, attrib).append(value)
 
