@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import os
-import csv
 import dill
 import time
 

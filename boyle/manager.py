@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import scipy.integrate
-from export import Export
 from export import BoyleOutput
 from logger import manager_logger
 
@@ -38,7 +37,6 @@ class Manager:
         else:
             manager_logger.info("Finished setting up model. %s" % self._meta)
             self._data_output = BoyleOutput(self._meta)
-            self._data_exporter = Export(self._meta)
 
     def initialize_solver(self, iname, i_params):
         """Initialize the solver for computation"""
@@ -56,8 +54,9 @@ class Manager:
             result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
                 result[idx][0] - result[idx-1][0]
             ) / 1000
-            self._data_exporter._append_values("processed", result[idx])
+            self._data_output._update("processed", result[idx])
         # --
+        self._data_output.as_pickle()
         manager_logger.info("Post processing of data finished.")
 
     def __solver_start(self):
@@ -68,8 +67,6 @@ class Manager:
             y_dot = self._solver.integrate(self._solver.t + self._step,
                                            step=True)
             self._data_output._update("result", [self._solver.t] + list(y_dot))
-            self._data_exporter._append_values("result",
-                                               [self._solver.t] + list(y_dot))
             result.append(y_dot)
         # --
         manager_logger.info("Starting post-process of result data.")
@@ -78,7 +75,6 @@ class Manager:
     def function_parameters(self, parameters):
         """Pass function parameters to the simulator"""
         try:
-            parameters.append(self._data_exporter)
             parameters.append(self._data_output)
             self._solver.set_f_params(*parameters)
         except:
