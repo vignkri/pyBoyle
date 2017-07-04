@@ -2,6 +2,7 @@
 
 import scipy.integrate
 from export import Export
+from export import BoyleOutput
 from logger import manager_logger
 
 """
@@ -36,6 +37,7 @@ class Manager:
             raise
         else:
             manager_logger.info("Finished setting up model. %s" % self._meta)
+            self._data_output = BoyleOutput(self._meta)
             self._data_exporter = Export(self._meta)
 
     def initialize_solver(self, iname, i_params):
@@ -65,6 +67,7 @@ class Manager:
         while self._solver.successful() and self._solver.t < self._end_time:
             y_dot = self._solver.integrate(self._solver.t + self._step,
                                            step=True)
+            self._data_output._update("result", [self._solver.t] + list(y_dot))
             self._data_exporter._append_values("result",
                                                [self._solver.t] + list(y_dot))
             result.append(y_dot)
@@ -76,6 +79,7 @@ class Manager:
         """Pass function parameters to the simulator"""
         try:
             parameters.append(self._data_exporter)
+            parameters.append(self._data_output)
             self._solver.set_f_params(*parameters)
         except:
             raise
