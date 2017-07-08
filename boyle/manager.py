@@ -51,9 +51,14 @@ class Manager:
 
     def post_process(self, result):
         for idx in reversed(list(range(1, len(result)))):
-            result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
-                result[idx][0] - result[idx-1][0]
-            ) / 1000
+            if result[idx][0] - result[idx-1][0] != 0:
+                result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
+                    result[idx][0] - result[idx-1][0]
+                ) / 1000
+            else:
+                result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
+                    result[idx-1][0]
+                ) / 1000
             self._data_output._update("processed", result[idx])
         # --
         self._data_output.as_pickle()

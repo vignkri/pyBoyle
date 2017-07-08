@@ -57,7 +57,7 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
 
 def standard(time, y0,
              constant_ones, mu_max, xxval, mu_max_t0,
-             k0_zeros, flow, yieldc, inflow, exporter, output):
+             k0_zeros, flow, yieldc, inflow, output):
     """Standard Integrator Model
 
     PARAMETERS
@@ -245,11 +245,6 @@ def standard(time, y0,
     #       Appendix A: Data Logging
     #
     # --------------------------------------------
-
-    exporter._append_values("substrates", [time] + y0[0:20].tolist())
-    exporter._append_values("degraders", [time] + degraders.tolist())
-    exporter._append_values("ph", [time, pH])
-    exporter._append_values("mu", [time] + mu[:, 0].tolist() + [True])
 
     output._update("substrates", [time] + y0[0:20].tolist())
     output._update("degraders", [time] + degraders.tolist())
