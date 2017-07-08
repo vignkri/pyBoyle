@@ -17,7 +17,7 @@ class BoyleOutput(object):
     """Resultant export object from the simulation."""
     def __init__(self, exp_name):
         self._name = exp_name
-        self._run_date = time.gmtime()
+        self._creation_date = time.gmtime()
         # result key_list
         self.__available_headers = dict(
             mu=["time", "one", "two", "three", "four", "five", "six", "seven",
@@ -48,6 +48,15 @@ class BoyleOutput(object):
         except:
             raise
 
+    def __repr__(self):
+        """Create representation of the object for introspection."""
+        return ("Simulation {name} performed on {DD}/{MON}/{YYYY}-{HH}:{MM}"
+                .format(name=self._name, DD=self._creation_date.tm_mday,
+                        MON=self._creation_date.tm_mon,
+                        YYYY=self._creation_date.tm_year,
+                        HH=self._creation_date.tm_hour,
+                        MM=self._creation_date.tm_min))
+
     def as_pickle(self):
         """Store the data as a pickle."""
         try:
@@ -56,12 +65,14 @@ class BoyleOutput(object):
         except:
             raise
 
-    def _update(self, attrib, value):
+    def _update(self, attrname, value):
         """Update the attribute if the value exists"""
         try:
-            getattr(self, attrib)
+            getattr(self, attrname)
         except AttributeError as e:
-            setattr(self, attrib, [self.__available_headers.get(attrib)])
+            if attrname == "processed":
+                attrname == "result"
+            setattr(self, attrname, [self.__available_headers.get(attrname)])
             # -- log the error in the logging file.
         else:
-            getattr(self, attrib).append(value)
+            getattr(self, attrname).append(value)
