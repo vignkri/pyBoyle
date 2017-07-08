@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import yaml
 import numpy as np
 
 import model
@@ -12,30 +13,35 @@ Boyle Python
 Simulation agent for Biogas Production
 """
 
+# Configuration Load
+config_file = "./simulation.yaml"
+with open(config_file, "r") as config_stream:
+    configuration = yaml.load(config_stream)
+# --
+settings = configuration.get("settings")
+regulate = configuration.get("regulate")
+boyle_logger.info("Configuration file loaded.")
+
+# Simulation settings
+start_time = settings.get("t_initial")
+end_time = settings.get("t_final")
+step_size = settings.get("step_size")
+
+# Regulation Settings
+temp = regulate.get("temperature")
+flow_in = regulate.get("flow_in")
+flow_out = regulate.get("flow_out")
+substrate_inflow = flow_in * np.array(list(regulate.get("flow").values()))
+
 # Import datasets
 initial = np.loadtxt("./sample/Initial", comments="%")
 yield_c = np.loadtxt("./sample/yc", comments="%")
-regulate = np.loadtxt("./sample/regulate", comments="%")
 const1 = np.loadtxt("./sample/Const1", comments="%")
 const2 = np.loadtxt("./sample/Const2", comments="%")
 boyle_logger.info("Input data loaded.")
 
 # Set up initial values
-volume = initial[0]
-substrate = initial[1:20]
-degraders = initial[20:29]
-gas_conc = np.zeros((4,))
-
-# Set up regulation
-start_time = 0
-end_time = regulate[0]
-step_size = 0.5
-
-# Substrate Conditions
-temp = regulate[1]
-flow_in = regulate[2]
-flow_out = regulate[3]
-substrate_inflow = flow_in * regulate[4:]
+initial = np.concatenate((initial, np.zeros(4, )))
 
 # Compute Temperature Dependent Constants
 mu_max = np.zeros((10, 1))
@@ -107,8 +113,6 @@ xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
 # Set up integrator
 time_array = np.linspace(start_time, end_time,
                          (end_time - start_time)/step_size)
-initial_values = np.concatenate((np.array([volume]), substrate,
-                                 degraders, gas_conc))
 
 parameters = [constants_one, mu_max, xxval, mu_max_t0,
               [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
@@ -116,7 +120,7 @@ parameters = [constants_one, mu_max, xxval, mu_max_t0,
 
 solver = Manager(model.standard,
                  config=dict(
-                     initial=initial_values,
+                     initial=initial,
                      start_time=0,
                      end_time=1000,
                      step=step_size,
