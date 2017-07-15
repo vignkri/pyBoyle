@@ -71,8 +71,10 @@ class BoyleOutput(object):
             getattr(self, attrname)
         except AttributeError as e:
             if attrname == "processed":
-                attrname == "result"
-            setattr(self, attrname, [self.__available_headers.get(attrname)])
+                header_name = "result"
+            else:
+                header_name = attrname
+            setattr(self, attrname, [self.__available_headers.get(header_name)])
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
