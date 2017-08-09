@@ -36,7 +36,7 @@ class Manager:
             raise
         else:
             manager_logger.info("Finished setting up model. %s" % self._meta)
-            self._data_output = BoyleOutput(self._meta)
+            self._data_output = BoyleOutput(self._meta, self._model)
 
     def initialize_solver(self, iname, i_params):
         """Initialize the solver for computation"""
