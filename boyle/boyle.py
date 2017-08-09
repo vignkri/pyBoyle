@@ -19,19 +19,27 @@ with open(config_file, "r") as config_stream:
     configuration = yaml.load(config_stream)
 # --
 settings = configuration.get("settings")
-# regulate = configuration.get("regulate")
+solver_settings = configuration.get("solver")
+regulate_settings = configuration.get("regulate")
 boyle_logger.info("Configuration file loaded.")
 
 # Simulation settings
+experiment_name = configuration.get("name")
 start_time = settings.get("t_initial")
 end_time = settings.get("t_final")
 step_size = settings.get("step_size")
 
-# Regulation Settings
-# temp = regulate.get("temperature")
-# flow_in = regulate.get("flow_in")
-# flow_out = regulate.get("flow_out")
-# substrate_inflow = flow_in * np.array(list(regulate.get("flow").values()))
+# Solver Settings
+solver_method = solver_settings.get("method")
+solver_order = solver_settings.get("order")
+solver_nsteps = solver_settings.get("nsteps")
+absolute_tolerance = solver_settings.get("absolute")
+relative_tolerance = solver_settings.get("relative")
+
+# Regulate Settings
+temp = regulate_settings.get("temperature")
+flow_in = regulate_settings.get("flow_in")
+flow_out = regulate_settings.get("flow_out")
 
 # Import datasets
 initial = np.loadtxt("./sample/Initial", comments="%")
@@ -41,9 +49,6 @@ const2 = np.loadtxt("./sample/Const2", comments="%")
 regulate = np.loadtxt("./sample/regulate", comments="%")
 boyle_logger.info("Input data loaded.")
 
-temp = regulate[1]
-flow_in = regulate[2]
-flow_out = regulate[3]
 substrate_inflow = flow_in * regulate[4:]
 
 # Set up initial values
@@ -113,32 +118,20 @@ boyle_logger.info("Finished setting up constants.")
 constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
                  ki_carbon, ki_prot, ki_hac_hpr, ki_hac_hbut,
                  ki_hac_hval, ki_nh3_hac, ki_lcfa]
-# XXVal Argument
+# XX-Val Argument
 xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
          ka2_co2, ka_h2s, ka_h2po4, kw]
-# Set up integrator
-time_array = np.linspace(start_time, end_time,
-                         (end_time - start_time)/step_size)
 
-parameters = [constants_one, mu_max, xxval, mu_max_t0,
-              [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
-              substrate_inflow]
+_config = dict(initial=initial, start_time=start_time, end_time=end_time,
+               step=step_size, metadata=experiment_name)
+_solver_params = dict(method=solver_method, order=solver_order,
+                      rtol=relative_tolerance, atol=absolute_tolerance,
+                      nsteps=solver_nsteps)
+_parameters = [constants_one, mu_max, xxval, mu_max_t0,
+               [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
+               substrate_inflow]
 
-solver = Manager(model.standard,
-                 config=dict(
-                     initial=initial,
-                     start_time=0,
-                     end_time=1000,
-                     step=step_size,
-                     metadata="Test"
-                 ))
-solver.initialize_solver(iname="vode",
-                         i_params=dict(
-                             method="bdf",
-                             order=1,
-                             rtol=1e-4,
-                             atol=1e-8,
-                             nsteps=2
-                         ))
-solver.function_parameters(parameters=parameters)
+solver = Manager(model.standard, config=_config)
+solver.initialize_solver(iname="vode", i_params=_solver_params)
+solver.function_parameters(parameters=_parameters)
 solver.start()
