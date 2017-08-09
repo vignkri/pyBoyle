@@ -15,8 +15,9 @@ further analysis.
 
 class BoyleOutput(object):
     """Resultant export object from the simulation."""
-    def __init__(self, exp_name):
+    def __init__(self, exp_name, model):
         self._name = exp_name
+        self._model_name = model
         self._creation_date = time.gmtime()
         # result key_list
         self.__available_headers = dict(
@@ -59,6 +60,7 @@ class BoyleOutput(object):
 
     def as_pickle(self):
         """Store the data as a pickle."""
+        self._finish_date = time.gmtime()
         try:
             with open(os.path.join(self._path, "output.pkl"), "wb") as _file:
                 dill.dump(self, _file)
