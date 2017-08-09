@@ -19,7 +19,7 @@ with open(config_file, "r") as config_stream:
     configuration = yaml.load(config_stream)
 # --
 settings = configuration.get("settings")
-regulate = configuration.get("regulate")
+# regulate = configuration.get("regulate")
 boyle_logger.info("Configuration file loaded.")
 
 # Simulation settings
@@ -28,17 +28,23 @@ end_time = settings.get("t_final")
 step_size = settings.get("step_size")
 
 # Regulation Settings
-temp = regulate.get("temperature")
-flow_in = regulate.get("flow_in")
-flow_out = regulate.get("flow_out")
-substrate_inflow = flow_in * np.array(list(regulate.get("flow").values()))
+# temp = regulate.get("temperature")
+# flow_in = regulate.get("flow_in")
+# flow_out = regulate.get("flow_out")
+# substrate_inflow = flow_in * np.array(list(regulate.get("flow").values()))
 
 # Import datasets
 initial = np.loadtxt("./sample/Initial", comments="%")
 yield_c = np.loadtxt("./sample/yc", comments="%")
 const1 = np.loadtxt("./sample/Const1", comments="%")
 const2 = np.loadtxt("./sample/Const2", comments="%")
+regulate = np.loadtxt("./sample/regulate", comments="%")
 boyle_logger.info("Input data loaded.")
+
+temp = regulate[1]
+flow_in = regulate[2]
+flow_out = regulate[3]
+substrate_inflow = flow_in * regulate[4:]
 
 # Set up initial values
 initial = np.concatenate((initial, np.zeros(4, )))
@@ -124,7 +130,7 @@ solver = Manager(model.standard,
                      start_time=0,
                      end_time=1000,
                      step=step_size,
-                     metadata="test_3"
+                     metadata="Test"
                  ))
 solver.initialize_solver(iname="vode",
                          i_params=dict(

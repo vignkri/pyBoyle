@@ -1,0 +1,13 @@
+# Simulation Settings
+# Author: Vignesh
+# Version: Alpha
+
+settings:
+    t_initial: 0
+    t_final: 1000
+    step_size: 0.5
+
+regulate:
+    temperature: 37
+    flow_in: 1000
+    flow_out: 1000
