@@ -12,7 +12,7 @@ simulation.
 """
 
 
-class Frame:
+class Parameters:
     def __init__(self, folder):
         """Set up Frame for setting up process information"""
         try:
