@@ -4,7 +4,7 @@ import yaml
 import numpy as np
 
 import model
-from frame import Frame
+from frame import Parameters
 from logger import boyle_logger
 from manager import Manager
 
@@ -43,14 +43,12 @@ flow_in = regulate_settings.get("flow_in")
 flow_out = regulate_settings.get("flow_out")
 
 # Import datasets
-dataset = Frame("./sample")
-yield_c = np.loadtxt("./sample/yc", comments="%")
+dataset = Parameters("./sample")
 const1 = np.loadtxt("./sample/Const1", comments="%")
 const2 = np.loadtxt("./sample/Const2", comments="%")
-regulate = np.loadtxt("./sample/regulate", comments="%")
 boyle_logger.info("Input data loaded.")
 
-substrate_inflow = flow_in * regulate[4:]
+substrate_inflow = flow_in * dataset.regulate.get("value")[4:]
 dataset.process_data(temp=temp, flow_in=flow_in, flow_out=flow_out)
 
 # Compute Temperature Dependent Constants
@@ -128,8 +126,8 @@ _solver_params = dict(method=solver_method, order=solver_order,
                       rtol=relative_tolerance, atol=absolute_tolerance,
                       nsteps=solver_nsteps)
 _parameters = [constants_one, mu_max, xxval, mu_max_t0,
-               [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
-               substrate_inflow]
+               [k0_carbon, k0_prot], [flow_in, flow_out],
+               dataset.yc.get("value"), substrate_inflow]
 
 solver = Manager(model.standard, config=_config)
 solver.initialize_solver(iname="vode", i_params=_solver_params)
