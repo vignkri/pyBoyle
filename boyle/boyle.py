@@ -4,6 +4,7 @@ import yaml
 import numpy as np
 
 import model
+from frame import Frame
 from logger import boyle_logger
 from manager import Manager
 
@@ -42,7 +43,7 @@ flow_in = regulate_settings.get("flow_in")
 flow_out = regulate_settings.get("flow_out")
 
 # Import datasets
-initial = np.loadtxt("./sample/Initial", comments="%")
+dataset = Frame("./sample")
 yield_c = np.loadtxt("./sample/yc", comments="%")
 const1 = np.loadtxt("./sample/Const1", comments="%")
 const2 = np.loadtxt("./sample/Const2", comments="%")
@@ -50,9 +51,7 @@ regulate = np.loadtxt("./sample/regulate", comments="%")
 boyle_logger.info("Input data loaded.")
 
 substrate_inflow = flow_in * regulate[4:]
-
-# Set up initial values
-initial = np.concatenate((initial, np.zeros(4, )))
+dataset.process_data(temp=temp, flow_in=flow_in, flow_out=flow_out)
 
 # Compute Temperature Dependent Constants
 mu_max = np.zeros((10, 1))
@@ -122,7 +121,8 @@ constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
 xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
          ka2_co2, ka_h2s, ka_h2po4, kw]
 
-_config = dict(initial=initial, start_time=start_time, end_time=end_time,
+_config = dict(initial=dataset.Initial.get("value"),
+               start_time=start_time, end_time=end_time,
                step=step_size, metadata=experiment_name)
 _solver_params = dict(method=solver_method, order=solver_order,
                       rtol=relative_tolerance, atol=absolute_tolerance,
