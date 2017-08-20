@@ -56,18 +56,43 @@ class Frame:
             else:
                 mu_max[index] = (mu_max_t0[index] + alpha * (t_opt - t0)) * \
                     (t_max - temp) / (t_max - t_opt)
-        setattr(self, "mu_max", mu_max)
+        setattr(self, "mu_max", dict(value=mu_max))
         # --
         # Set up Const1 Parameters
-        self.c1params = dict(
-            kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
-            pk_low=const1[2:, 9], pk_high=const1[2:, 10],
-            ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
-            ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
-            ki_nh3_hac=const1[9, 8], ki_lcfa=const1[2:, 8]
-        )
+        self.Const1.update(dict(
+            params=dict(
+                kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
+                pk_low=const1[2:, 9], pk_high=const1[2:, 10],
+                ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
+                ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
+                ki_nh3_hac=const1[9, 8], ki_lcfa=const1[2:, 8])
+        ))
         # -- mu_max parameters
-        self.mu_max_params = dict(
-            k0_carbon=mu_max[0, 0], k0_prot=mu_max[1, 0],
-            mu_max_t0=mu_max_t0[2:, ], mu_max=mu_max[2:]
+        self.mu_max.update(dict(
+            params=dict(
+                k0_carbon=mu_max[0, 0], k0_prot=mu_max[1, 0],
+                mu_max_t0=mu_max_t0[2:, ], mu_max=mu_max[2:]
+            )
+        ))
+        # -- delta tempature
+        const2 = self.Const2.get("value")
+        delta_temp = temp - const2[:, 1]
+        henry_constants = const2[:, 0] + delta_temp * const2[:, 2] + \
+            delta_temp**2 * const2[:, 3] + delta_temp**3 * const2[:, 4]
+        # --
+        hc = dict(
+            k_h=henry_constants[[1, 7, 8, 11]],
+            # -- log inverse values
+            ka1_lcfa=10**(-henry_constants[0]),
+            ka_nh4=10**(-henry_constants[2]),
+            ka_hac=10**(-henry_constants[3]),
+            ka_hpr=10**(-henry_constants[4]),
+            ka_hbut=10**(-henry_constants[5]),
+            ka_hval=10**(-henry_constants[6]),
+            ka1_co2=10**(-henry_constants[9]),
+            ka2_co2=10**(-henry_constants[10]),
+            ka_h2s=10**(-henry_constants[12]),
+            ka_h2po4=10**(-henry_constants[13]),
+            kw=10**(-henry_constants[14])
         )
+        setattr(self, "henry_constants", hc)
