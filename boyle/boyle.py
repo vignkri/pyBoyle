@@ -51,23 +51,6 @@ boyle_logger.info("Input data loaded.")
 substrate_inflow = flow_in * dataset.regulate.get("value")[4:]
 dataset.process_data(temp=temp, flow_in=flow_in, flow_out=flow_out)
 
-# Compute Temperature Dependent Constants
-mu_max = np.zeros((10, 1))
-mu_max_t0 = np.zeros((10, 1))
-for index in range(0, 10):
-    mu_max_t0[index] = const1[index, 0]
-    alpha = const1[index, 1]
-    t0 = const1[index, 2]
-    t_opt = const1[index, 3]
-    t_max = const1[index, 4]
-    #
-    if temp < t_opt:
-        mu_max[index] = mu_max_t0[index] + alpha * (temp - t0)
-    else:
-        mu_max[index] = (mu_max_t0[index] + alpha * (t_opt - t0)) * \
-            (t_max - temp) / (t_max - t_opt)
-# --
-
 # Set up Const1 Parameters
 kd0 = 0.05
 ks = const1[2:, 5]
@@ -84,11 +67,11 @@ ki_nh3_hac = const1[9, 8]
 ki_lcfa = const1[2:, 8]
 
 # Define reaction rates and growth factors
-k0_carbon = mu_max[0, 0]
-k0_prot = mu_max[1, 0]
+k0_carbon = dataset.mu_max.get("params").get("k0_carbon")
+k0_prot = dataset.mu_max.get("params").get("k0_prot")
 # --
-mu_max_t0 = mu_max_t0[2:]
-mu_max = mu_max[2:]
+mu_max = dataset.mu_max.get("params").get("mu_max")
+mu_max_t0 = dataset.mu_max.get("params").get("mu_max_t0")
 
 # Defining Henry Constant Values
 delta_temp = temp - const2[:, 1]
