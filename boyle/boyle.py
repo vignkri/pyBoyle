@@ -1,11 +1,11 @@
 #!/usr/bin/python
 
+import yaml
 import numpy as np
-import scipy.integrate
 
 import model
-import export
-from scribe import logger
+from logger import boyle_logger
+from manager import Manager
 
 """
 Boyle Python
@@ -13,30 +13,46 @@ Boyle Python
 Simulation agent for Biogas Production
 """
 
+# Configuration Load
+config_file = "./simulation.yaml"
+with open(config_file, "r") as config_stream:
+    configuration = yaml.load(config_stream)
+# --
+settings = configuration.get("settings")
+solver_settings = configuration.get("solver")
+regulate_settings = configuration.get("regulate")
+boyle_logger.info("Configuration file loaded.")
+
+# Simulation settings
+experiment_name = configuration.get("name")
+start_time = settings.get("t_initial")
+end_time = settings.get("t_final")
+step_size = settings.get("step_size")
+
+# Solver Settings
+solver_method = solver_settings.get("method")
+solver_order = solver_settings.get("order")
+solver_nsteps = solver_settings.get("nsteps")
+absolute_tolerance = solver_settings.get("absolute")
+relative_tolerance = solver_settings.get("relative")
+
+# Regulate Settings
+temp = regulate_settings.get("temperature")
+flow_in = regulate_settings.get("flow_in")
+flow_out = regulate_settings.get("flow_out")
+
 # Import datasets
 initial = np.loadtxt("./sample/Initial", comments="%")
 yield_c = np.loadtxt("./sample/yc", comments="%")
-regulate = np.loadtxt("./sample/regulate", comments="%")
 const1 = np.loadtxt("./sample/Const1", comments="%")
 const2 = np.loadtxt("./sample/Const2", comments="%")
-logger.info("Input data loaded.")
+regulate = np.loadtxt("./sample/regulate", comments="%")
+boyle_logger.info("Input data loaded.")
+
+substrate_inflow = flow_in * regulate[4:]
 
 # Set up initial values
-volume = initial[0]
-substrate = initial[1:20]
-degraders = initial[20:29]
-gas_conc = np.zeros((4,))
-
-# Set up regulation
-start_time = 0
-end_time = regulate[0]
-step_size = 0.5
-
-# Substrate Conditions
-temp = regulate[1]
-flow_in = regulate[2]
-flow_out = regulate[3]
-substrate_inflow = flow_in * regulate[4:]
+initial = np.concatenate((initial, np.zeros(4, )))
 
 # Compute Temperature Dependent Constants
 mu_max = np.zeros((10, 1))
@@ -96,44 +112,26 @@ ka_h2s = 10**(-henry_constants[12])
 ka_h2po4 = 10**(-henry_constants[13])
 kw = 10**(-henry_constants[14])
 # --
-logger.info("Finished setting up constants.")
-
-# Create Logging Parameters
-simport = export.Simulation()
-logger.info("Create simulation data exporter.")
+boyle_logger.info("Finished setting up constants.")
 
 # Constant One Argument
 constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
                  ki_carbon, ki_prot, ki_hac_hpr, ki_hac_hbut,
                  ki_hac_hval, ki_nh3_hac, ki_lcfa]
-# XXVal Argument
+# XX-Val Argument
 xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
          ka2_co2, ka_h2s, ka_h2po4, kw]
-# Set up integrator
-time_array = np.linspace(start_time, end_time,
-                         (end_time - start_time)/step_size)
-initial_values = np.concatenate((np.array([volume]), substrate,
-                                 degraders, gas_conc))
 
-solver = scipy.integrate.ode(model.standard) \
-    .set_integrator("vode", method="bdf", order=1, rtol=1e-4, atol=1e-8,
-                    nsteps=2)
-solver.set_initial_value(y=initial_values, t=start_time)
-solver.set_f_params(constants_one, mu_max, xxval, mu_max_t0,
-                    [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
-                    substrate_inflow, simport)
-logger.info("Set up integrator.")
-logger.info("Starting Integration.")
+_config = dict(initial=initial, start_time=start_time, end_time=end_time,
+               step=step_size, metadata=experiment_name)
+_solver_params = dict(method=solver_method, order=solver_order,
+                      rtol=relative_tolerance, atol=absolute_tolerance,
+                      nsteps=solver_nsteps)
+_parameters = [constants_one, mu_max, xxval, mu_max_t0,
+               [k0_carbon, k0_prot], [flow_in, flow_out], yield_c,
+               substrate_inflow]
 
-result_set = []
-while solver.successful() and solver.t < end_time:
-    logger.info("Computation Time %.2f" % solver.t)
-    y_dot = solver.integrate(solver.t + step_size, step=True)
-    simport._append_values("result", [solver.t] + list(y_dot))
-    result_set.append(np.append(np.array([solver.t]), (y_dot)))
-
-for idx in reversed(list(range(1, len(result_set)))):
-    result_set[idx][29:] = (result_set[idx][29:] - result_set[idx-1][29:]) / (
-        result_set[idx][0] - result_set[idx-1][0]
-    ) / 1000
-    simport._append_values("processed", result_set[idx])
+solver = Manager(model.standard, config=_config)
+solver.initialize_solver(iname="vode", i_params=_solver_params)
+solver.function_parameters(parameters=_parameters)
+solver.start()
