@@ -14,6 +14,9 @@ boyle_logger.setLevel(logging.DEBUG)
 manager_logger = logging.getLogger("manager")
 manager_logger.setLevel(logging.DEBUG)
 
+model_logger = logging.getLogger("manager")
+model_logger.setLevel(logging.DEBUG)
+
 # --
 fh = logging.FileHandler("./logs/simulation.log")
 fh.setLevel(logging.INFO)
@@ -31,3 +34,6 @@ boyle_logger.addHandler(ch)
 # --
 manager_logger.addHandler(fh)
 manager_logger.addHandler(ch)
+# --
+model_logger.addHandler(fh)
+model_logger.addHandler(ch)

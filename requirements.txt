@@ -3,6 +3,7 @@ appdirs==1.4.3
 Babel==2.4.0
 certifi==2017.4.17
 chardet==3.0.3
+dill==0.2.7
 docutils==0.13.1
 idna==2.5
 imagesize==0.7.1
