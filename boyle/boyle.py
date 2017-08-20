@@ -51,21 +51,6 @@ boyle_logger.info("Input data loaded.")
 substrate_inflow = flow_in * dataset.regulate.get("value")[4:]
 dataset.process_data(temp=temp, flow_in=flow_in, flow_out=flow_out)
 
-# Set up Const1 Parameters
-kd0 = 0.05
-ks = const1[2:, 5]
-ks_nh3 = const1[2:, 6]
-pk_low = const1[2:, 9]
-pk_high = const1[2:, 10]
-# --
-ki_carbon = const1[0, 7]
-ki_prot = const1[1, 7]
-ki_hac_hpr = const1[6, 7]
-ki_hac_hbut = const1[7, 7]
-ki_hac_hval = const1[8, 7]
-ki_nh3_hac = const1[9, 8]
-ki_lcfa = const1[2:, 8]
-
 # Define reaction rates and growth factors
 k0_carbon = dataset.mu_max.get("params").get("k0_carbon")
 k0_prot = dataset.mu_max.get("params").get("k0_prot")
@@ -73,34 +58,19 @@ k0_prot = dataset.mu_max.get("params").get("k0_prot")
 mu_max = dataset.mu_max.get("params").get("mu_max")
 mu_max_t0 = dataset.mu_max.get("params").get("mu_max_t0")
 
-# Defining Henry Constant Values
-delta_temp = temp - const2[:, 1]
-henry_constants = const2[:, 0] + delta_temp * const2[:, 2] + \
-    delta_temp**2 * const2[:, 3] + delta_temp**3 * const2[:, 4]
-# --
-k_h = henry_constants[[1, 7, 8, 11]]
-# -- log inverse values
-ka1_lcfa = 10**(-henry_constants[0])
-ka_nh4 = 10**(-henry_constants[2])
-ka_hac = 10**(-henry_constants[3])
-ka_hpr = 10**(-henry_constants[4])
-ka_hbut = 10**(-henry_constants[5])
-ka_hval = 10**(-henry_constants[6])
-ka1_co2 = 10**(-henry_constants[9])
-ka2_co2 = 10**(-henry_constants[10])
-ka_h2s = 10**(-henry_constants[12])
-ka_h2po4 = 10**(-henry_constants[13])
-kw = 10**(-henry_constants[14])
 # --
 boyle_logger.info("Finished setting up constants.")
 
 # Constant One Argument
-constants_one = [ks, ks_nh3, pk_low, pk_high, ks_nh3,
-                 ki_carbon, ki_prot, ki_hac_hpr, ki_hac_hbut,
-                 ki_hac_hval, ki_nh3_hac, ki_lcfa]
+names = ["ks", "ks_nh3", "pk_low", "pk_high", "ks_nh3", "ki_carbon",
+         "ki_prot", "ki_hac_hpr", "ki_hac_hbut", "ki_hac_hval",
+         "ki_nh3_hac", "ki_lcfa"]
+constants_one = [dataset.Const1.get("params").get(item) for item in names]
+
 # XX-Val Argument
-xxval = [k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2,
-         ka2_co2, ka_h2s, ka_h2po4, kw]
+names = ["k_h", "ka_nh4", "ka_hac", "ka_hpr", "ka_hbut", "ka_hval",
+         "ka1_co2", "ka2_co2", "ka_h2s", "ka_h2po4", "kw"]
+xxval = [dataset.henry_constants.get(item) for item in names]
 
 _config = dict(initial=dataset.Initial.get("value"),
                start_time=start_time, end_time=end_time,
