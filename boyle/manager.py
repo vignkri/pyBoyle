@@ -55,7 +55,9 @@ class Manager:
             result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
                 result[idx][0] - result[idx-1][0]
             ) / result[idx][1]
-            self._data_output._update("processed", result[idx])
+            final_result = np.hstack([result[idx],
+                                      np.array(np.sum(result[idx][29:]))])
+            self._data_output._update("processed", final_result)
         # --
         self._data_output.as_pickle()
         manager_logger.info("Post processing of data finished.")
