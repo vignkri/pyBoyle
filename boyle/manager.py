@@ -54,7 +54,7 @@ class Manager:
         for idx in reversed(list(range(1, len(result)))):
             result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
                 result[idx][0] - result[idx-1][0]
-            ) / result[idx][1]
+            ) / 1000
             final_result = np.hstack([result[idx],
                                       np.array(np.sum(result[idx][29:]))])
             self._data_output._update("processed", final_result)

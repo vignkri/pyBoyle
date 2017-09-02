@@ -37,6 +37,13 @@ class BoyleOutput(object):
                     "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
                     "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
                     "gfnh3", "gfch4", "gfco2", "gfh2s"],
+            processed=["time", "volume", "carbois", "carboin", "carbon",
+                       "lipids", "lcfa", "protis", "protin", "amino",
+                       "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                       "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
+                       "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
+                       "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
+                       "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
             ph=["time", "ph"]
         )
         try:
@@ -72,11 +79,7 @@ class BoyleOutput(object):
         try:
             getattr(self, attrname)
         except AttributeError as e:
-            if attrname == "processed":
-                header_name = "result"
-            else:
-                header_name = attrname
-            setattr(self, attrname, [self.__available_headers.get(header_name)])
+            setattr(self, attrname, [self.__available_headers.get(attrname)])
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
