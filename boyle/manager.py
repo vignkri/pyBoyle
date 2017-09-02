@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import numpy as np
 import scipy.integrate
 from export import BoyleOutput
 from logger import manager_logger
@@ -51,14 +52,9 @@ class Manager:
 
     def post_process(self, result):
         for idx in reversed(list(range(1, len(result)))):
-            if result[idx][0] - result[idx-1][0] != 0:
-                result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
-                    result[idx][0] - result[idx-1][0]
-                ) / 1000
-            else:
-                result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
-                    result[idx-1][0]
-                ) / 1000
+            result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
+                result[idx][0] - result[idx-1][0]
+            ) / result[idx][1]
             self._data_output._update("processed", result[idx])
         # --
         self._data_output.as_pickle()
@@ -72,7 +68,8 @@ class Manager:
             y_dot = self._solver.integrate(self._solver.t + self._step,
                                            step=True)
             self._data_output._update("result", [self._solver.t] + list(y_dot))
-            result.append(y_dot)
+            row = np.hstack([np.array([self._solver.t]), y_dot])
+            result.append(row)
         # --
         manager_logger.info("Starting post-process of result data.")
         self.post_process(result=result)
