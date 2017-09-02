@@ -25,6 +25,7 @@ regulate_settings = configuration.get("regulate")
 boyle_logger.info("Configuration file loaded.")
 
 # Simulation settings
+data_folder = configuration.get("data")
 experiment_name = configuration.get("name")
 start_time = settings.get("t_initial")
 end_time = settings.get("t_final")
@@ -43,9 +44,7 @@ flow_in = regulate_settings.get("flow_in")
 flow_out = regulate_settings.get("flow_out")
 
 # Import datasets
-dataset = Parameters("./sample")
-const1 = np.loadtxt("./sample/Const1", comments="%")
-const2 = np.loadtxt("./sample/Const2", comments="%")
+dataset = Parameters(data_folder)
 boyle_logger.info("Input data loaded.")
 
 substrate_inflow = flow_in * dataset.regulate.get("value")[4:]
