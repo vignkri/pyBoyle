@@ -43,6 +43,10 @@ temp = regulate_settings.get("temperature")
 flow_in = regulate_settings.get("flow_in")
 flow_out = regulate_settings.get("flow_out")
 
+# Days to hourly flow rate change
+flow_in = flow_in / 24
+flow_out = flow_out / 24
+
 # Import datasets
 dataset = Parameters(data_folder)
 boyle_logger.info("Input data loaded.")
