@@ -57,7 +57,7 @@ class Manager:
             ) / 1000
             final_result = np.hstack([result[idx],
                                       np.array(np.sum(result[idx][29:]))])
-            self._data_output._update("processed", final_result)
+            self._data_output._update("solution", final_result)
         # --
         self._data_output.as_pickle()
         manager_logger.info("Post processing of data finished.")
@@ -69,7 +69,7 @@ class Manager:
         while self._solver.successful() and self._solver.t < self._end_time:
             y_dot = self._solver.integrate(self._solver.t + self._step,
                                            step=True)
-            self._data_output._update("result", [self._solver.t] + list(y_dot))
+            # self._data_output._update("result", [self._solver.t] + list(y_dot))
             row = np.hstack([np.array([self._solver.t]), y_dot])
             result.append(row)
         # --

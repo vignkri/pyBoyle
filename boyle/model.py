@@ -246,9 +246,6 @@ def standard(time, y0,
     #
     # --------------------------------------------
 
-    output._update("substrates", [time] + y0[0:20].tolist())
-    output._update("degraders", [time] + degraders.tolist())
-    output._update("ph", [time, pH])
-    output._update("mu", [time] + mu[:, 0].tolist() + [True])
+    output._update("debug", [time] + mu[:, 0].tolist() + [pH] + y_dot.tolist())
 
     return y_dot
