@@ -49,31 +49,11 @@ flow_out = flow_out / 24
 
 # Import datasets
 dataset = Parameters(data_folder)
-boyle_logger.info("Input data loaded.")
-
-substrate_inflow = flow_in * dataset.regulate.get("value")[4:]
 dataset.process_data(temp=temp, flow_in=flow_in, flow_out=flow_out)
-
-# Define reaction rates and growth factors
-k0_carbon = dataset.mu_max.get("params").get("k0_carbon")
-k0_prot = dataset.mu_max.get("params").get("k0_prot")
-# --
-mu_max = dataset.mu_max.get("params").get("mu_max")
-mu_max_t0 = dataset.mu_max.get("params").get("mu_max_t0")
+boyle_logger.info("Input data loaded.")
 
 # --
 boyle_logger.info("Finished setting up constants.")
-
-# Constant One Argument
-names = ["ks", "ks_nh3", "pk_low", "pk_high", "ks_nh3", "ki_carbon",
-         "ki_prot", "ki_hac_hpr", "ki_hac_hbut", "ki_hac_hval",
-         "ki_nh3_hac", "ki_lcfa"]
-constants_one = [dataset.Const1.get("params").get(item) for item in names]
-
-# XX-Val Argument
-names = ["k_h", "ka_nh4", "ka_hac", "ka_hpr", "ka_hbut", "ka_hval",
-         "ka1_co2", "ka2_co2", "ka_h2s", "ka_h2po4", "kw"]
-xxval = [dataset.henry_constants.get(item) for item in names]
 
 _config = dict(initial=dataset.Initial.get("value"),
                start_time=start_time, end_time=end_time,
@@ -81,11 +61,8 @@ _config = dict(initial=dataset.Initial.get("value"),
 _solver_params = dict(method=solver_method, order=solver_order,
                       rtol=relative_tolerance, atol=absolute_tolerance,
                       nsteps=solver_nsteps)
-_parameters = [constants_one, mu_max, xxval, mu_max_t0,
-               [k0_carbon, k0_prot], [flow_in, flow_out],
-               dataset.yc.get("value"), substrate_inflow]
 
 solver = Manager(model.standard, config=_config)
 solver.initialize_solver(iname="vode", i_params=_solver_params)
-solver.function_parameters(parameters=_parameters)
+solver.function_parameters(parameters=[dataset])
 solver.start()

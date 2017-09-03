@@ -55,9 +55,7 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
         return pH
 
 
-def standard(time, y0,
-             constant_ones, mu_max, xxval, mu_max_t0,
-             k0_zeros, flow, yieldc, inflow, output):
+def standard(time, y0, dataset, output):
     """Standard Integrator Model
 
     PARAMETERS
@@ -77,6 +75,33 @@ def standard(time, y0,
     #       Section 1: Variable Data Preprocessing
     #
     # ---------------------------------------------------
+    # _parameters = [constants_one, mu_max, xxval, mu_max_t0,
+    #                [k0_carbon, k0_prot], [flow_in, flow_out],
+    #                dataset.yc.get("value"), substrate_inflow]
+
+    # Constant One Argument
+    names = ["ks", "ks_nh3", "pk_low", "pk_high", "ks_nh3", "ki_carbon",
+             "ki_prot", "ki_hac_hpr", "ki_hac_hbut", "ki_hac_hval",
+             "ki_nh3_hac", "ki_lcfa"]
+    constant_ones = [dataset.Const1.get("params").get(item) for item in names]
+
+    # XX-Val Argument
+    names = ["k_h", "ka_nh4", "ka_hac", "ka_hpr", "ka_hbut", "ka_hval",
+             "ka1_co2", "ka2_co2", "ka_h2s", "ka_h2po4", "kw"]
+    xxval = [dataset.henry_constants.get(item) for item in names]
+
+    inflow = dataset.substrate_flow
+    flow_in = dataset.flow_in
+    flow_out = dataset.flow_out
+
+    # Define reaction rates and growth factors
+    k0_carbon = dataset.mu_max.get("params").get("k0_carbon")
+    k0_prot = dataset.mu_max.get("params").get("k0_prot")
+    # --
+    mu_max = dataset.mu_max.get("params").get("mu_max")
+    mu_max_t0 = dataset.mu_max.get("params").get("mu_max_t0")
+    # --
+    yieldc = dataset.yc.get("value")
 
     # Constants
     kd0 = 0.05
@@ -99,9 +124,6 @@ def standard(time, y0,
     # XXVal Argument
     k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2, \
         ka2_co2, ka_h2s, ka_h2po4, kw = xxval
-
-    # K_zeros
-    k0_carbon, k0_prot = k0_zeros
 
     # ---------------------------------------------------
     #
@@ -179,7 +201,6 @@ def standard(time, y0,
     z_two = (mu * degraders.reshape(-1, 1)).reshape(-1)
     z = np.concatenate((z, z_two))
     # -- flow in y_value
-    flow_in, flow_out = flow
     y_dot = np.zeros((33,))
     y_dot[0] = flow_in - flow_out
     y_dot[1:17] = (yieldc.conj().transpose()).dot(z)
