@@ -1,7 +1,6 @@
 #!/usr/bin/python
 
 import yaml
-import numpy as np
 
 import model
 from frame import Parameters
@@ -48,7 +47,7 @@ flow_in = flow_in / 24
 flow_out = flow_out / 24
 
 # Import datasets
-dataset = Parameters(data_folder)
+dataset = Parameters(configuration)
 dataset.process_data(temp=temp, flow_in=flow_in, flow_out=flow_out)
 boyle_logger.info("Input data loaded.")
 
