@@ -40,6 +40,7 @@ class Manager:
             manager_logger.info("Finished setting up model. %s" % self._meta)
             self._data_output = BoyleOutput(self._meta, self._model)
             self.initialize_solver(iname="vode")
+            self.function_parameters()
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
@@ -78,11 +79,10 @@ class Manager:
         manager_logger.info("Starting post-process of result data.")
         self.post_process(result=result)
 
-    def function_parameters(self, parameters):
+    def function_parameters(self):
         """Pass function parameters to the simulator"""
         try:
-            parameters.append(self._data_output)
-            self._solver.set_f_params(*parameters)
+            self._solver.set_f_params(*[self._frame, self._data_output])
         except:
             raise
         finally:

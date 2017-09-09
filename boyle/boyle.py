@@ -40,5 +40,4 @@ boyle_logger.info("Input data loaded.")
 boyle_logger.info("Finished setting up constants.")
 
 solver = Manager(model.standard, frame=dataset)
-solver.function_parameters(parameters=[dataset])
 solver.start()
