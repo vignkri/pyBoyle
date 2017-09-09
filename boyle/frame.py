@@ -15,16 +15,13 @@ simulation.
 class Parameters:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
-        settings = configuration.get("settings")
+        self.__experiment_name = configuration.get("name")
+        self.__settings = configuration.get("settings")
         self.__solver_settings = configuration.get("solver")
         regulate_settings = configuration.get("regulate")
 
         # Simulation settings
         folder = configuration.get("data")
-        experiment_name = configuration.get("name")
-        start_time = settings.get("t_initial")
-        end_time = settings.get("t_final")
-        step_size = settings.get("step_size")
 
         try:
             assert os.path.exists(folder)
@@ -48,6 +45,18 @@ class Parameters:
             nsteps=self.__solver_settings.get("nsteps")
         )
         return _solver_params
+
+    @property
+    def _simulation_config(self):
+        """Simulation configuration dictionary"""
+        _simulation_config = dict(
+            initial=self.Initial.get("value"),
+            start_time=self.__settings.get("t_initial"),
+            end_time=self.__settings.get("t_final"),
+            step=self.__settings.get("step_size"),
+            metadata=self.__experiment_name
+        )
+        return _simulation_config
 
     def import_files(self, names, files):
         """Import the files from the defined folder"""

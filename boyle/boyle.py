@@ -18,8 +18,7 @@ config_file = "./simulation.yaml"
 with open(config_file, "r") as config_stream:
     configuration = yaml.load(config_stream)
 # --
-settings = configuration.get("settings")
-solver_settings = configuration.get("solver")
+
 regulate_settings = configuration.get("regulate")
 boyle_logger.info("Configuration file loaded.")
 
