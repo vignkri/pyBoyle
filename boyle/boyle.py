@@ -62,6 +62,6 @@ _solver_params = dict(method=solver_method, order=solver_order,
                       nsteps=solver_nsteps)
 
 solver = Manager(model.standard, config=_config)
-solver.initialize_solver(iname="vode", i_params=_solver_params)
+solver.initialize_solver(iname="vode", i_params=dataset._solver)
 solver.function_parameters(parameters=[dataset])
 solver.start()

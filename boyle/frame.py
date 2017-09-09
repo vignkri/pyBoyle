@@ -16,7 +16,7 @@ class Parameters:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
         settings = configuration.get("settings")
-        solver_settings = configuration.get("solver")
+        self.__solver_settings = configuration.get("solver")
         regulate_settings = configuration.get("regulate")
 
         # Simulation settings
@@ -26,12 +26,6 @@ class Parameters:
         end_time = settings.get("t_final")
         step_size = settings.get("step_size")
 
-        # Solver Settings
-        solver_method = solver_settings.get("method")
-        solver_order = solver_settings.get("order")
-        solver_nsteps = solver_settings.get("nsteps")
-        absolute_tolerance = solver_settings.get("absolute")
-        relative_tolerance = solver_settings.get("relative")
         try:
             assert os.path.exists(folder)
             self._folder = folder
@@ -43,6 +37,17 @@ class Parameters:
             _names = [item for item in files]
             _files = [os.path.join(fldr, item) for item in files]
             self.import_files(names=_names, files=_files)
+
+    @property
+    def _solver(self):
+        _solver_params = dict(
+            method=self.__solver_settings.get("method"),
+            order=self.__solver_settings.get("order"),
+            rtol=self.__solver_settings.get("relative"),
+            atol=self.__solver_settings.get("absolute"),
+            nsteps=self.__solver_settings.get("nsteps")
+        )
+        return _solver_params
 
     def import_files(self, names, files):
         """Import the files from the defined folder"""
