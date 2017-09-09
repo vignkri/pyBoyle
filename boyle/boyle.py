@@ -30,12 +30,6 @@ start_time = settings.get("t_initial")
 end_time = settings.get("t_final")
 step_size = settings.get("step_size")
 
-# Solver Settings
-solver_method = solver_settings.get("method")
-solver_order = solver_settings.get("order")
-solver_nsteps = solver_settings.get("nsteps")
-absolute_tolerance = solver_settings.get("absolute")
-relative_tolerance = solver_settings.get("relative")
 
 # Regulate Settings
 temp = regulate_settings.get("temperature")
@@ -57,9 +51,6 @@ boyle_logger.info("Finished setting up constants.")
 _config = dict(initial=dataset.Initial.get("value"),
                start_time=start_time, end_time=end_time,
                step=step_size, metadata=experiment_name)
-_solver_params = dict(method=solver_method, order=solver_order,
-                      rtol=relative_tolerance, atol=absolute_tolerance,
-                      nsteps=solver_nsteps)
 
 solver = Manager(model.standard, config=_config)
 solver.initialize_solver(iname="vode", i_params=dataset._solver)
