@@ -39,12 +39,13 @@ class Manager:
         else:
             manager_logger.info("Finished setting up model. %s" % self._meta)
             self._data_output = BoyleOutput(self._meta, self._model)
+            self.initialize_solver(iname="vode")
 
-    def initialize_solver(self, iname, i_params):
+    def initialize_solver(self, iname):
         """Initialize the solver for computation"""
         try:
             self._solver = scipy.integrate.ode(self._model) \
-                .set_integrator(iname, **i_params)
+                .set_integrator(iname, **self._frame._solver)
         except:
             raise
         finally:
