@@ -15,7 +15,7 @@ to the main application.
 
 
 class Manager:
-    def __init__(self, model, config):
+    def __init__(self, model, frame):
         """Initialize manager for creating a simulation
 
         PARAMETERS
@@ -24,12 +24,13 @@ class Manager:
         config : dict
         """
         self._model = model
+        self._frame = frame
         try:
-            self._initial_value = config.get("initial")
-            self._initial_time = config.get("start_time")
-            self._end_time = config.get("end_time")
-            self._step = config.get("step")
-            self._meta = config.get("metadata")
+            self._initial_value = frame._simulation_config.get("initial")
+            self._initial_time = frame._simulation_config.get("start_time")
+            self._end_time = frame._simulation_config.get("end_time")
+            self._step = frame._simulation_config.get("step")
+            self._meta = frame._simulation_config.get("metadata")
         except KeyError as e:
             manager_logger.error("KeyError: Check Configuration File", e)
             print("KeyError: Check configuration file. Key is missing.")
