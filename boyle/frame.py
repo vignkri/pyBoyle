@@ -40,6 +40,10 @@ class Parameters:
         self.Initial.update({"value": np.concatenate(
             (self.Initial["value"], np.zeros(4, ))
         )})
+        # -- substrate flow
+        self.flow_in = flow_in
+        self.flow_out = flow_out
+        self.substrate_flow = flow_in * self.regulate.get("value")[4:]
         # -- Compute Temperature Dependent Constants
         const1 = self.Const1.get("value")
         mu_max = np.zeros((10, 1))
