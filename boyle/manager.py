@@ -26,9 +26,6 @@ class Manager:
         self._model = model
         self._frame = frame
         try:
-            self._initial_value = frame._simulation_config.get("initial")
-            self._initial_time = frame._simulation_config.get("start_time")
-            self._end_time = frame._simulation_config.get("end_time")
             self._step = frame._simulation_config.get("step")
             self._meta = frame._simulation_config.get("metadata")
         except KeyError as e:
@@ -48,7 +45,7 @@ class Manager:
         except:
             raise
         finally:
-            self._solver.set_initial_value(y=self._initial_value,
+            self._solver.set_initial_value(y=self._frame.Initial.get("value"),
                                            t=self._initial_time)
 
     def post_process(self):
@@ -91,6 +88,10 @@ class Manager:
     def start(self):
         manager_logger.info("Starting the simulation.")
         self._frame.regulation()
+        # -- set timing by regulation settings
+        self._initial_time = 0
+        self._end_time = self._frame.regulation_values["tp"][0]
+        self._frame.process_data(index=0)
         self.initialize_solver(iname="vode")
         self.function_parameters()
         try:

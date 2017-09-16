@@ -50,9 +50,6 @@ class Parameters:
     def _simulation_config(self):
         """Simulation configuration dictionary"""
         _simulation_config = dict(
-            initial=self.Initial.get("value"),
-            start_time=self.__settings.get("t_initial"),
-            end_time=self.__settings.get("t_final"),
             step=self.__settings.get("step_size"),
             metadata=self.__experiment_name
         )
