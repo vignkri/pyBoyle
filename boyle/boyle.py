@@ -33,7 +33,6 @@ flow_out = flow_out / 24
 
 # Import datasets
 dataset = Parameters(configuration)
-dataset.process_data(temp=temp, flow_in=flow_in, flow_out=flow_out)
 boyle_logger.info("Input data loaded.")
 
 # --

@@ -70,24 +70,23 @@ class Parameters:
         time_periods = self.regulate.get("value")[:, 0]
         temperatures = self.regulate.get("value")[:, 1]
         flows = self.regulate.get("value")[:, [2, 3]] / 24
-        substrate = flows.reshape(-1, 1) * self.regulate.get("value")[0, 4:]
-        return dict(
-            tp=time_periods,
-            temp=temperatures,
-            flows=flows,
-            substrates=substrate
+        substrate = flows[:,0].reshape(-1,1) * self.regulate.get("value")[:, 4:]
+        self.regulation_values = dict(
+            tp=time_periods, temp=temperatures,
+            flows=flows, substrates=substrate
         )
 
-    def process_data(self, temp, flow_in, flow_out):
+    def process_data(self, index):
         """Process the imported dataset and update the values."""
         # -- Update initial values set
         self.Initial.update({"value": np.concatenate(
             (self.Initial["value"], np.zeros(4, ))
         )})
         # -- substrate flow
-        self.flow_in = flow_in
-        self.flow_out = flow_out
-        self.substrate_flow = flow_in * self.regulate.get("value")[0, 4:]
+        temp = self.regulation_values["temp"][index]
+        self.flow_in = self.regulation_values["flows"][index, 0]
+        self.flow_out = self.regulation_values["flows"][index, 1]
+        self.substrate_flow = self.regulation_values["substrates"][index]
         # -- Compute Temperature Dependent Constants
         const1 = self.Const1.get("value")
         mu_max = np.zeros((10, 1))
