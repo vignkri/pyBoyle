@@ -45,7 +45,7 @@ class Manager:
         except:
             raise
         finally:
-            self._solver.set_initial_value(y=self._frame.Initial.get("value"),
+            self._solver.set_initial_value(y=self.initial_value,
                                            t=self._initial_time)
 
     def post_process(self):
@@ -58,8 +58,6 @@ class Manager:
                                            np.array(np.sum(self.result[idx][29:]))])
             self._data_output._update("solution", self.final_result)
         # --
-        self._data_output.as_pickle()
-        manager_logger.info("Post processing of data finished.")
 
     def __solver_start(self):
         """Start the solver"""
@@ -74,7 +72,7 @@ class Manager:
             self.result.append(row)
         # --
         manager_logger.info("Starting post-process of result data.")
-        self.post_process()
+        self._frame.Initial.update({"value": self.result[-1][1:]})
 
     def function_parameters(self):
         """Pass function parameters to the simulator"""
@@ -89,14 +87,26 @@ class Manager:
         manager_logger.info("Starting the simulation.")
         self._frame.regulation()
         # -- set timing by regulation settings
-        self._initial_time = 0
-        self._end_time = self._frame.regulation_values["tp"][0]
-        self._frame.process_data(index=0)
-        self.initialize_solver(iname="vode")
-        self.function_parameters()
-        try:
-            self.__solver_start()
-        except:
-            raise
-        finally:
-            manager_logger.info("Simulation finished successfully.")
+        for idx in range(0, len(self._frame.regulation_values["tp"])):
+            if idx == 0:
+                self._initial_time = 0
+                self._end_time = self._frame.regulation_values["tp"][idx]
+            else:
+                self._initial_time = self._end_time
+                self._end_time = self._end_time + \
+                    self._frame.regulation_values["tp"][idx]
+            print(self._initial_time, self._end_time)
+            self._frame.process_data(index=idx)
+            self.initial_value = self._frame.Initial.get("value")
+            self.initialize_solver(iname="vode")
+            self.function_parameters()
+            try:
+                self.__solver_start()
+            except:
+                raise
+            finally:
+                manager_logger.info("Simulation finished successfully.")
+        # --
+        self.post_process()
+        self._data_output.as_pickle()
+        manager_logger.info("Post processing of data finished.")
