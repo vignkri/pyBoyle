@@ -64,6 +64,12 @@ class Parameters:
 
     def regulation(self):
         """Set up solver regulation settings"""
+        # -- Update initial values set at start
+        # TODO: CHANGE THIS PROPERLY
+        self.Initial.update({"value": np.concatenate(
+            (self.Initial["value"], np.zeros(4, ))
+        )})
+        # --
         time_periods = self.regulate.get("value")[:, 0]
         temperatures = self.regulate.get("value")[:, 1]
         flows = self.regulate.get("value")[:, [2, 3]] / 24
@@ -75,10 +81,6 @@ class Parameters:
 
     def process_data(self, index):
         """Process the imported dataset and update the values."""
-        # -- Update initial values set
-        self.Initial.update({"value": np.concatenate(
-            (self.Initial["value"], np.zeros(4, ))
-        )})
         # -- substrate flow
         temp = self.regulation_values["temp"][index]
         self.flow_in = self.regulation_values["flows"][index, 0]
