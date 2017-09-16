@@ -39,8 +39,6 @@ class Manager:
         else:
             manager_logger.info("Finished setting up model. %s" % self._meta)
             self._data_output = BoyleOutput(self._meta, self._model)
-            self.initialize_solver(iname="vode")
-            self.function_parameters()
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
@@ -53,14 +51,15 @@ class Manager:
             self._solver.set_initial_value(y=self._initial_value,
                                            t=self._initial_time)
 
-    def post_process(self, result):
-        for idx in reversed(list(range(1, len(result)))):
-            result[idx][29:] = (result[idx][29:] - result[idx-1][29:]) / (
-                result[idx][0] - result[idx-1][0]
+    def post_process(self):
+        for idx in reversed(list(range(1, len(self.result)))):
+            self.result[idx][29:] = (self.result[idx][29:] -
+                                     self.result[idx-1][29:]) / (
+                self.result[idx][0] - self.result[idx-1][0]
             ) / 1000
-            final_result = np.hstack([result[idx],
-                                      np.array(np.sum(result[idx][29:]))])
-            self._data_output._update("solution", final_result)
+            self.final_result = np.hstack([self.result[idx],
+                                           np.array(np.sum(self.result[idx][29:]))])
+            self._data_output._update("solution", self.final_result)
         # --
         self._data_output.as_pickle()
         manager_logger.info("Post processing of data finished.")
@@ -68,16 +67,17 @@ class Manager:
     def __solver_start(self):
         """Start the solver"""
         manager_logger.info("Starting the solver")
-        result = []
+        self.result = []
+        # --
         while self._solver.successful() and self._solver.t < self._end_time:
             y_dot = self._solver.integrate(self._solver.t + self._step,
                                            step=True)
             # self._data_output._update("result", [self._solver.t] + list(y_dot))
             row = np.hstack([np.array([self._solver.t]), y_dot])
-            result.append(row)
+            self.result.append(row)
         # --
         manager_logger.info("Starting post-process of result data.")
-        self.post_process(result=result)
+        self.post_process()
 
     def function_parameters(self):
         """Pass function parameters to the simulator"""
