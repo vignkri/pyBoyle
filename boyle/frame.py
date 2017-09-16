@@ -65,6 +65,21 @@ class Parameters:
             setattr(self, name, {"path": _file,
                                  "value": np.loadtxt(_file, comments="%")})
 
+    def regulation(self):
+        """Set up solver regulation settings"""
+        time_periods = self.regulate.get("value")[:, 0]
+        temperatures = self.regulate.get("value")[:, 1]
+        flow_in = self.regulate.get("value")[:, 2] / 24
+        flow_out = self.regulate.get("value")[:, 3] / 24
+        substrate_flows = self.regulate.get("value")[0, 4:]
+        return dict(
+            tp=time_periods,
+            temp=temperatures,
+            flowin=flow_in,
+            flowout=flow_out,
+            substrates=substrate_flows
+        )
+
     def process_data(self, temp, flow_in, flow_out):
         """Process the imported dataset and update the values."""
         # -- Update initial values set
@@ -74,7 +89,7 @@ class Parameters:
         # -- substrate flow
         self.flow_in = flow_in
         self.flow_out = flow_out
-        self.substrate_flow = flow_in * self.regulate.get("value")[4:]
+        self.substrate_flow = flow_in * self.regulate.get("value")[0, 4:]
         # -- Compute Temperature Dependent Constants
         const1 = self.Const1.get("value")
         mu_max = np.zeros((10, 1))
