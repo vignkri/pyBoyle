@@ -90,6 +90,9 @@ class Manager:
 
     def start(self):
         manager_logger.info("Starting the simulation.")
+        self._frame.regulation()
+        self.initialize_solver(iname="vode")
+        self.function_parameters()
         try:
             self.__solver_start()
         except:
