@@ -69,15 +69,13 @@ class Parameters:
         """Set up solver regulation settings"""
         time_periods = self.regulate.get("value")[:, 0]
         temperatures = self.regulate.get("value")[:, 1]
-        flow_in = self.regulate.get("value")[:, 2] / 24
-        flow_out = self.regulate.get("value")[:, 3] / 24
-        substrate_flows = self.regulate.get("value")[0, 4:]
+        flows = self.regulate.get("value")[:, [2, 3]] / 24
+        substrate = flows.reshape(-1, 1) * self.regulate.get("value")[0, 4:]
         return dict(
             tp=time_periods,
             temp=temperatures,
-            flowin=flow_in,
-            flowout=flow_out,
-            substrates=substrate_flows
+            flows=flows,
+            substrates=substrate
         )
 
     def process_data(self, temp, flow_in, flow_out):
