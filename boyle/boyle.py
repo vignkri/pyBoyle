@@ -22,14 +22,6 @@ with open(config_file, "r") as config_stream:
 regulate_settings = configuration.get("regulate")
 boyle_logger.info("Configuration file loaded.")
 
-# Regulate Settings
-temp = regulate_settings.get("temperature")
-flow_in = regulate_settings.get("flow_in")
-flow_out = regulate_settings.get("flow_out")
-
-# Days to hourly flow rate change
-flow_in = flow_in / 24
-flow_out = flow_out / 24
 
 # Import datasets
 dataset = Parameters(configuration)
