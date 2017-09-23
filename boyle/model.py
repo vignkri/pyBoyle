@@ -201,9 +201,9 @@ def standard(time, y0, dataset, output):
     z = np.array([
         cell_decay,
         carbo_is * k0_carbon * ki_carbon / (ki_carbon + hac + 0.811 * hpr +
-                                            0.659 * hbut),
+                                            0.682 * hbut + 0.588 * hval),
         prot_is * k0_prot * ki_prot / (ki_prot + hac + 0.811 * hpr +
-                                       0.659 * hbut)
+                                       0.682 * hbut + 0.588 * hval)
     ])
     z_two = (mu * degraders.reshape(-1, 1)).reshape(-1)
     z = np.concatenate((z, z_two))

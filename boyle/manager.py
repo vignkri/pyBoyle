@@ -95,7 +95,6 @@ class Manager:
                 self._initial_time = self._end_time
                 self._end_time = self._end_time + \
                     self._frame.regulation_values["tp"][idx]
-            print(self._initial_time, self._end_time)
             self._frame.process_data(index=idx)
             self.initial_value = self._frame.Initial.get("value")
             self.initialize_solver(iname="vode")
