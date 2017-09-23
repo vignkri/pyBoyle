@@ -87,20 +87,21 @@ class Parameters:
         self.flow_out = self.regulation_values["flows"][index, 1]
         self.substrate_flow = self.regulation_values["substrates"][index]
         # -- Compute Temperature Dependent Constants
+        print(temp, self.flow_in, self.flow_out)
         const1 = self.Const1.get("value")
         mu_max = np.zeros((10, 1))
         mu_max_t0 = np.zeros((10, 1))
-        for index in range(0, 10):
-            mu_max_t0[index] = const1[index, 0]
-            alpha = const1[index, 1]
-            t0 = const1[index, 2]
-            t_opt = const1[index, 3]
-            t_max = const1[index, 4]
+        for idx in range(0, 10):
+            mu_max_t0[idx] = const1[idx, 0]
+            alpha = const1[idx, 1]
+            t0 = const1[idx, 2]
+            t_opt = const1[idx, 3]
+            t_max = const1[idx, 4]
             #
             if temp < t_opt:
-                mu_max[index] = mu_max_t0[index] + alpha * (temp - t0)
+                mu_max[idx] = mu_max_t0[idx] + alpha * (temp - t0)
             else:
-                mu_max[index] = (mu_max_t0[index] + alpha * (t_opt - t0)) * \
+                mu_max[idx] = (mu_max_t0[idx] + alpha * (t_opt - t0)) * \
                     (t_max - temp) / (t_max - t_opt)
         setattr(self, "mu_max", dict(value=mu_max))
         # --
