@@ -44,14 +44,21 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
     # --
     H = H - (Hfunc - H) / (dhfunc_dh - 1)
     # --
-    pH = -np.log10(H)
+    pH = - np.log10(H)
     # --
-    if abs(Hfunc - H) > 1e-12 and pH is None:
+    if abs(Hfunc - H) > 1e-12:
         new_args = kwargs
-        H = H
-        Hfunc = Hfunc
-        newton_pH(H, Hfunc, i=i, **new_args)
-    else:
+        new_H = H
+        new_Hfunc = Hfunc
+        newton_pH(new_H, new_Hfunc, i=i, **new_args)
+    try:
+        assert pH is not None
+    except AssertionError as e:
+        new_args = kwargs
+        new_H = H
+        new_Hfunc = Hfunc
+        newton_pH(new_H, new_Hfunc, i=1, **new_args)
+    finally:
         return pH
 
 
