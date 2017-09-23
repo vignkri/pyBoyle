@@ -210,7 +210,7 @@ def standard(time, y0, dataset, output):
     # -- flow in y_value
     y_dot = np.zeros((33,))
     y_dot[0] = flow_in - flow_out
-    y_dot[1:17] = (yieldc.conj().transpose()).dot(z)
+    y_dot[1:17] = (yieldc.transpose()).dot(z)
     y_dot[20] = np.sum(cell_death) - cell_decay
     y_dot[21:29] = z[3:] - cell_death.reshape(-1)
     y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y0[1:29]) / volume
