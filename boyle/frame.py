@@ -87,7 +87,6 @@ class Parameters:
         self.flow_out = self.regulation_values["flows"][index, 1]
         self.substrate_flow = self.regulation_values["substrates"][index]
         # -- Compute Temperature Dependent Constants
-        print(temp, self.flow_in, self.flow_out)
         const1 = self.Const1.get("value")
         mu_max = np.zeros((10, 1))
         mu_max_t0 = np.zeros((10, 1))

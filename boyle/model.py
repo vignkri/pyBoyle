@@ -43,23 +43,24 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
         nh3 / 14 * ka_nh4 / (H + ka_nh4)**2
     # --
     H = H - (Hfunc - H) / (dhfunc_dh - 1)
+    return H, Hfunc
     # --
-    pH = - np.log10(H)
-    # --
-    if abs(Hfunc - H) > 1e-12:
-        new_args = kwargs
-        new_H = H
-        new_Hfunc = Hfunc
-        newton_pH(new_H, new_Hfunc, i=i, **new_args)
-    try:
-        assert pH is not None
-    except AssertionError as e:
-        new_args = kwargs
-        new_H = H
-        new_Hfunc = Hfunc
-        newton_pH(new_H, new_Hfunc, i=1, **new_args)
-    finally:
-        return pH
+    # pH = - np.log10(H)
+    # if 1e-12 < abs(Hfunc - H):
+    #     new_args = kwargs
+    #     new_H = H
+    #     new_Hfunc = Hfunc
+    #     newton_pH(new_H, new_Hfunc, i=i, **new_args)
+
+    # try:
+    #     assert pH is not None
+    # except AssertionError as e:/ 100i
+    #     new_args = kwargs
+    #     new_H = H
+    #     new_Hfunc = Hfunc
+    #     newton_pH(new_H, new_Hfunc, i=1, **new_args)
+    # finally:
+    #     return H
 
 
 def standard(time, y0, dataset, output):
@@ -139,14 +140,29 @@ def standard(time, y0, dataset, output):
     # ---------------------------------------------------
     H = 1e-8
     Hfunc = 1
+    pH = 8
+
+    while abs(Hfunc - H) > 1e-12 or pH is None:
+        H, Hfunc = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
+                             HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
+                             HBut=[hbut, ka_hbut],
+                             HVal=[hval, ka_hval], Other=[a, z, kw],
+                             h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+        pH = - np.log10(Hfunc)
 
     # -- call pH computation function using newton-raphson
     # -- this function is recursive and therefore additional information
     # -- and logging should be added to get best data possible
-    pH = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
-                   HAc=[hac, ka_hac], HPr=[hpr, ka_hpr], HBut=[hbut, ka_hbut],
-                   HVal=[hval, ka_hval], Other=[a, z, kw],
-                   h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+    # pH = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
+    #                HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
+    #                HBut=[hbut, ka_hbut],
+    #                HVal=[hval, ka_hval], Other=[a, z, kw],
+    #                h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+
+    try:
+        assert pH is not None
+    except AssertionError as e:
+        raise
 
     # ---------------------------------------------------
     #
