@@ -71,6 +71,8 @@ class Parameters:
         )})
         # --
         time_periods = self.regulate.get("value")[:, 0]
+        if not isinstance(time_periods, np.ndarray):
+            time_periods = np.array(time_periods)
         temperatures = self.regulate.get("value")[:, 1]
         flows = self.regulate.get("value")[:, [2, 3]] / 24
         substrate = flows[:,0].reshape(-1,1) * self.regulate.get("value")[:, 4:]
