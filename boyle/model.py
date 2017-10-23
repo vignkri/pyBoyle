@@ -43,21 +43,27 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
         nh3 / 14 * ka_nh4 / (H + ka_nh4)**2
     # --
     H = H - (Hfunc - H) / (dhfunc_dh - 1)
+    return H, Hfunc
     # --
-    pH = -np.log10(H)
-    # --
-    if abs(Hfunc - H) > 1e-12 and pH is None:
-        new_args = kwargs
-        H = H
-        Hfunc = Hfunc
-        newton_pH(H, Hfunc, i=i, **new_args)
-    else:
-        return pH
+    # pH = - np.log10(H)
+    # if 1e-12 < abs(Hfunc - H):
+    #     new_args = kwargs
+    #     new_H = H
+    #     new_Hfunc = Hfunc
+    #     newton_pH(new_H, new_Hfunc, i=i, **new_args)
+
+    # try:
+    #     assert pH is not None
+    # except AssertionError as e:/ 100i
+    #     new_args = kwargs
+    #     new_H = H
+    #     new_Hfunc = Hfunc
+    #     newton_pH(new_H, new_Hfunc, i=1, **new_args)
+    # finally:
+    #     return H
 
 
-def standard(time, y0,
-             constant_ones, mu_max, xxval, mu_max_t0,
-             k0_zeros, flow, yieldc, inflow, output):
+def standard(time, y0, dataset, output):
     """Standard Integrator Model
 
     PARAMETERS
@@ -77,6 +83,33 @@ def standard(time, y0,
     #       Section 1: Variable Data Preprocessing
     #
     # ---------------------------------------------------
+    # _parameters = [constants_one, mu_max, xxval, mu_max_t0,
+    #                [k0_carbon, k0_prot], [flow_in, flow_out],
+    #                dataset.yc.get("value"), substrate_inflow]
+
+    # Constant One Argument
+    names = ["ks", "ks_nh3", "pk_low", "pk_high", "ks_nh3", "ki_carbon",
+             "ki_prot", "ki_hac_hpr", "ki_hac_hbut", "ki_hac_hval",
+             "ki_nh3_hac", "ki_lcfa"]
+    constant_ones = [dataset.Const1.get("params").get(item) for item in names]
+
+    # XX-Val Argument
+    names = ["k_h", "ka_nh4", "ka_hac", "ka_hpr", "ka_hbut", "ka_hval",
+             "ka1_co2", "ka2_co2", "ka_h2s", "ka_h2po4", "kw"]
+    xxval = [dataset.henry_constants.get(item) for item in names]
+
+    inflow = dataset.substrate_flow
+    flow_in = dataset.flow_in
+    flow_out = dataset.flow_out
+
+    # Define reaction rates and growth factors
+    k0_carbon = dataset.mu_max.get("params").get("k0_carbon")
+    k0_prot = dataset.mu_max.get("params").get("k0_prot")
+    # --
+    mu_max = dataset.mu_max.get("params").get("mu_max")
+    mu_max_t0 = dataset.mu_max.get("params").get("mu_max_t0")
+    # --
+    yieldc = dataset.yc.get("value")
 
     # Constants
     kd0 = 0.05
@@ -100,9 +133,6 @@ def standard(time, y0,
     k_h, ka_nh4, ka_hac, ka_hpr, ka_hbut, ka_hval, ka1_co2, \
         ka2_co2, ka_h2s, ka_h2po4, kw = xxval
 
-    # K_zeros
-    k0_carbon, k0_prot = k0_zeros
-
     # ---------------------------------------------------
     #
     #       Section 2: pH Computation
@@ -110,14 +140,29 @@ def standard(time, y0,
     # ---------------------------------------------------
     H = 1e-8
     Hfunc = 1
+    pH = 8
+
+    while abs(Hfunc - H) > 1e-12 or pH is None:
+        H, Hfunc = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
+                             HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
+                             HBut=[hbut, ka_hbut],
+                             HVal=[hval, ka_hval], Other=[a, z, kw],
+                             h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+        pH = - np.log10(Hfunc)
 
     # -- call pH computation function using newton-raphson
     # -- this function is recursive and therefore additional information
     # -- and logging should be added to get best data possible
-    pH = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
-                   HAc=[hac, ka_hac], HPr=[hpr, ka_hpr], HBut=[hbut, ka_hbut],
-                   HVal=[hval, ka_hval], Other=[a, z, kw],
-                   h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+    # pH = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
+    #                HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
+    #                HBut=[hbut, ka_hbut],
+    #                HVal=[hval, ka_hval], Other=[a, z, kw],
+    #                h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+
+    try:
+        assert pH is not None
+    except AssertionError as e:
+        raise
 
     # ---------------------------------------------------
     #
@@ -172,17 +217,16 @@ def standard(time, y0,
     z = np.array([
         cell_decay,
         carbo_is * k0_carbon * ki_carbon / (ki_carbon + hac + 0.811 * hpr +
-                                            0.659 * hbut),
+                                            0.682 * hbut + 0.588 * hval),
         prot_is * k0_prot * ki_prot / (ki_prot + hac + 0.811 * hpr +
-                                       0.659 * hbut)
+                                       0.682 * hbut + 0.588 * hval)
     ])
     z_two = (mu * degraders.reshape(-1, 1)).reshape(-1)
     z = np.concatenate((z, z_two))
     # -- flow in y_value
-    flow_in, flow_out = flow
     y_dot = np.zeros((33,))
     y_dot[0] = flow_in - flow_out
-    y_dot[1:17] = (yieldc.conj().transpose()).dot(z)
+    y_dot[1:17] = (yieldc.transpose()).dot(z)
     y_dot[20] = np.sum(cell_death) - cell_decay
     y_dot[21:29] = z[3:] - cell_death.reshape(-1)
     y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y0[1:29]) / volume
@@ -246,9 +290,6 @@ def standard(time, y0,
     #
     # --------------------------------------------
 
-    output._update("substrates", [time] + y0[0:20].tolist())
-    output._update("degraders", [time] + degraders.tolist())
-    output._update("ph", [time, pH])
-    output._update("mu", [time] + mu[:, 0].tolist() + [True])
+    output._update("debug", [time] + mu[:, 0].tolist() + [pH] + y_dot.tolist())
 
     return y_dot

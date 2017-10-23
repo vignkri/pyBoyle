@@ -21,23 +21,22 @@ class BoyleOutput(object):
         self._creation_date = time.gmtime()
         # result key_list
         self.__available_headers = dict(
-            mu=["time", "one", "two", "three", "four", "five", "six", "seven",
-                "eight", "PostFlag"],
-            substrates=["time", "volume", "carbo_is", "carbo_in", "carbon",
-                        "lipids", "lcfa", "prot_is", "prot_in", "amino",
-                        "nh3", "hac", "hpr", "hbut", "hval", "ch4",
-                        "co2", "h2s", "zplus", "h2po4", "aminus"],
-            degraders=["time", "carb_degr", "amino_degr", "lipid_degr",
-                       "lcfa_degr", "prop_degr", "butyr_degr",
-                       "valer_degr", "acet_degr"],
-            result=["time", "volume", "carbois", "carboin", "carbon",
-                    "lipids", "lcfa", "protis", "protin", "amino",
-                    "nh3", "hac", "hpr", "hbut", "hval", "ch4",
-                    "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
-                    "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
-                    "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
-                    "gfnh3", "gfch4", "gfco2", "gfh2s"],
-            ph=["time", "ph"]
+            debug=["time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
+                   "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
+                   "carboin", "carbon", "lipids", "lcfa", "protis",
+                   "protin", "amino", "nh3", "hac", "hpr", "hbut",
+                   "hval", "ch4", "co2", "h2s", "zplus", "h2po4",
+                   "aminus", "deadcell", "carb_degr", "amino_degr",
+                   "lipid_degr", "lcfa_degr", "prop_degr", "butyr_degr",
+                   "valer_degr", "acet_degr", "gfnh3", "gfch4",
+                   "gfco2", "gfh2s"],
+            solution=["time", "volume", "carbois", "carboin", "carbon",
+                      "lipids", "lcfa", "protis", "protin", "amino",
+                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                      "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
+                      "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
+                      "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
+                      "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
         )
         try:
             base_path = "./logs"
@@ -72,11 +71,7 @@ class BoyleOutput(object):
         try:
             getattr(self, attrname)
         except AttributeError as e:
-            if attrname == "processed":
-                header_name = "result"
-            else:
-                header_name = attrname
-            setattr(self, attrname, [self.__available_headers.get(header_name)])
+            setattr(self, attrname, [self.__available_headers.get(attrname)])
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
