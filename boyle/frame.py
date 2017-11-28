@@ -3,12 +3,16 @@
 import os
 import numpy as np
 
+from logger import simulationLogger
+
 """
 Process Frame data
 
 The process data for the simulation is imported
 and the data is cleaned up and updated to run the
 simulation.
+
+TODO: Refactor code for proper error catching.
 """
 
 
@@ -18,6 +22,7 @@ class Parameters:
         self.__experiment_name = configuration.get("name")
         self.__settings = configuration.get("settings")
         self.__solver_settings = configuration.get("solver")
+        # TODO: Refactor regulate settings variable
         regulate_settings = configuration.get("regulate")
 
         # Simulation settings
@@ -27,7 +32,8 @@ class Parameters:
             assert os.path.exists(folder)
             self._folder = folder
         except AssertionError as e:
-            print("Folder not found.", e)
+            simulationLogger.critical("Data folder not found.", e)
+            raise
         else:
             items = list(os.walk(folder))
             fldr, lst, files = items[0]

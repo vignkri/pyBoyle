@@ -6,7 +6,7 @@ import argparse
 
 import model
 from frame import Parameters
-from logger import boyle_logger
+from logger import simulationLogger
 from manager import Manager
 
 """
@@ -23,10 +23,7 @@ def main(cfg_path):
     # --
     # Import datasets
     dataset = Parameters(configuration)
-    boyle_logger.info("Input data loaded.")
-
-    # --
-    boyle_logger.info("Finished setting up constants.")
+    simulationLogger.info("Loaded Input data into frame.")
 
     solver = Manager(model.standard, frame=dataset)
     solver.start()
@@ -43,14 +40,14 @@ if __name__ == "__main__":
         assert args.path is not None
     except AssertionError as e:
         print("Please provide path of configuration file.")
-        boyle_logger.error("No arguments are provided. %s" % e)
+        simulationLogger.critical("No arguments are provided. %s" % e)
         raise
     # --
     try:
         assert os.path.isfile(os.path.join(cwd, args.path))
     except AssertionError as e:
         print("Configuration file not found.")
-        boyle_logger.error("Configuration file not found. %s" % e)
+        simulationLogger.critical("Configuration file not found. %s" % e)
         raise
     finally:
         main(os.path.join(cwd, args.path))

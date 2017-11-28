@@ -3,7 +3,7 @@
 import numpy as np
 import scipy.integrate
 from export import BoyleOutput
-from logger import manager_logger
+from logger import simulationLogger
 
 """
 Simulation Manager
@@ -29,12 +29,11 @@ class Manager:
             self._step = frame._simulation_config.get("step")
             self._meta = frame._simulation_config.get("metadata")
         except KeyError as e:
-            manager_logger.error("KeyError: Check Configuration File", e)
-            print("KeyError: Check configuration file. Key is missing.")
-            print("Message: ", e)
+            simulationLogger.error("KeyError: Check Configuration File"
+                                   "Key is missing.", e)
             raise
         else:
-            manager_logger.info("Finished setting up model. %s" % self._meta)
+            simulationLogger.info("Set up experiment: '%s'" % self._meta)
             self._data_output = BoyleOutput(self._meta, self._model,
                                             frame.OutputFolder)
 
@@ -62,7 +61,7 @@ class Manager:
 
     def __solver_start(self):
         """Start the solver"""
-        manager_logger.info("Starting the solver")
+        simulationLogger.info("Starting the solver")
         self.result = []
         # --
         while self._solver.successful() and self._solver.t < self._end_time:
@@ -72,7 +71,7 @@ class Manager:
             row = np.hstack([np.array([self._solver.t]), y_dot])
             self.result.append(row)
         # --
-        manager_logger.info("Starting post-process of result data.")
+        simulationLogger.info("Starting post-process of result data.")
         self._frame.Initial.update({"value": self.result[-1][1:]})
 
     def function_parameters(self):
@@ -82,10 +81,10 @@ class Manager:
         except:
             raise
         finally:
-            manager_logger.info("Function parameters set in model.")
+            simulationLogger.info("Setting function parameters for the model")
 
     def start(self):
-        manager_logger.info("Starting the simulation.")
+        simulationLogger.info("Starting experiment simulation.")
         self._frame.regulation()
         # -- set timing by regulation settings
         for idx in range(0, len(self._frame.regulation_values["tp"])):
@@ -105,8 +104,8 @@ class Manager:
             except:
                 raise
             finally:
-                manager_logger.info("Simulation finished successfully.")
+                simulationLogger.info("Simulation finished successfully.")
         # --
         self.post_process()
         self._data_output.as_pickle()
-        manager_logger.info("Post processing of data finished.")
+        simulationLogger.info("Post processing of data finished.")

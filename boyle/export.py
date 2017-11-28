@@ -4,6 +4,8 @@ import os
 import dill
 import time
 
+from logger import simulationLogger
+
 """
 Simulation Logging Framework
 
@@ -45,7 +47,7 @@ class BoyleOutput(object):
                 os.mkdir(output_fldr)
             self._path = output_fldr
         except OSError as e:
-            print("OSError: BoyleOutput Creation Module.")
+            simulationLogger.error("OSError: BoyleOutput Creation Module.")
             raise
 
     def __repr__(self):
@@ -63,7 +65,9 @@ class BoyleOutput(object):
         try:
             with open(os.path.join(self._path, "output.pkl"), "wb") as _file:
                 dill.dump(self, _file)
-        except:
+        except OSError as e:
+            simulationLogger.error("OSError: Output pickle file not found."
+                                   "Create output file/folder to continue.")
             raise
 
     def _update(self, attrname, value):
@@ -72,6 +76,8 @@ class BoyleOutput(object):
             getattr(self, attrname)
         except AttributeError as e:
             setattr(self, attrname, [self.__available_headers.get(attrname)])
+            simulationLogger.warning("BoyleOutput: attribute '%s' not found"
+                                     % (attrname))
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
