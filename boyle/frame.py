@@ -36,6 +36,10 @@ class Parameters:
             self.import_files(names=_names, files=_files)
 
     @property
+    def OutputFolder(self):
+        return self._folder
+
+    @property
     def _solver(self):
         _solver_params = dict(
             method=self.__solver_settings.get("method"),
