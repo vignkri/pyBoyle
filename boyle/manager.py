@@ -2,7 +2,7 @@
 
 import numpy as np
 import scipy.integrate
-from frame import BoyleOutput
+from iotools import BoyleOutput
 from logger import simulationLogger
 
 """

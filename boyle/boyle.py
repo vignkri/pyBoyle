@@ -5,7 +5,7 @@ import yaml
 import argparse
 
 import model
-from frame import Parameters
+from iotools import Parameters
 from logger import simulationLogger
 from manager import Manager
 
