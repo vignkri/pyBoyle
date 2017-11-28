@@ -15,7 +15,7 @@ further analysis.
 
 class BoyleOutput(object):
     """Resultant export object from the simulation."""
-    def __init__(self, exp_name, model):
+    def __init__(self, exp_name, model, output):
         self._name = exp_name
         self._model_name = model
         self._creation_date = time.gmtime()
@@ -39,13 +39,13 @@ class BoyleOutput(object):
                       "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
         )
         try:
-            base_path = "./logs"
-            if not os.path.exists(base_path):
-                os.mkdir(base_path)
-            self._path = os.path.join(base_path, self._name)
-            if not os.path.exists(self._path):
-                os.mkdir(os.path.join(base_path, self._name))
-        except:
+            _base_path = output
+            output_fldr = os.path.join(_base_path, "output")
+            if not os.path.exists(output_fldr):
+                os.mkdir(output_fldr)
+            self._path = output_fldr
+        except OSError as e:
+            print("OSError: BoyleOutput Creation Module.")
             raise
 
     def __repr__(self):
