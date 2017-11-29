@@ -2,7 +2,6 @@
 
 import numpy as np
 import scipy.integrate
-from iotools import BoyleOutput
 from logger import simulationLogger
 
 """
@@ -34,8 +33,8 @@ class Manager:
             raise
         else:
             simulationLogger.info("Set up experiment: '%s'" % self._meta)
-            self._data_output = BoyleOutput(self._meta, self._model,
-                                            frame.OutputFolder)
+            frame.create_output()
+            self._data_output = frame
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
@@ -54,8 +53,9 @@ class Manager:
                                      self.result[idx-1][29:]) / (
                 self.result[idx][0] - self.result[idx-1][0]
             ) / 1000
+            secondary_array = np.array(np.sum(self.result[idx][29:]))
             self.final_result = np.hstack([self.result[idx],
-                                           np.array(np.sum(self.result[idx][29:]))])
+                                           secondary_array])
             self._data_output._update("solution", self.final_result)
         # --
 

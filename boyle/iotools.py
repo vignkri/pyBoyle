@@ -19,7 +19,7 @@ to.
 """
 
 
-class Parameters:
+class io:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
         self.__experiment_name = configuration.get("name")
@@ -40,10 +40,6 @@ class Parameters:
             _names = [item for item in files]
             _files = [os.path.join(fldr, item) for item in files]
             self.import_files(names=_names, files=_files)
-
-    @property
-    def OutputFolder(self):
-        return self._folder
 
     @property
     def _solver(self):
@@ -173,12 +169,8 @@ class Parameters:
         self.__const1_parameters()
         self.__compute_hconstants(temp=temp)
 
-
-class BoyleOutput(object):
-    """Resultant export object from the simulation."""
-    def __init__(self, exp_name, model, output):
-        self._name = exp_name
-        self._model_name = model
+    def create_output(self):
+        """Resultant export object from the simulation."""
         self._creation_date = time.gmtime()
         # result key_list
         self.__available_headers = dict(
@@ -200,7 +192,7 @@ class BoyleOutput(object):
                       "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
         )
         try:
-            _base_path = output
+            _base_path = self._folder
             output_fldr = os.path.join(_base_path, "output")
             if not os.path.exists(output_fldr):
                 os.mkdir(output_fldr)
@@ -208,15 +200,6 @@ class BoyleOutput(object):
         except OSError as e:
             simulationLogger.error("OSError: BoyleOutput Creation Module.")
             raise
-
-    def __repr__(self):
-        """Create representation of the object for introspection."""
-        return ("Simulation {name} performed on {DD}/{MON}/{YYYY}-{HH}:{MM}"
-                .format(name=self._name, DD=self._creation_date.tm_mday,
-                        MON=self._creation_date.tm_mon,
-                        YYYY=self._creation_date.tm_year,
-                        HH=self._creation_date.tm_hour,
-                        MM=self._creation_date.tm_min))
 
     def as_pickle(self):
         """Store the data as a pickle."""
@@ -240,3 +223,5 @@ class BoyleOutput(object):
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
+
+
