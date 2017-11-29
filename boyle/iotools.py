@@ -39,7 +39,57 @@ class io:
             fldr, lst, files = items[0]
             _names = [item for item in files]
             _files = [os.path.join(fldr, item) for item in files]
-            self.import_files(names=_names, files=_files)
+            self.setup_inputs(names=_names, files=_files)
+
+    def __const1_parameters(self):
+        """Update Const1 Parameters"""
+        const1 = self.Const1.get("value")
+        self.Const1.update(dict(
+            params=dict(
+                kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
+                pk_low=const1[2:, 9], pk_high=const1[2:, 10],
+                ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
+                ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
+                ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
+                ki_lcfa=const1[2:, 8])
+        ))
+        simulationLogger.info("Process parameter space of Const1 updated.")
+
+    def setup_inputs(self, names, files):
+        """Setup all Simulation Model Inputs"""
+        names_and_files = tuple(zip(names, files))
+        for name, _file in names_and_files:
+            setattr(self, name, {"path": _file,
+                                 "value": np.loadtxt(_file, comments="%")})
+            if name == "Const1":
+                const1 = self.Const1.get("value")
+                self.Const1.update(dict(
+                    params=dict(
+                        kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
+                        pk_low=const1[2:, 9], pk_high=const1[2:, 10],
+                        ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
+                        ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
+                        ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
+                        ki_lcfa=const1[2:, 8])
+                ))
+            elif name == "regulate":
+                time_periods = self.regulate.get("value")[:, 0]
+                if not isinstance(time_periods, np.ndarray):
+                    time_periods = np.array(time_periods)
+                temperatures = self.regulate.get("value")[:, 1]
+                flows = self.regulate.get("value")[:, [2, 3]] / 24
+                substrate = flows[:, 0].reshape(-1, 1) * \
+                    self.regulate.get("value")[:, 4:]
+                self.regulation_values = dict(
+                    tp=time_periods, temp=temperatures,
+                    flows=flows, substrates=substrate)
+            elif name == "Initial":
+                self.Initial.update({"value": np.concatenate(
+                    (self.Initial["value"], np.zeros(4, ))
+                )})
+            else:
+                pass
+        simulationLogger.info("Input parameters created.")
 
     @property
     def _solver(self):
@@ -60,34 +110,6 @@ class io:
             metadata=self.__experiment_name
         )
         return _simulation_config
-
-    def import_files(self, names, files):
-        """Import the files from the defined folder"""
-        parsed = tuple(zip(names, files))
-        for name, _file in parsed:
-            setattr(self, name, {"path": _file,
-                                 "value": np.loadtxt(_file, comments="%")})
-
-    def regulation(self):
-        """Set up solver regulation settings"""
-        # -- Update initial values set at start
-        # TODO: CHANGE THIS PROPERLY
-        self.Initial.update({"value": np.concatenate(
-            (self.Initial["value"], np.zeros(4, ))
-        )})
-        # --
-        time_periods = self.regulate.get("value")[:, 0]
-        if not isinstance(time_periods, np.ndarray):
-            time_periods = np.array(time_periods)
-        temperatures = self.regulate.get("value")[:, 1]
-        flows = self.regulate.get("value")[:, [2, 3]] / 24
-        substrate = flows[:, 0].reshape(-1, 1) *  \
-            self.regulate.get("value")[:, 4:]
-        # --
-        self.regulation_values = dict(
-            tp=time_periods, temp=temperatures,
-            flows=flows, substrates=substrate
-        )
 
     def __mu_max_compute(self, temp):
         """Compute Temperature Dependent Constants"""
@@ -116,20 +138,6 @@ class io:
             )
         ))
         simulationLogger.info("Process variable mu_max created.")
-
-    def __const1_parameters(self):
-        """Update Const1 Parameters"""
-        const1 = self.Const1.get("value")
-        self.Const1.update(dict(
-            params=dict(
-                kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
-                pk_low=const1[2:, 9], pk_high=const1[2:, 10],
-                ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
-                ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
-                ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
-                ki_lcfa=const1[2:, 8])
-        ))
-        simulationLogger.info("Process parameter space of Const1 updated.")
 
     def __compute_hconstants(self, temp):
         """Compuate henry constants"""
@@ -166,7 +174,6 @@ class io:
         self.substrate_flow = self.regulation_values["substrates"][index]
         # -- Update functions
         self.__mu_max_compute(temp=temp)
-        self.__const1_parameters()
         self.__compute_hconstants(temp=temp)
 
     def create_output(self):

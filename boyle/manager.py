@@ -85,7 +85,6 @@ class Manager:
 
     def start(self):
         simulationLogger.info("Starting experiment simulation.")
-        self._frame.regulation()
         # -- set timing by regulation settings
         for idx in range(0, len(self._frame.regulation_values["tp"])):
             if idx == 0:
