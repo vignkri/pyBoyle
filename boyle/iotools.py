@@ -8,13 +8,14 @@ import numpy as np
 from logger import simulationLogger
 
 """
-Process Frame data
+Input-Output Tools
 
-The process data for the simulation is imported
-and the data is cleaned up and updated to run the
-simulation.
 
-TODO: Refactor code for proper error catching.
+Collection of tools for ingesting and exporting data
+from the simulation process. The input is for creating
+simulation-friendly data while the export strives to create
+a dataset that is friendly to analyse and attach metadata
+to.
 """
 
 
@@ -24,12 +25,9 @@ class Parameters:
         self.__experiment_name = configuration.get("name")
         self.__settings = configuration.get("settings")
         self.__solver_settings = configuration.get("solver")
-        # TODO: Refactor regulate settings variable
-        regulate_settings = configuration.get("regulate")
 
         # Simulation settings
         folder = configuration.get("data")
-
         try:
             assert os.path.exists(folder)
             self._folder = folder
@@ -87,38 +85,45 @@ class Parameters:
             time_periods = np.array(time_periods)
         temperatures = self.regulate.get("value")[:, 1]
         flows = self.regulate.get("value")[:, [2, 3]] / 24
-        substrate = flows[:,0].reshape(-1,1) * self.regulate.get("value")[:, 4:]
+        substrate = flows[:, 0].reshape(-1, 1) *  \
+            self.regulate.get("value")[:, 4:]
+        # --
         self.regulation_values = dict(
             tp=time_periods, temp=temperatures,
             flows=flows, substrates=substrate
         )
 
-    def process_data(self, index):
-        """Process the imported dataset and update the values."""
-        # -- substrate flow
-        temp = self.regulation_values["temp"][index]
-        self.flow_in = self.regulation_values["flows"][index, 0]
-        self.flow_out = self.regulation_values["flows"][index, 1]
-        self.substrate_flow = self.regulation_values["substrates"][index]
-        # -- Compute Temperature Dependent Constants
+    def __mu_max_compute(self, temp):
+        """Compute Temperature Dependent Constants"""
         const1 = self.Const1.get("value")
         mu_max = np.zeros((10, 1))
         mu_max_t0 = np.zeros((10, 1))
+        # --
         for idx in range(0, 10):
             mu_max_t0[idx] = const1[idx, 0]
             alpha = const1[idx, 1]
             t0 = const1[idx, 2]
             t_opt = const1[idx, 3]
             t_max = const1[idx, 4]
-            #
             if temp < t_opt:
                 mu_max[idx] = mu_max_t0[idx] + alpha * (temp - t0)
             else:
                 mu_max[idx] = (mu_max_t0[idx] + alpha * (t_opt - t0)) * \
                     (t_max - temp) / (t_max - t_opt)
+        # --
         setattr(self, "mu_max", dict(value=mu_max))
         # --
-        # Set up Const1 Parameters
+        self.mu_max.update(dict(
+            params=dict(
+                k0_carbon=mu_max[0, 0], k0_prot=mu_max[1, 0],
+                mu_max_t0=mu_max_t0[2:, ], mu_max=mu_max[2:]
+            )
+        ))
+        simulationLogger.info("Process variable mu_max created.")
+
+    def __const1_parameters(self):
+        """Update Const1 Parameters"""
+        const1 = self.Const1.get("value")
         self.Const1.update(dict(
             params=dict(
                 kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
@@ -128,13 +133,10 @@ class Parameters:
                 ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
                 ki_lcfa=const1[2:, 8])
         ))
-        # -- mu_max parameters
-        self.mu_max.update(dict(
-            params=dict(
-                k0_carbon=mu_max[0, 0], k0_prot=mu_max[1, 0],
-                mu_max_t0=mu_max_t0[2:, ], mu_max=mu_max[2:]
-            )
-        ))
+        simulationLogger.info("Process parameter space of Const1 updated.")
+
+    def __compute_hconstants(self, temp):
+        """Compuate henry constants"""
         # -- delta tempature
         const2 = self.Const2.get("value")
         delta_temp = temp - const2[:, 1]
@@ -157,6 +159,19 @@ class Parameters:
             kw=10**(-henry_constants[14])
         )
         setattr(self, "henry_constants", hc)
+        simulationLogger.info("Process variable Henry-Constants created.")
+
+    def process_data(self, index):
+        """Process the imported dataset and update the values."""
+        # -- substrate flow information
+        temp = self.regulation_values["temp"][index]
+        self.flow_in = self.regulation_values["flows"][index, 0]
+        self.flow_out = self.regulation_values["flows"][index, 1]
+        self.substrate_flow = self.regulation_values["substrates"][index]
+        # -- Update functions
+        self.__mu_max_compute(temp=temp)
+        self.__const1_parameters()
+        self.__compute_hconstants(temp=temp)
 
 
 class BoyleOutput(object):
