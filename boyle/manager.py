@@ -33,7 +33,6 @@ class Manager:
             raise
         else:
             simulationLogger.info("Set up experiment: '%s'" % self._meta)
-            frame.create_output()
             self._data_output = frame
 
     def initialize_solver(self, iname):

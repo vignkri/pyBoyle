@@ -40,6 +40,36 @@ class io:
             _names = [item for item in files]
             _files = [os.path.join(fldr, item) for item in files]
             self.setup_inputs(names=_names, files=_files)
+        # Create Output Headers
+        self.__available_headers = dict(
+            debug=["time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
+                   "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
+                   "carboin", "carbon", "lipids", "lcfa", "protis",
+                   "protin", "amino", "nh3", "hac", "hpr", "hbut",
+                   "hval", "ch4", "co2", "h2s", "zplus", "h2po4",
+                   "aminus", "deadcell", "carb_degr", "amino_degr",
+                   "lipid_degr", "lcfa_degr", "prop_degr", "butyr_degr",
+                   "valer_degr", "acet_degr", "gfnh3", "gfch4",
+                   "gfco2", "gfh2s"],
+            solution=["time", "volume", "carbois", "carboin", "carbon",
+                      "lipids", "lcfa", "protis", "protin", "amino",
+                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                      "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
+                      "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
+                      "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
+                      "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
+        )
+        try:
+            _base_path = self._folder
+            output_fldr = os.path.join(_base_path, "output")
+            if not os.path.exists(output_fldr):
+                os.mkdir(output_fldr)
+            self._path = output_fldr
+        except AssertionError or OSError as e:
+            simulationLogger.error("OSError: BoyleOutput Creation Module.")
+            raise
+        else:
+            simulationLogger.info("Created IO toolkit for the system.")
 
     def __const1_parameters(self):
         """Update Const1 Parameters"""
@@ -176,38 +206,6 @@ class io:
         self.__mu_max_compute(temp=temp)
         self.__compute_hconstants(temp=temp)
 
-    def create_output(self):
-        """Resultant export object from the simulation."""
-        self._creation_date = time.gmtime()
-        # result key_list
-        self.__available_headers = dict(
-            debug=["time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
-                   "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
-                   "carboin", "carbon", "lipids", "lcfa", "protis",
-                   "protin", "amino", "nh3", "hac", "hpr", "hbut",
-                   "hval", "ch4", "co2", "h2s", "zplus", "h2po4",
-                   "aminus", "deadcell", "carb_degr", "amino_degr",
-                   "lipid_degr", "lcfa_degr", "prop_degr", "butyr_degr",
-                   "valer_degr", "acet_degr", "gfnh3", "gfch4",
-                   "gfco2", "gfh2s"],
-            solution=["time", "volume", "carbois", "carboin", "carbon",
-                      "lipids", "lcfa", "protis", "protin", "amino",
-                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
-                      "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
-                      "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
-                      "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
-                      "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
-        )
-        try:
-            _base_path = self._folder
-            output_fldr = os.path.join(_base_path, "output")
-            if not os.path.exists(output_fldr):
-                os.mkdir(output_fldr)
-            self._path = output_fldr
-        except OSError as e:
-            simulationLogger.error("OSError: BoyleOutput Creation Module.")
-            raise
-
     def as_pickle(self):
         """Store the data as a pickle."""
         self._finish_date = time.gmtime()
@@ -230,5 +228,3 @@ class io:
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
-
-
