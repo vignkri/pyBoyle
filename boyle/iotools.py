@@ -25,7 +25,7 @@ class io:
         self.__experiment_name = configuration.get("name")
         self.__settings = configuration.get("settings")
         self.__solver_settings = configuration.get("solver")
-
+        self.__creation_time = time.gmtime()
         # Simulation settings
         folder = configuration.get("data")
         try:
@@ -219,11 +219,18 @@ class io:
             simulationLogger.error("OSError: Output file exists."
                                    "Creating a new output file.")
         else:
-            of.attrs["debug"] = [np.string_(item) for item in
-                                 self.__headers.get("debug")]
-            of.attrs["solution"] = [np.string_(item) for item in
-                                    self.__headers.get("solution")]
-            out_grp = of.create_group("Outputs")
+            meta = of.create_group("Metadata")
+            meta["Experiment"] = np.string_(self.__experiment_name)
+            meta["Creation"] = self.__creation_time
+            meta["Finish"] = time.gmtime()
+            # --
+            headers = of.create_group("Headers")
+            headers["debug"] = [np.string_(item) for item in
+                                self.__headers.get("debug")]
+            headers["solution"] = [np.string_(item) for item in
+                                   self.__headers.get("solution")]
+            # --
+            out_grp = of.create_group("Output")
             out_grp["debug"] = self.debug[1:]
             out_grp["solution"] = self.solution[1:]
 
