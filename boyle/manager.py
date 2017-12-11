@@ -105,5 +105,5 @@ class Manager:
                 simulationLogger.info("Simulation finished successfully.")
         # --
         self.post_process()
-        self._data_output.as_pickle()
+        self._data_output.persist()
         simulationLogger.info("Post processing of data finished.")

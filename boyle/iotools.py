@@ -1,8 +1,8 @@
 #!/usr/bin/env
 
 import os
-import dill
 import time
+import h5py as h5
 import numpy as np
 
 from logger import simulationLogger
@@ -41,7 +41,7 @@ class io:
             _files = [os.path.join(fldr, item) for item in files]
             self.setup_inputs(names=_names, files=_files)
         # Create Output Headers
-        self.__available_headers = dict(
+        self.__headers = dict(
             debug=["time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
                    "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
                    "carboin", "carbon", "lipids", "lcfa", "protis",
@@ -206,23 +206,33 @@ class io:
         self.__mu_max_compute(temp=temp)
         self.__compute_hconstants(temp=temp)
 
-    def as_pickle(self):
+    def persist(self):
         """Store the data as a pickle."""
-        self._finish_date = time.gmtime()
+        otime = time.gmtime()
+        file_name = "output_{year}{month}{day}_{hour}.hdf5".format(
+            year=otime.tm_year, month=otime.tm_mon, day=otime.tm_mday,
+            hour=otime.tm_hour)
+        output_path = os.path.join(self._path, file_name)
         try:
-            with open(os.path.join(self._path, "output.pkl"), "wb") as _file:
-                dill.dump(self, _file)
+            of = h5.File(output_path, "w")
         except OSError as e:
-            simulationLogger.error("OSError: Output pickle file not found."
-                                   "Create output file/folder to continue.")
-            raise
+            simulationLogger.error("OSError: Output file exists."
+                                   "Creating a new output file.")
+        else:
+            of.attrs["debug"] = [np.string_(item) for item in
+                                 self.__headers.get("debug")]
+            of.attrs["solution"] = [np.string_(item) for item in
+                                    self.__headers.get("solution")]
+            out_grp = of.create_group("Outputs")
+            out_grp["debug"] = self.debug[1:]
+            out_grp["solution"] = self.solution[1:]
 
     def _update(self, attrname, value):
         """Update the attribute if the value exists"""
         try:
             getattr(self, attrname)
         except AttributeError as e:
-            setattr(self, attrname, [self.__available_headers.get(attrname)])
+            setattr(self, attrname, [self.__headers.get(attrname)])
             simulationLogger.warning("BoyleOutput: attribute '%s' not found"
                                      % (attrname))
             # -- log the error in the logging file.
