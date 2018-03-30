@@ -210,9 +210,9 @@ class io:
     def persist(self):
         """Store the data as a pickle."""
         otime = time.gmtime()
-        file_name = "output_{year}{month}{day}_{hour}.hdf5".format(
+        file_name = "output_Y{year}M{month}D{day}_{hour}h{min}m.hdf5".format(
             year=otime.tm_year, month=otime.tm_mon, day=otime.tm_mday,
-            hour=otime.tm_hour)
+            hour=otime.tm_hour, min=otime.tm_min)
         output_path = os.path.join(self._path, file_name)
         try:
             of = h5.File(output_path, "w")
@@ -220,10 +220,10 @@ class io:
             simulationLogger.error("OSError: Output file exists."
                                    "Creating a new output file.")
         else:
-            meta = of.create_group("Metadata")
-            meta["Experiment"] = np.string_(self.__experiment_name)
-            meta["Creation"] = self.__creation_time
-            meta["Finish"] = time.gmtime()
+            of.attrs["Experiment"] = np.string_(self.__experiment_name)
+            of.attrs["CreationTime"] = self.__creation_time
+            of.attrs["FinishTime"] = time.gmtime()
+            of.attrs["Description"] = self.__description
             # --
             headers = of.create_group("Headers")
             headers["debug"] = [np.string_(item) for item in
