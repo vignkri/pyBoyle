@@ -23,6 +23,7 @@ class io:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
         self.__experiment_name = configuration.get("name")
+        self.__description = configuration.get("description")
         self.__settings = configuration.get("settings")
         self.__solver_settings = configuration.get("solver")
         self.__creation_time = time.gmtime()
@@ -233,6 +234,10 @@ class io:
             out_grp = of.create_group("Output")
             out_grp["debug"] = self.debug[1:]
             out_grp["solution"] = self.solution[1:]
+            # --
+            in_grp = of.create_group("Input")
+            in_grp["regulate"] = self.regulate.get("value")
+            in_grp["initial"] = self.Initial.get("value")
 
     def _update(self, attrname, value):
         """Update the attribute if the value exists"""
