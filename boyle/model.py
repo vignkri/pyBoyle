@@ -63,7 +63,7 @@ def newton_pH(H, Hfunc, i=0, **kwargs):
     #     return H
 
 
-def standard(time, y0, dataset, output):
+def standard(time, y0, dataset, output, run_no):
     """Standard Integrator Model
 
     PARAMETERS
@@ -290,6 +290,7 @@ def standard(time, y0, dataset, output):
     #
     # --------------------------------------------
 
-    output._update("debug", [time] + mu[:, 0].tolist() + [pH] + y_dot.tolist())
+    output._update("debug", [run_no, time] +
+                   mu[:, 0].tolist() + [pH] + y_dot.tolist())
 
     return y_dot

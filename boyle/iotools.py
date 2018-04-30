@@ -43,7 +43,7 @@ class io:
             self.setup_inputs(names=_names, files=_files)
         # Create Output Headers
         self.__headers = dict(
-            debug=["time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
+            debug=["run_no", "time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
                    "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
                    "carboin", "carbon", "lipids", "lcfa", "protis",
                    "protin", "amino", "nh3", "hac", "hpr", "hbut",

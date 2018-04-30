@@ -83,10 +83,11 @@ class Manager:
         # self._frame.Initial.update({"value": self.result[-1][2:]})
         self._frame.Initial.update({"value": y_dot})
 
-    def function_parameters(self):
+    def function_parameters(self, run_no):
         """Pass function parameters to the simulator"""
         try:
-            self._solver.set_f_params(*[self._frame, self._data_output])
+            self._solver.set_f_params(*[self._frame, self._data_output,
+                                        run_no])
         except:
             raise
         finally:
@@ -109,7 +110,7 @@ class Manager:
             self._frame.process_data(index=idx)
             self.initial_value = self._frame.Initial.get("value")
             self.initialize_solver(iname="vode")
-            self.function_parameters()
+            self.function_parameters(run_no=idx)
             try:
                 self.__solver_start(run_no=idx)
             except:
