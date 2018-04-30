@@ -50,15 +50,18 @@ class Manager:
         for idx in reversed(list(range(1, len(self.result)))):
             self.result[idx][29:] = (self.result[idx][29:] -
                                      self.result[idx-1][29:]) / (
-                self.result[idx][0] - self.result[idx-1][0]
+                self.result[idx][1] - self.result[idx-1][1]
             ) / 1000
+            # The above result[idx][1] points to the time position of
+            # the index. Previously it was pointing to 0 because the
+            # run_no value was not included.
             secondary_array = np.array(np.sum(self.result[idx][29:]))
             self.final_result = np.hstack([self.result[idx],
                                            secondary_array])
             self._data_output._update("solution", self.final_result)
         # --
 
-    def __solver_start(self):
+    def __solver_start(self, run_no):
         """Start the solver"""
         simulationLogger.info("Starting the solver")
         # --
@@ -68,13 +71,17 @@ class Manager:
                                                step=True)
                 # self._data_output._update("result",
                 # [self._solver.t] + list(y_dot))
-                row = np.hstack([np.array([self._solver.t]), y_dot])
+                row = np.hstack([np.array([run_no, self._solver.t]), y_dot])
                 self.result.append(row)
         except:
             print("Current Iteration {}".format(self._solver.t))
             raise
         # --
-        self._frame.Initial.update({"value": self.result[-1][1:]})
+        # The result chooses the elements from the start of y_dot instead
+        # of the initial value set. Forcing to use the result setup is probably
+        # not useful
+        # self._frame.Initial.update({"value": self.result[-1][2:]})
+        self._frame.Initial.update({"value": y_dot})
 
     def function_parameters(self):
         """Pass function parameters to the simulator"""
@@ -104,7 +111,7 @@ class Manager:
             self.initialize_solver(iname="vode")
             self.function_parameters()
             try:
-                self.__solver_start()
+                self.__solver_start(run_no=idx)
             except:
                 raise
             finally:
