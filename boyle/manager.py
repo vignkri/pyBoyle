@@ -74,7 +74,6 @@ class Manager:
             print("Current Iteration {}".format(self._solver.t))
             raise
         # --
-        # simulationLogger.info("Starting post-process of result data.")
         self._frame.Initial.update({"value": self.result[-1][1:]})
 
     def function_parameters(self):
@@ -110,6 +109,8 @@ class Manager:
                 raise
             finally:
                 simulationLogger.info("Simulation finished successfully.")
+        # --
+        simulationLogger.info("Starting post-processing")
         # --
         self.post_process()
         self._data_output.persist()
