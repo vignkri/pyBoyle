@@ -90,8 +90,16 @@ class io:
         """Setup all Simulation Model Inputs"""
         names_and_files = tuple(zip(names, files))
         for name, _file in names_and_files:
-            setattr(self, name, {"path": _file,
-                                 "value": np.loadtxt(_file, comments="%")})
+            if not (name.startswith("regulate") or name.startswith("Initial")):
+                try:
+                    setattr(self, name, {"path": _file,
+                                         "value": np.loadtxt(_file, comments="%")})
+                except:
+                    print(_file)
+                    raise
+            else:
+                setattr(self, name, {"path": _file,
+                                     "value": np.load(_file)})
             if name == "Const1":
                 const1 = self.Const1.get("value")
                 self.Const1.update(dict(
@@ -108,16 +116,20 @@ class io:
                 if not isinstance(time_periods, np.ndarray):
                     time_periods = np.array(time_periods)
                 temperatures = self.regulate.get("value")[:, 1]
-                flows = self.regulate.get("value")[:, [2, 3]] / 24
+                # TODO: Handle flow division by 24 elegantly
+                # flows = self.regulate.get("value")[:, [2, 3]] / 24
+                flows = self.regulate.get("value")[:, [2, 3]]
                 substrate = flows[:, 0].reshape(-1, 1) * \
                     self.regulate.get("value")[:, 4:]
                 self.regulation_values = dict(
                     tp=time_periods, temp=temperatures,
                     flows=flows, substrates=substrate)
             elif name == "Initial":
-                self.Initial.update({"value": np.concatenate(
-                    (self.Initial["value"], np.zeros(4, ))
-                )})
+                _extend = np.concatenate((self.Initial.get("value"),
+                                          np.zeros(4, )))
+
+                _value = {"value": _extend}
+                self.Initial.update(_value)
             else:
                 pass
         simulationLogger.info("Input parameters created.")
