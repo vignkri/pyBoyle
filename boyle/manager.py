@@ -61,16 +61,20 @@ class Manager:
     def __solver_start(self):
         """Start the solver"""
         simulationLogger.info("Starting the solver")
-        self.result = []
         # --
-        while self._solver.successful() and self._solver.t < self._end_time:
-            y_dot = self._solver.integrate(self._solver.t + self._step,
-                                           step=True)
-            # self._data_output._update("result", [self._solver.t] + list(y_dot))
-            row = np.hstack([np.array([self._solver.t]), y_dot])
-            self.result.append(row)
+        try:
+            while self._solver.successful() and self._solver.t < self._end_time:
+                y_dot = self._solver.integrate(self._solver.t + self._step,
+                                               step=True)
+                # self._data_output._update("result",
+                # [self._solver.t] + list(y_dot))
+                row = np.hstack([np.array([self._solver.t]), y_dot])
+                self.result.append(row)
+        except:
+            print("Current Iteration {}".format(self._solver.t))
+            raise
         # --
-        simulationLogger.info("Starting post-process of result data.")
+        # simulationLogger.info("Starting post-process of result data.")
         self._frame.Initial.update({"value": self.result[-1][1:]})
 
     def function_parameters(self):
@@ -85,7 +89,9 @@ class Manager:
     def start(self):
         simulationLogger.info("Starting experiment simulation.")
         # -- set timing by regulation settings
+        self.result = []
         for idx in range(0, len(self._frame.regulation_values["tp"])):
+            simulationLogger.info("Running Simulation Frame: {}".format(idx))
             if idx == 0:
                 self._initial_time = 0
                 self._end_time = self._frame.regulation_values["tp"][idx]
@@ -93,6 +99,7 @@ class Manager:
                 self._initial_time = self._end_time
                 self._end_time = self._end_time + \
                     self._frame.regulation_values["tp"][idx]
+            # --
             self._frame.process_data(index=idx)
             self.initial_value = self._frame.Initial.get("value")
             self.initialize_solver(iname="vode")
