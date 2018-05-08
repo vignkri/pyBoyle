@@ -219,7 +219,7 @@ class io:
         self.__mu_max_compute(temp=temp)
         self.__compute_hconstants(temp=temp)
 
-    def persist(self):
+    def persist(self, status="debug"):
         """Store the data as a pickle."""
         otime = time.gmtime()
         file_name = "output_Y{year}M{month}D{day}_{hour}h{min}m.hdf5".format(
@@ -246,6 +246,11 @@ class io:
             out_grp = of.create_group("Output")
             out_grp["debug"] = self.debug[1:]
             out_grp["solution"] = self.solution[1:]
+            # -- Deprecate this:
+            if status == "debug":
+                out_grp["debug_solution"] = self.dbgSoln[1:]
+            else:
+                pass
             # --
             in_grp = of.create_group("Input")
             in_grp["regulate"] = self.regulate.get("value")
