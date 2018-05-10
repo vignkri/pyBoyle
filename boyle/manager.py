@@ -47,6 +47,18 @@ class Manager:
                                            t=self._initial_time)
 
     def post_process(self):
+        """Computes the change in values
+
+        The dy/dt is computed as the y is cumulative from the
+        results. Cumulative `y` is not useful for visualisation
+        as the required output is change with respect to the
+        previous step.
+
+            dy/dt = y[n] - y[n-1] / t[n] - t[n-1]
+        """
+        # TODO: This should be re-engineered. Data should not be
+        # reversed but only the values should be subtracted with previous
+        # values.
         for idx in reversed(list(range(1, len(self.result)))):
             self.result[idx][29:] = (self.result[idx][29:] -
                                      self.result[idx-1][29:]) / (
@@ -60,6 +72,7 @@ class Manager:
                                            secondary_array])
             self._data_output._update("solution", self.final_result)
         # --
+        self._data_output._update("dbgSoln", np.array(self.result))
 
     def __solver_start(self, run_no):
         """Start the solver"""
