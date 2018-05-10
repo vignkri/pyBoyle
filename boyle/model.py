@@ -1,66 +1,11 @@
 #!/usr/bin/python
 
+import ph
 import numpy as np
 
 """
 Standard Computation Model
 """
-
-
-def newton_pH(H, Hfunc, i=0, **kwargs):
-    """pH Computation using Newton-Raphson method"""
-    # -- set up variables
-    co2, ka1_co2, ka2_co2 = kwargs.get("co2")
-    hac, ka_hac = kwargs.get("HAc")
-    hpr, ka_hpr = kwargs.get("HPr")
-    hbut, ka_hbut = kwargs.get("HBut")
-    hval, ka_hval = kwargs.get("HVal")
-    a, z, kw = kwargs.get("Other")
-    h2po4, ka_h2po4 = kwargs.get("h2po4")
-    nh3, ka_nh4 = kwargs.get("NH3")
-    # --
-    Hfunc = co2 / 44 * ka1_co2 * (H + 2 * ka2_co2) / (H * (H + ka1_co2) +
-                                                      ka1_co2 * ka2_co2) + \
-        hac / 60 * ka_hac / (H + ka_hac) + \
-        hpr / 74 * ka_hpr / (H + ka_hpr) + \
-        hbut / 88 * ka_hbut / (H + ka_hbut) + \
-        hval / 102 * ka_hval / (H + ka_hval) + \
-        a / 35.5 + \
-        h2po4 / 31 * (H + 2 * ka_h2po4) / (H + ka_h2po4) - \
-        nh3 / 14 * H / (H + ka_nh4) - \
-        z / 39 + \
-        kw / H
-    # --
-    dhfunc_dh = - co2 / 44 * ka1_co2 * (H * (H + 4 * ka2_co2) + ka1_co2 *
-                                        ka2_co2) / (H * (H + ka1_co2) +
-                                                    ka1_co2 * ka2_co2)**2 - \
-        hac / 60 * ka_hac / (H + ka_hac)**2 - \
-        hpr / 74 * ka_hpr / (H + ka_hpr)**2 - \
-        hbut / 88 * ka_hbut / (H + ka_hbut)**2 - \
-        hval / 102 * ka_hval / (H + ka_hval)**2 - \
-        kw / (H**2) - \
-        h2po4 / 31 * ka_h2po4 / (H + ka_h2po4)**2 - \
-        nh3 / 14 * ka_nh4 / (H + ka_nh4)**2
-    # --
-    H = H - (Hfunc - H) / (dhfunc_dh - 1)
-    return H, Hfunc
-    # --
-    # pH = - np.log10(H)
-    # if 1e-12 < abs(Hfunc - H):
-    #     new_args = kwargs
-    #     new_H = H
-    #     new_Hfunc = Hfunc
-    #     newton_pH(new_H, new_Hfunc, i=i, **new_args)
-
-    # try:
-    #     assert pH is not None
-    # except AssertionError as e:/ 100i
-    #     new_args = kwargs
-    #     new_H = H
-    #     new_Hfunc = Hfunc
-    #     newton_pH(new_H, new_Hfunc, i=1, **new_args)
-    # finally:
-    #     return H
 
 
 def standard(time, y0, dataset, output, run_no, ph_mode="standard"):
@@ -144,11 +89,13 @@ def standard(time, y0, dataset, output, run_no, ph_mode="standard"):
 
     if ph_mode == "standard":
         while abs(Hfunc - H) > 1e-12 or pH is None:
-            H, Hfunc = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
-                                 HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
-                                 HBut=[hbut, ka_hbut],
-                                 HVal=[hval, ka_hval], Other=[a, z, kw],
-                                 h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+            H, Hfunc = ph.newton_raphson(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
+                                         HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
+                                         HBut=[hbut, ka_hbut],
+                                         HVal=[hval, ka_hval],
+                                         Other=[a, z, kw],
+                                         h2po4=[h2po4, ka_h2po4],
+                                         NH3=[nh3, ka_nh4])
             pH = - np.log10(Hfunc)
     else:
         print("Unknown method")
