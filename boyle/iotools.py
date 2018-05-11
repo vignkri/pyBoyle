@@ -280,7 +280,10 @@ class io:
                                      % (attrname))
             simulationLogger.info("BoyleOutput: creating attribute %s" %
                                   (attrname))
-            setattr(self, attrname, [self.__headers.get(attrname)])
+            if attrname in self.__headers.keys():
+                setattr(self, attrname, [self.__headers.get(attrname)])
+            else:
+                setattr(self, attrname, value)
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
