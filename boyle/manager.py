@@ -33,7 +33,6 @@ class Manager:
             raise
         else:
             simulationLogger.info("Set up experiment: '%s'" % self._meta)
-            self._data_output = frame
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
@@ -70,9 +69,9 @@ class Manager:
             secondary_array = np.array(np.sum(self.result[idx][29:]))
             self.final_result = np.hstack([self.result[idx],
                                            secondary_array])
-            self._data_output._update("solution", self.final_result)
+            self._frame._update("solution", self.final_result)
         # --
-        self._data_output._update("dbgSoln", np.array(self.result))
+        self._frame._update("debug_solution", np.array(self.result))
 
     def __solver_start(self, run_no):
         """Start the solver"""
@@ -99,7 +98,7 @@ class Manager:
     def function_parameters(self, run_no):
         """Pass function parameters to the simulator"""
         try:
-            self._solver.set_f_params(*[self._frame, self._data_output,
+            self._solver.set_f_params(*[self._frame, self._frame,
                                         run_no, self._frame._ph_method])
         except:
             raise
@@ -134,5 +133,6 @@ class Manager:
         simulationLogger.info("Starting post-processing")
         # --
         self.post_process()
-        self._data_output.persist()
+        self._frame.persist()
         simulationLogger.info("Post processing of data finished.")
+        simulationLogger.info("Finishing up simulation. Closing.")
