@@ -2,13 +2,14 @@
 
 import ph
 import numpy as np
+from logger import simulationLogger
 
 """
 Standard Computation Model
 """
 
 
-def standard(time, y0, dataset, output, run_no, ph_mode="standard"):
+def standard(time, y0, dataset, output, run_no, ph_mode):
     """Standard Integrator Model
 
     PARAMETERS
@@ -87,6 +88,13 @@ def standard(time, y0, dataset, output, run_no, ph_mode="standard"):
     Hfunc = 1
     pH = 8
 
+    # -- Create data for arguments
+    _data = {"co2": [co2, ka1_co2, ka2_co2],
+             "HAc": [hac, ka_hac], "HPr": [hpr, ka_hpr],
+             "HBut": [hbut, ka_hbut], "HVal": [hval, ka_hval],
+             "Other": [a, z, kw], "h2po4": [h2po4, ka_h2po4],
+             "NH3": [nh3, ka_nh4]}
+    # --
     if ph_mode == "standard":
         while abs(Hfunc - H) > 1e-12 or pH is None:
             H, Hfunc = ph.newton_raphson(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
@@ -97,6 +105,10 @@ def standard(time, y0, dataset, output, run_no, ph_mode="standard"):
                                          h2po4=[h2po4, ka_h2po4],
                                          NH3=[nh3, ka_nh4])
             pH = - np.log10(Hfunc)
+    elif ph_mode == "fsolve":
+        pH = ph.find_roots(data=_data)
+    elif ph_mode == "brentq":
+        pH = ph.brent_dekker(data=_data)
     else:
         print("Unknown method")
 
