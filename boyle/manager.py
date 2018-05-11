@@ -58,6 +58,7 @@ class Manager:
         # TODO: This should be re-engineered. Data should not be
         # reversed but only the values should be subtracted with previous
         # values.
+        self._frame._update("debug_solution", self.result)
         for idx in reversed(list(range(1, len(self.result)))):
             self.result[idx][29:] = (self.result[idx][29:] -
                                      self.result[idx-1][29:]) / (
@@ -71,7 +72,6 @@ class Manager:
                                            secondary_array])
             self._frame._update("solution", self.final_result)
         # --
-        self._frame._update("debug_solution", np.array(self.result))
 
     def __solver_start(self, run_no):
         """Start the solver"""
