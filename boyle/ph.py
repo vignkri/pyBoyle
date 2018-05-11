@@ -1,6 +1,7 @@
 #!/usr/bin/env/python
 
 
+from numpy import log10
 from scipy.optimize import fsolve, brentq
 
 """
@@ -54,16 +55,25 @@ def newton_raphson(H, Hfunc, i=0, **kwargs):
     return H, Hfunc
 
 
-def calculate(H, *args, **kwargs):
+def calculate(H, *args):
     # -- set up variables
-    co2, ka1_co2, ka2_co2 = kwargs.get("co2")
-    hac, ka_hac = kwargs.get("HAc")
-    hpr, ka_hpr = kwargs.get("HPr")
-    hbut, ka_hbut = kwargs.get("HBut")
-    hval, ka_hval = kwargs.get("HVal")
-    a, z, kw = kwargs.get("Other")
-    h2po4, ka_h2po4 = kwargs.get("h2po4")
-    nh3, ka_nh4 = kwargs.get("NH3")
+    for arg in args:
+        if arg.get("co2"):
+            co2, ka1_co2, ka2_co2 = arg.get("co2")
+        elif arg.get("HAc"):
+            hac, ka_hac = arg.get("HAc")
+        elif arg.get("HPr"):
+            hpr, ka_hpr = arg.get("HPr")
+        elif arg.get("HBut"):
+            hbut, ka_hbut = arg.get("HBut")
+        elif arg.get("HVal"):
+            hval, ka_hval = arg.get("HVal")
+        elif arg.get("Other"):
+            a, z, kw = arg.get("Other")
+        elif arg.get("h2po4"):
+            h2po4, ka_h2po4 = arg.get("h2po4")
+        elif arg.get("NH3"):
+            nh3, ka_nh4 = arg.get("NH3")
     # --
     Hfunc = co2 / 44 * ka1_co2 * (H + 2 * ka2_co2) / (H * (H + ka1_co2) +
                                                       ka1_co2 * ka2_co2) + \
