@@ -79,13 +79,17 @@ def calculate(H, *args):
         nh3 / 14 * H / (H + ka_nh4) - \
         z / 39 + \
         kw / H
+    # --
     return H - Hfunc
 
 
-def brent_dekker(data, guesses=(1e-4, 1e-10)):
+def brent_dekker(data, guesses=(1e-10, 14)):
     """Compute pH using brent-dekker method"""
     a, b = guesses
-    x_H = brentq(calculate, a, b, args=data)
+    # TODO: Fix brentq ValueError: f(a) and f(b) must have
+    # different signs
+    x_H = brentq(calculate, a, b, xtol=1e-4,
+                 rtol=1e-1, args=data)
     pH = - log10(x_H)
     return pH
 
