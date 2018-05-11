@@ -115,9 +115,12 @@ class Manager:
                 self._initial_time = 0
                 self._end_time = self._frame.regulation_values["tp"][idx]
             else:
+                # Increase timesteps by the next timestep where there is
+                # feed. Previously, the data was structured to have dT instead
+                # of T of feed. Therefore there was an addition setup for
+                # computing end_time. That is no longer needed.
                 self._initial_time = self._end_time
-                self._end_time = self._end_time + \
-                    self._frame.regulation_values["tp"][idx]
+                self._end_time = self._frame.regulation_values["tp"][idx]
             # --
             self._frame.process_data(index=idx)
             self.initial_value = self._frame.Initial.get("value")
