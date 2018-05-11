@@ -95,3 +95,10 @@ def brent_dekker(data, guesses=(1e-4, 1e-10)):
     x_H = brentq(a, b, args=data)
     pH = - log10(x_H)
     return pH
+
+
+def find_roots(data, guess=1e-8):
+    """Compute pH using standard root-finding method"""
+    x_H = fsolve(calculate, x0=guess, args=data)
+    pH = - log10(x_H)
+    return pH
