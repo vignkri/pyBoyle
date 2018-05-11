@@ -276,9 +276,11 @@ class io:
         try:
             getattr(self, attrname)
         except AttributeError as e:
-            setattr(self, attrname, [self.__headers.get(attrname)])
             simulationLogger.warning("BoyleOutput: attribute '%s' not found"
                                      % (attrname))
+            simulationLogger.info("BoyleOutput: creating attribute %s" %
+                                  (attrname))
+            setattr(self, attrname, [self.__headers.get(attrname)])
             # -- log the error in the logging file.
         else:
             getattr(self, attrname).append(value)
