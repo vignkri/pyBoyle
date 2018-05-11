@@ -112,15 +112,6 @@ def standard(time, y0, dataset, output, run_no, ph_mode):
     else:
         print("Unknown method")
 
-    # -- call pH computation function using newton-raphson
-    # -- this function is recursive and therefore additional information
-    # -- and logging should be added to get best data possible
-    # pH = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
-    #                HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
-    #                HBut=[hbut, ka_hbut],
-    #                HVal=[hval, ka_hval], Other=[a, z, kw],
-    #                h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
-
     try:
         assert pH is not None
     except AssertionError as e:
