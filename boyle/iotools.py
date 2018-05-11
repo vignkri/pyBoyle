@@ -22,10 +22,15 @@ to.
 class io:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
+        # -- Experiment information for metadata
         self.__experiment_name = configuration.get("name")
         self.__description = configuration.get("description")
+        self.__experiment_tags = configuration.get("tags")
+        # -- Experiment settings for additional information
         self.__settings = configuration.get("settings")
+        self.__ph_settings = configuration.get("ph")
         self.__solver_settings = configuration.get("solver")
+        # -- Created metadata in time of simulation
         self.__creation_time = time.gmtime()
         # Simulation settings
         folder = configuration.get("data")
@@ -133,6 +138,14 @@ class io:
             else:
                 pass
         simulationLogger.info("Input parameters created.")
+
+    @property
+    def _ph_method(self):
+        """Return ph if defined in configuration file"""
+        if self.__ph_settings.get("method"):
+            return self.__ph_settings.get("method")
+        else:
+            return "standard"
 
     @property
     def _solver(self):
