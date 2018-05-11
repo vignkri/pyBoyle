@@ -4,6 +4,7 @@ name: Test
 data: ./sample/sample
 description: List of changes or file changes in the input folder to be aware of for analysis
 tags: test, sample-data
+status: debug
 settings:
     t_initial: 0
     t_final: 192

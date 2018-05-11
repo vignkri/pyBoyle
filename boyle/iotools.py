@@ -26,6 +26,7 @@ class io:
         self.__experiment_name = configuration.get("name")
         self.__description = configuration.get("description")
         self.__experiment_tags = configuration.get("tags")
+        self.__experiment_status = configuration.get("status")
         # -- Experiment settings for additional information
         self.__settings = configuration.get("settings")
         self.__ph_settings = configuration.get("ph")
@@ -249,6 +250,7 @@ class io:
             of.attrs["CreationTime"] = self.__creation_time
             of.attrs["FinishTime"] = time.gmtime()
             of.attrs["Description"] = self.__description
+            of.attrs["Tags"] = np.string_(self.__experiment_tags)
             # --
             headers = of.create_group("Headers")
             headers["debug"] = [np.string_(item) for item in
@@ -260,7 +262,7 @@ class io:
             out_grp["debug"] = self.debug[1:]
             out_grp["solution"] = self.solution[1:]
             # -- Deprecate this:
-            if status == "debug":
+            if self.__experiment_status == "debug":
                 out_grp["debug_solution"] = self.dbgSoln[1:]
             else:
                 pass
