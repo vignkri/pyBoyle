@@ -92,7 +92,7 @@ def calculate(H, *args):
 def brent_dekker(data, guesses=(1e-4, 1e-10)):
     """Compute pH using brent-dekker method"""
     a, b = guesses
-    x_H = brentq(a, b, args=data)
+    x_H = brentq(calculate, a, b, args=data)
     pH = - log10(x_H)
     return pH
 
