@@ -32,7 +32,7 @@ class io:
         self.__ph_settings = configuration.get("ph")
         self.__solver_settings = configuration.get("solver")
         # -- Created metadata in time of simulation
-        self.__creation_time = time.gmtime()
+        self.__creation_time = time.time()
         # Simulation settings
         folder = configuration.get("data")
         try:
@@ -248,7 +248,9 @@ class io:
         else:
             of.attrs["Experiment"] = np.string_(self.__experiment_name)
             of.attrs["CreationTime"] = self.__creation_time
-            of.attrs["FinishTime"] = time.gmtime()
+            ending_time = time.time()
+            of.attrs["FinishTime"] = ending_time
+            of.attrs["Duration"] = ending_time - self.__creation_time
             of.attrs["Description"] = self.__description
             of.attrs["Tags"] = np.string_(self.__experiment_tags)
             # --
