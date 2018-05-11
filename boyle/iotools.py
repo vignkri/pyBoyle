@@ -263,7 +263,7 @@ class io:
             out_grp["solution"] = self.solution[1:]
             # -- Deprecate this:
             if self.__experiment_status == "debug":
-                out_grp["debug_solution"] = self.dbgSoln[1:]
+                out_grp["debug_solution"] = self.debug_solution[1:]
             else:
                 pass
             # --
