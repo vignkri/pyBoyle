@@ -100,7 +100,7 @@ class Manager:
         """Pass function parameters to the simulator"""
         try:
             self._solver.set_f_params(*[self._frame, self._data_output,
-                                        run_no])
+                                        run_no, self._frame._ph_method])
         except:
             raise
         finally:
