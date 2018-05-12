@@ -83,13 +83,12 @@ def calculate(H, *args):
     return H - Hfunc
 
 
-def brent_dekker(data, guesses=(1e-10, 14)):
+def brent_dekker(data, guesses=(1e-4, 1e-10)):
     """Compute pH using brent-dekker method"""
-    a, b = guesses
+    _a, _b = guesses
     # TODO: Fix brentq ValueError: f(a) and f(b) must have
     # different signs
-    x_H = brentq(calculate, a, b, xtol=1e-4,
-                 rtol=1e-1, args=data)
+    x_H = brentq(f=calculate, a=_a, b=_b, args=data)
     pH = - log10(x_H)
     return pH
 
@@ -97,5 +96,7 @@ def brent_dekker(data, guesses=(1e-10, 14)):
 def find_roots(data, guess=1e-8):
     """Compute pH using standard root-finding method"""
     x_H = fsolve(calculate, x0=guess, args=data)
+    # TODO: Negative values in the pH indicates some sort of failure
+    # in the computation engine for pH.
     pH = - log10(x_H)
     return pH
