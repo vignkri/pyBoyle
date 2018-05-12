@@ -28,9 +28,10 @@ class io:
         self.__experiment_tags = configuration.get("tags")
         self.__experiment_status = configuration.get("status")
         # -- Experiment settings for additional information
-        self.__settings = configuration.get("settings")
-        self.__ph_settings = configuration.get("ph")
-        self.__solver_settings = configuration.get("solver")
+        settings = configuration.get("settings")
+        self.__step_size = settings.get("step_size")
+        self.__ph_settings = settings.get("ph")
+        self.__solver_settings = settings.get("solver")
         # -- Created metadata in time of simulation
         self.__creation_time = time.time()
         # Simulation settings
@@ -163,7 +164,7 @@ class io:
     def _simulation_config(self):
         """Simulation configuration dictionary"""
         _simulation_config = dict(
-            step=self.__settings.get("step_size"),
+            step=self.__step_size,
             metadata=self.__experiment_name
         )
         return _simulation_config
