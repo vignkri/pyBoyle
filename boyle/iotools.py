@@ -97,19 +97,20 @@ class io:
         """Setup all Simulation Model Inputs"""
         names_and_files = tuple(zip(names, files))
         for name, _file in names_and_files:
-            if not (name.startswith("regulate") or name.startswith("Initial")):
-                try:
-                    setattr(self, name, {"path": _file,
-                                         "value": np.loadtxt(_file, comments="%")})
-                except:
-                    print(_file)
-                    raise
-            else:
-                try:
-                    setattr(self, name, {"path": _file,
-                                         "value": np.load(_file)})
-                except:
-                    raise
+            if name in ["Const1", "Const2", "yc", "inoculum", "feed"]:
+                if not (name.startswith("feed") or name.startswith("inoculum")):
+                    try:
+                        setattr(self, name, {"path": _file,
+                                             "value": np.loadtxt(_file, comments="%")})
+                    except:
+                        print(_file)
+                        raise
+                else:
+                    try:
+                        setattr(self, name, {"path": _file,
+                                             "value": np.load(_file)})
+                    except:
+                        raise
             if name == "Const1":
                 const1 = self.Const1.get("value")
                 self.Const1.update(dict(
@@ -121,27 +122,32 @@ class io:
                         ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
                         ki_lcfa=const1[2:, 8])
                 ))
-            elif name == "regulate":
-                time_periods = self.regulate.get("value")[:, 0]
+            elif name == "feed":
+                time_periods = self.feed.get("value")[:, 0]
                 if not isinstance(time_periods, np.ndarray):
                     time_periods = np.array(time_periods)
-                temperatures = self.regulate.get("value")[:, 1]
+                temperatures = self.feed.get("value")[:, 1]
                 # TODO: Handle flow division by 24 elegantly
                 # flows = self.regulate.get("value")[:, [2, 3]] / 24
-                flows = self.regulate.get("value")[:, [2, 3]]
+                flows = self.feed.get("value")[:, [2, 3]]
                 substrate = flows[:, 0].reshape(-1, 1) * \
-                    self.regulate.get("value")[:, 4:]
+                    self.feed.get("value")[:, 4:]
                 self.regulation_values = dict(
                     tp=time_periods, temp=temperatures,
                     flows=flows, substrates=substrate)
-            elif name == "Initial":
-                _extend = np.concatenate((self.Initial.get("value"),
+            elif name == "inoculum":
+                _extend = np.concatenate((self.inoculum.get("value"),
                                           np.zeros(4, )))
 
                 _value = {"value": _extend}
-                self.Initial.update(_value)
+                self.inoculum.update(_value)
             else:
                 pass
+        self.Initial = self.inoculum # Place holder for inoculum refactor
+        # TODO: Refactor all cases where self.Initial is called in
+        # downstream functions and methods. They should be calling
+        # io.inoculum because it is a much more correct description of
+        # the code.
         simulationLogger.info("Input parameters created.")
 
     @property
