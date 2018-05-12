@@ -126,12 +126,8 @@ class Manager:
             self.initial_value = self._frame.Initial.get("value")
             self.initialize_solver(iname="vode")
             self.function_parameters(run_no=idx)
-            try:
-                self.__solver_start(run_no=idx)
-            except:
-                raise
-            finally:
-                simulationLogger.info("Simulation finished successfully.")
+            self.__solver_start(run_no=idx)
+            simulationLogger.info("Simulation finished successfully.")
         # --
         simulationLogger.info("Starting post-processing")
         # --
