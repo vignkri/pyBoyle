@@ -105,8 +105,11 @@ class io:
                     print(_file)
                     raise
             else:
-                setattr(self, name, {"path": _file,
-                                     "value": np.load(_file)})
+                try:
+                    setattr(self, name, {"path": _file,
+                                         "value": np.load(_file)})
+                except:
+                    raise
             if name == "Const1":
                 const1 = self.Const1.get("value")
                 self.Const1.update(dict(
