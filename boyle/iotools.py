@@ -97,6 +97,8 @@ class io:
         """Setup all Simulation Model Inputs"""
         names_and_files = tuple(zip(names, files))
         for name, _file in names_and_files:
+            # TODO: Clean up this process for setting up
+            # input files for the iotools.
             if name in ["Const1", "Const2", "yc", "inoculum", "feed"]:
                 if not (name.startswith("feed") or name.startswith("inoculum")):
                     try:
@@ -132,6 +134,7 @@ class io:
                 flows = self.feed.get("value")[:, [2, 3]]
                 substrate = flows[:, 0].reshape(-1, 1) * \
                     self.feed.get("value")[:, 4:]
+                # --
                 self.regulation_values = dict(
                     tp=time_periods, temp=temperatures,
                     flows=flows, substrates=substrate)
@@ -143,7 +146,7 @@ class io:
                 self.inoculum.update(_value)
             else:
                 pass
-        self.Initial = self.inoculum # Place holder for inoculum refactor
+        self.Initial = self.inoculum  # Place holder for inoculum refactor
         # TODO: Refactor all cases where self.Initial is called in
         # downstream functions and methods. They should be calling
         # io.inoculum because it is a much more correct description of
@@ -280,8 +283,8 @@ class io:
                 pass
             # --
             in_grp = of.create_group("Input")
-            in_grp["regulate"] = self.regulate.get("value")
-            in_grp["initial"] = self.Initial.get("value")
+            in_grp["regulate"] = self.feed.get("value")
+            in_grp["initial"] = self.inoculum.get("value")
 
     def _update(self, attrname, value):
         """Update the attribute if the value exists"""
