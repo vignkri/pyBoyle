@@ -26,9 +26,9 @@ class io:
         self.__experiment_name = configuration.get("name")
         self.__description = configuration.get("description")
         self.__experiment_tags = configuration.get("tags")
-        self.__experiment_status = configuration.get("status")
         # -- Experiment settings for additional information
         settings = configuration.get("settings")
+        self.__experiment_status = settings.get("process")
         self.__step_size = settings.get("step_size")
         self.__ph_settings = settings.get("ph")
         self.__solver_settings = settings.get("solver")

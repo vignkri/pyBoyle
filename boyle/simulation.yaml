@@ -4,8 +4,9 @@ name: Test
 data: ./sample/sample
 description: List of changes or file changes in the input folder to be aware of for analysis
 tags: test, sample-data
-status: debug
 settings:
+    process: debug
+    constants: standard
     step_size: 0.5
     ph:
         method: fsolve
