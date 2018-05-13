@@ -171,6 +171,73 @@ class io:
         )
         return _simulation_config
 
+    def __process_constants(self):
+        const1 = self.Const1.get("value")
+        const_one_payload = dict(
+            kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
+            pk_low=const1[2:, 9], pk_high=const1[2:, 10],
+            ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
+            ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
+            ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
+            ki_lcfa=const1[2:, 8]
+        )
+        self.Const1.update(dict(params=const_one_payload))
+
+    def __process_client_data(self):
+        """Process client data to get feed and inoculum"""
+
+        time_periods = self.feed.get("value")[:, 0]
+
+        # TODO: Handle single day feed elegantly. Right now it
+        # will break because there is no elegant solution to solve
+        # 1-day feeding solution.
+        if time_periods.shape[0] < 1:
+            e_ = "IO: Time period provided for 1 day of feed."
+            er = e_ + " Multi-day feeding is only supported not 1-day feed."
+            simulationLogger.Error(e_)
+            raise ValueError(er)
+
+        # -- Get other specific information
+        temperatures = self.feed.get("value")[:, 1]
+        flows = self.feed.get("value")[:, [2, 3]] / 24
+        substrate = flows[:, 0].reshape(-1, 1) * \
+            self.feed.get("value")[:, 4:]
+
+        # -- feed payload
+        feed_payload = dict(tp=time_periods, temp=temperatures,
+                            flows=flows, substrates=substrate)
+
+        # TODO: Rename regulation values to Feed_Payload to reflect
+        # real world phenomena
+        self.regulation_values = feed_payload
+
+        # Work with Inoculum files
+        _extension = np.concatenate((self.inoculum.get("value"),
+                                     np.zeros(4, )))
+        _value = {"value": _extension}
+        self.inoculum.update(_value)
+
+    def setup_inputs(self, dataLocn):
+        """Setup all Simulation Model Inputs"""
+        for name, _file in dataLocn:
+            if not (name.startswith("feed") or name.startswith("inoculum")):
+                self.__set(_text=name, _path=_file, _dType="constant")
+            else:
+                self.__set(_text=name, _path=_file, _dType="numpy")
+        # --
+
+        # Perform required computations for processing input
+        # data. Each constant file requires a series of processing
+        # and the client data requires a different series of processing
+        # in order to make sure the data is usable for the simulation.
+        self.__process_constants()
+
+        # -- process client data
+        self.__process_client_data()
+
+        # -- update logs
+        simulationLogger.info("Input parameters created.")
+
     def __mu_max_compute(self, temp):
         """Compute Temperature Dependent Constants"""
         const1 = self.Const1.get("value")
