@@ -138,71 +138,21 @@ class io:
             # -- set attribute to self with the above payload
             setattr(self, _text, payload)
 
-    def setup_inputs(self, dataLocn):
-        """Setup all Simulation Model Inputs"""
-        for name, _file in dataLocn:
-            if not (name.startswith("feed") or name.startswith("inoculum")):
-                self.__set(_text=name, _path=_file, _dType="constant")
-            else:
-                self.__set(_text=name, _path=_file, _dType="numpy")
-            if name == "Const1":
-                const1 = self.Const1.get("value")
-                self.Const1.update(dict(
-                    params=dict(
-                        kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
-                        pk_low=const1[2:, 9], pk_high=const1[2:, 10],
-                        ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
-                        ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
-                        ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
-                        ki_lcfa=const1[2:, 8])
-                ))
-            elif name.split(".")[0] == "feed":
-                time_periods = self.feed.get("value")[:, 0]
-                if not isinstance(time_periods, np.ndarray):
-                    time_periods = np.array(time_periods)
-                temperatures = self.feed.get("value")[:, 1]
-                # TODO: Handle flow division by 24 elegantly
-                flows = self.feed.get("value")[:, [2, 3]] / 24
-                substrate = flows[:, 0].reshape(-1, 1) * \
-                    self.feed.get("value")[:, 4:]
-                # --
-                self.regulation_values = dict(
-                    tp=time_periods, temp=temperatures,
-                    flows=flows, substrates=substrate)
-            elif name == "inoculum":
-                _extend = np.concatenate((self.inoculum.get("value"),
-                                          np.zeros(4, )))
-
-                _value = {"value": _extend}
-                self.inoculum.update(_value)
-            else:
-                pass
-        simulationLogger.info("Input parameters created.")
-
-    def __const1_parameters(self):
-        """Update Const1 Parameters"""
-        const1 = self.Const1.get("value")
-        self.Const1.update(dict(
-            params=dict(
-                kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
-                pk_low=const1[2:, 9], pk_high=const1[2:, 10],
-                ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
-                ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
-                ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
-                ki_lcfa=const1[2:, 8])
-        ))
-        simulationLogger.info("Process parameter space of Const1 updated.")
-
     @property
     def _ph_method(self):
-        """Return ph if defined in configuration file"""
+        """Return pH method if defined in configuration file"""
         if self.__ph_settings.get("method"):
             return self.__ph_settings.get("method")
         else:
+            # Returns standard pH method if there is no
+            # defined pH method.
+            # TODO: Standard should be renamed to newton-raphson
+            # in future versions.
             return "standard"
 
     @property
     def _solver(self):
+        """Return Solver settings for starting the simulation"""
         _solver_params = dict(
             method=self.__solver_settings.get("method"),
             order=self.__solver_settings.get("order"),
