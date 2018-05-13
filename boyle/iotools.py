@@ -97,28 +97,24 @@ class io:
         self._path = output_folder_
 
         # Start the processing of the imported data paths now
-        self.setup_inputs(names=_names, files=_files)
+        self.setup_inputs(dataLocn=_input_data)
 
-    def setup_inputs(self, names, files):
+    def setup_inputs(self, dataLocn):
         """Setup all Simulation Model Inputs"""
-        names_and_files = tuple(zip(names, files))
-        for name, _file in names_and_files:
-            # TODO: Clean up this process for setting up
-            # input files for the iotools.
-            if name in ["Const1", "Const2", "yc", "inoculum", "feed.npy"]:
-                if not (name.startswith("feed") or name.startswith("inoculum")):
-                    try:
-                        setattr(self, name, {"path": _file,
-                                             "value": np.loadtxt(_file, comments="%")})
-                    except:
-                        print(_file)
-                        raise
-                else:
-                    try:
-                        setattr(self, name.split(".")[0],
-                                {"path": _file, "value": np.load(_file)})
-                    except:
-                        raise
+        for name, _file in dataLocn:
+            if not (name.startswith("feed") or name.startswith("inoculum")):
+                try:
+                    setattr(self, name, {"path": _file,
+                                            "value": np.loadtxt(_file, comments="%")})
+                except:
+                    print(_file)
+                    raise
+            else:
+                try:
+                    setattr(self, name.split(".")[0],
+                            {"path": _file, "value": np.load(_file)})
+                except:
+                    raise
             if name == "Const1":
                 const1 = self.Const1.get("value")
                 self.Const1.update(dict(
