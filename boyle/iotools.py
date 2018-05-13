@@ -111,11 +111,32 @@ class io:
 
     def __set(self, _text, _path, _dType):
         if _dType == "constant":
-            v_ = {"path": _path, "value": load_constants(_path)}
-            setattr(self, _text, v_)
+            if not _path.endswith("constant"):
+                # Raise error if the file is found to have an extension
+                # that is not valid for the constants file.
+                _e = "IOERROR: File Format mismatch for {}.".format("constant")
+                er_ = _e + " Given file is {}".format(_path)
+                simulationLogger.error(_e)
+                raise IOError(er_)
+            # Create the required dictionary to be loaded at the
+            # attribute name and set up the data payload
+            payload = {"path": _path, "value": load_constants(_path)}
+            # -- set attribute to self with the above payload
+            setattr(self, _text, payload)
+
         elif _dType == "numpy":
-            v_ = {"path": _path, "value": load_client_data(_path)}
-            setattr(self, _text, v_)
+            # Raise error if the file is found to have an extension
+            # that is not valid for a numpy file.
+            if not _path.endswith(("npy", "npz")):
+                _e = "IOERROR: File Format mismatch for {}.".format("numpy")
+                er_ = _e + " Given file is {}".format(_path)
+                simulationLogger.error(_e)
+                raise IOError(er_)
+            # Create the required dictionary to be loaded at the
+            # attribute name and set up the data payload
+            payload = {"path": _path, "value": load_client_data(_path)}
+            # -- set attribute to self with the above payload
+            setattr(self, _text, payload)
 
     def setup_inputs(self, dataLocn):
         """Setup all Simulation Model Inputs"""
