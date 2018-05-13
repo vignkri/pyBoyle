@@ -81,36 +81,23 @@ class io:
 
         items = list(os.walk(folder))
         fldr, lst, files = items[0]
-        _names = [item for item in files if
-                  item.endswith(SUPPORTED_EXTENSIONS)]
-        _files = [os.path.join(fldr, item) for item in files]
-        self.setup_inputs(names=_names, files=_files)
-        # Create Output Headers
-        try:
-            _base_path = self._folder
-            output_fldr = os.path.join(_base_path, "output")
-            if not os.path.exists(output_fldr):
-                os.mkdir(output_fldr)
-            self._path = output_fldr
-        except AssertionError or OSError as e:
-            simulationLogger.error("OSError: BoyleOutput Creation Module.")
-            raise
-        else:
-            simulationLogger.info("Created IO toolkit for the system.")
+        # -- Create tuple of file names to load and handle
+        _input_data = [(_f.split(".")[0], os.path.join(fldr, _f))
+                       for _f in files if _f.endswith(SUPPORTED_EXTENSIONS)]
+        # The above code generates a tuple of file_name and file_path
+        # for setting the correct attributes for the program.
 
-    def __const1_parameters(self):
-        """Update Const1 Parameters"""
-        const1 = self.Const1.get("value")
-        self.Const1.update(dict(
-            params=dict(
-                kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
-                pk_low=const1[2:, 9], pk_high=const1[2:, 10],
-                ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
-                ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
-                ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
-                ki_lcfa=const1[2:, 8])
-        ))
-        simulationLogger.info("Process parameter space of Const1 updated.")
+        # The output headers and the output folders are to be
+        # created so that the results can be persisted quickly
+        output_folder_ = os.path.join(folder, "output")
+        if not os.path.exists(output_folder_):
+            os.mkdir(output_folder_)
+            simulationLogger.warn("Created missing output folder")
+
+        self._path = output_folder_
+
+        # Start the processing of the imported data paths now
+        self.setup_inputs(names=_names, files=_files)
 
     def setup_inputs(self, names, files):
         """Setup all Simulation Model Inputs"""
@@ -165,6 +152,20 @@ class io:
             else:
                 pass
         simulationLogger.info("Input parameters created.")
+
+    def __const1_parameters(self):
+        """Update Const1 Parameters"""
+        const1 = self.Const1.get("value")
+        self.Const1.update(dict(
+            params=dict(
+                kd0=0.05, ks=const1[2:, 5], ks_nh3=const1[2:, 6],
+                pk_low=const1[2:, 9], pk_high=const1[2:, 10],
+                ki_carbon=const1[0, 7], ki_prot=const1[1, 7],
+                ki_hac_hpr=const1[6, 7], ki_hac_hbut=const1[7, 7],
+                ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
+                ki_lcfa=const1[2:, 8])
+        ))
+        simulationLogger.info("Process parameter space of Const1 updated.")
 
     @property
     def _ph_method(self):
