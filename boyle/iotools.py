@@ -124,14 +124,13 @@ class io:
                         ki_nh3_hac=const1[9, 8], ki_hac_hval=const1[8, 7],
                         ki_lcfa=const1[2:, 8])
                 ))
-            elif name == "feed":
+            elif name.split(".")[0] == "feed":
                 time_periods = self.feed.get("value")[:, 0]
                 if not isinstance(time_periods, np.ndarray):
                     time_periods = np.array(time_periods)
                 temperatures = self.feed.get("value")[:, 1]
                 # TODO: Handle flow division by 24 elegantly
-                # flows = self.regulate.get("value")[:, [2, 3]] / 24
-                flows = self.feed.get("value")[:, [2, 3]]
+                flows = self.feed.get("value")[:, [2, 3]] / 24
                 substrate = flows[:, 0].reshape(-1, 1) * \
                     self.feed.get("value")[:, 4:]
                 # --
