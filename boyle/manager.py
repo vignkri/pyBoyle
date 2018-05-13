@@ -122,7 +122,7 @@ class Manager:
                 self._initial_time = self._end_time
                 self._end_time = self._frame.regulation_values["tp"][idx]
             # --
-            self._frame.process_data(index=idx)
+            self._frame.move_index_for_iteration(index=idx)
             self.initial_value = self._frame.inoculum.get("value")
             self.initialize_solver(iname="vode")
             self.function_parameters(run_no=idx)

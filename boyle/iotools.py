@@ -292,7 +292,7 @@ class io:
         setattr(self, "henry_constants", hc)
         simulationLogger.info("Process variable Henry-Constants created.")
 
-    def process_data(self, index):
+    def move_index_for_iteration(self, index):
         """Process the imported dataset and update the values."""
         # -- substrate flow information
         temp = self.regulation_values["temp"][index]
