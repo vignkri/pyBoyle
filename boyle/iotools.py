@@ -54,31 +54,34 @@ class io:
         self.__experiment_name = metadata.get("name")  # experiment name
         self.__description = metadata.get("description")  # description
         self.__experiment_tags = metadata.get("tags")  # tags for searching
+
         # -- Experiment settings for additional information
         settings = configuration.get("settings")
         self.__experiment_status = settings.get("process")
         self.__step_size = settings.get("step_size")
         self.__ph_settings = settings.get("ph")
         self.__solver_settings = settings.get("solver")
+
         # -- default to standard if solver settings is given as none
         if not self.__solver_settings:
             self.__solver_settings = STANDARD_SOLVER_SETTINGS
+
         # -- Created metadata in time of simulation
         self.__creation_time = time.time()
-        # Simulation settings
+
+        # -- Get path to the correct folder for accessing the files
         folder = metadata.get("data")
-        try:
-            assert os.path.exists(folder)
-            self._folder = folder
-        except AssertionError as e:
-            simulationLogger.critical("Data folder not found.", e)
-            raise
-        else:
-            items = list(os.walk(folder))
-            fldr, lst, files = items[0]
-            _names = [item for item in files]
-            _files = [os.path.join(fldr, item) for item in files]
-            self.setup_inputs(names=_names, files=_files)
+        if not os.path.exists(folder):
+            _e = "The folder mentioned does not exist."
+            _error = _e + "\nProvided folder: {}".format(folder)
+            simulationLogger.critical(_e)
+            raise IOError(_error)
+
+        items = list(os.walk(folder))
+        fldr, lst, files = items[0]
+        _names = [item for item in files]
+        _files = [os.path.join(fldr, item) for item in files]
+        self.setup_inputs(names=_names, files=_files)
         # Create Output Headers
         try:
             _base_path = self._folder
