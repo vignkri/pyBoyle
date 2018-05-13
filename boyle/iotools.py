@@ -51,9 +51,9 @@ class io:
         """Set up Frame for setting up process information"""
         # -- Experiment information for metadata
         metadata = configuration.get("metadata")
-        self.__experiment_name = metadata.get("name")
-        self.__description = metadata.get("description")
-        self.__experiment_tags = metadata.get("tags")
+        self.__experiment_name = metadata.get("name")  # experiment name
+        self.__description = metadata.get("description")  # description
+        self.__experiment_tags = metadata.get("tags")  # tags for searching
         # -- Experiment settings for additional information
         settings = configuration.get("settings")
         self.__experiment_status = settings.get("process")
@@ -66,7 +66,7 @@ class io:
         # -- Created metadata in time of simulation
         self.__creation_time = time.time()
         # Simulation settings
-        folder = configuration.get("data")
+        folder = metadata.get("data")
         try:
             assert os.path.exists(folder)
             self._folder = folder
