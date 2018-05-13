@@ -99,7 +99,7 @@ class io:
         for name, _file in names_and_files:
             # TODO: Clean up this process for setting up
             # input files for the iotools.
-            if name in ["Const1", "Const2", "yc", "inoculum", "feed"]:
+            if name in ["Const1", "Const2", "yc", "inoculum", "feed.npy"]:
                 if not (name.startswith("feed") or name.startswith("inoculum")):
                     try:
                         setattr(self, name, {"path": _file,
@@ -109,8 +109,8 @@ class io:
                         raise
                 else:
                     try:
-                        setattr(self, name, {"path": _file,
-                                             "value": np.load(_file)})
+                        setattr(self, name.split(".")[0],
+                                {"path": _file, "value": np.load(_file)})
                     except:
                         raise
             if name == "Const1":
