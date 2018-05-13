@@ -19,6 +19,8 @@ to.
 """
 
 
+# Define globals for files required
+SUPPORTED_EXTENSIONS = ("npy", "npz", "constant")
 # Standard solver settings if settings are not provided
 # in configuration file
 STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
@@ -79,7 +81,8 @@ class io:
 
         items = list(os.walk(folder))
         fldr, lst, files = items[0]
-        _names = [item for item in files]
+        _names = [item for item in files if
+                  item.endswith(SUPPORTED_EXTENSIONS)]
         _files = [os.path.join(fldr, item) for item in files]
         self.setup_inputs(names=_names, files=_files)
         # Create Output Headers
