@@ -21,8 +21,29 @@ to.
 
 # Standard solver settings if settings are not provided
 # in configuration file
-STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps":500,
+STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
                             "relative": 1e-4, "absolute": 1e-8}
+
+# Set a dictionary of headers that are to be set when saving
+# outputs to file.
+OUTPUT_HEADERS = dict(
+            debug=["run_no", "time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
+                   "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
+                   "carboin", "carbon", "lipids", "lcfa", "protis",
+                   "protin", "amino", "nh3", "hac", "hpr", "hbut",
+                   "hval", "ch4", "co2", "h2s", "zplus", "h2po4",
+                   "aminus", "deadcell", "carb_degr", "amino_degr",
+                   "lipid_degr", "lcfa_degr", "prop_degr", "butyr_degr",
+                   "valer_degr", "acet_degr", "gfnh3", "gfch4",
+                   "gfco2", "gfh2s"],
+            solution=["run_no", "time", "volume", "carbois", "carboin",
+                      "carbon", "lipids", "lcfa", "protis", "protin", "amino",
+                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
+                      "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
+                      "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
+                      "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
+                      "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
+        )
 
 
 class io:
@@ -59,24 +80,6 @@ class io:
             _files = [os.path.join(fldr, item) for item in files]
             self.setup_inputs(names=_names, files=_files)
         # Create Output Headers
-        self.__headers = dict(
-            debug=["run_no", "time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
-                   "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
-                   "carboin", "carbon", "lipids", "lcfa", "protis",
-                   "protin", "amino", "nh3", "hac", "hpr", "hbut",
-                   "hval", "ch4", "co2", "h2s", "zplus", "h2po4",
-                   "aminus", "deadcell", "carb_degr", "amino_degr",
-                   "lipid_degr", "lcfa_degr", "prop_degr", "butyr_degr",
-                   "valer_degr", "acet_degr", "gfnh3", "gfch4",
-                   "gfco2", "gfh2s"],
-            solution=["run_no", "time", "volume", "carbois", "carboin",
-                      "carbon", "lipids", "lcfa", "protis", "protin", "amino",
-                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
-                      "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
-                      "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
-                      "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
-                      "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
-        )
         try:
             _base_path = self._folder
             output_fldr = os.path.join(_base_path, "output")
@@ -273,9 +276,9 @@ class io:
             # --
             headers = of.create_group("Headers")
             headers["debug"] = [np.string_(item) for item in
-                                self.__headers.get("debug")]
+                                OUTPUT_HEADERS.get("debug")]
             headers["solution"] = [np.string_(item) for item in
-                                   self.__headers.get("solution")]
+                                   OUTPUT_HEADERS.get("solution")]
             # --
             out_grp = of.create_group("Output")
             out_grp["debug"] = self.debug[1:]
@@ -299,8 +302,8 @@ class io:
                                      % (attrname))
             simulationLogger.info("BoyleOutput: creating attribute %s" %
                                   (attrname))
-            if attrname in self.__headers.keys():
-                setattr(self, attrname, [self.__headers.get(attrname)])
+            if attrname in OUTPUT_HEADERS.keys():
+                setattr(self, attrname, [OUTPUT_HEADERS.get(attrname)])
             else:
                 setattr(self, attrname, value)
             # -- log the error in the logging file.
