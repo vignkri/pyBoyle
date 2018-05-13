@@ -1,9 +1,10 @@
 # Simulation Settings
 
-name: Test
-data: ./sample/sample
-description: List of changes or file changes in the input folder to be aware of for analysis
-tags: test, sample-data
+metadata:
+    name: Test
+    data: ./sample/sample
+    description: List of changes or file changes in the input folder to be aware of for analysis
+    tags: test, sample-data
 settings:
     process: debug
     constants: standard

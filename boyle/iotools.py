@@ -23,9 +23,10 @@ class io:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
         # -- Experiment information for metadata
-        self.__experiment_name = configuration.get("name")
-        self.__description = configuration.get("description")
-        self.__experiment_tags = configuration.get("tags")
+        metadata = configuration.get("metadata")
+        self.__experiment_name = metadata.get("name")
+        self.__description = metadata.get("description")
+        self.__experiment_tags = metadata.get("tags")
         # -- Experiment settings for additional information
         settings = configuration.get("settings")
         self.__experiment_status = settings.get("process")
