@@ -93,7 +93,7 @@ class Manager:
         # of the initial value set. Forcing to use the result setup is probably
         # not useful
         # self._frame.Initial.update({"value": self.result[-1][2:]})
-        self._frame.Initial.update({"value": y_dot})
+        self._frame.inoculum.update({"value": y_dot})
 
     def function_parameters(self, run_no):
         """Pass function parameters to the simulator"""
@@ -123,7 +123,7 @@ class Manager:
                 self._end_time = self._frame.regulation_values["tp"][idx]
             # --
             self._frame.process_data(index=idx)
-            self.initial_value = self._frame.Initial.get("value")
+            self.initial_value = self._frame.inoculum.get("value")
             self.initialize_solver(iname="vode")
             self.function_parameters(run_no=idx)
             self.__solver_start(run_no=idx)

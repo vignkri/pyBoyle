@@ -146,11 +146,6 @@ class io:
                 self.inoculum.update(_value)
             else:
                 pass
-        self.Initial = self.inoculum  # Place holder for inoculum refactor
-        # TODO: Refactor all cases where self.Initial is called in
-        # downstream functions and methods. They should be calling
-        # io.inoculum because it is a much more correct description of
-        # the code.
         simulationLogger.info("Input parameters created.")
 
     @property
