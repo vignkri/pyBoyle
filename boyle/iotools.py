@@ -19,6 +19,12 @@ to.
 """
 
 
+# Standard solver settings if settings are not provided
+# in configuration file
+STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps":500,
+                            "relative": 1e-4, "absolute": 1e-8}
+
+
 class io:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
@@ -33,6 +39,9 @@ class io:
         self.__step_size = settings.get("step_size")
         self.__ph_settings = settings.get("ph")
         self.__solver_settings = settings.get("solver")
+        # -- default to standard if solver settings is given as none
+        if not self.__solver_settings:
+            self.__solver_settings = STANDARD_SOLVER_SETTINGS
         # -- Created metadata in time of simulation
         self.__creation_time = time.time()
         # Simulation settings
