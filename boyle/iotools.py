@@ -48,6 +48,16 @@ OUTPUT_HEADERS = dict(
         )
 
 
+def load_constants(path):
+    """Utility function to load constants files"""
+    return np.loadtxt(path, comments="%")
+
+
+def load_client_data(path):
+    """Utility function to load client-data files"""
+    return np.load(path)
+
+
 class io:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
@@ -99,22 +109,21 @@ class io:
         # Start the processing of the imported data paths now
         self.setup_inputs(dataLocn=_input_data)
 
+    def __set(self, _text, _path, _dType):
+        if _dType == "constant":
+            v_ = {"path": _path, "value": load_constants(_path)}
+            setattr(self, _text, v_)
+        elif _dType == "numpy":
+            v_ = {"path": _path, "value": load_client_data(_path)}
+            setattr(self, _text, v_)
+
     def setup_inputs(self, dataLocn):
         """Setup all Simulation Model Inputs"""
         for name, _file in dataLocn:
             if not (name.startswith("feed") or name.startswith("inoculum")):
-                try:
-                    setattr(self, name, {"path": _file,
-                                            "value": np.loadtxt(_file, comments="%")})
-                except:
-                    print(_file)
-                    raise
+                self.__set(_text=name, _path=_file, _dType="constant")
             else:
-                try:
-                    setattr(self, name.split(".")[0],
-                            {"path": _file, "value": np.load(_file)})
-                except:
-                    raise
+                self.__set(_text=name, _path=_file, _dType="numpy")
             if name == "Const1":
                 const1 = self.Const1.get("value")
                 self.Const1.update(dict(
