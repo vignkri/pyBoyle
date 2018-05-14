@@ -6,6 +6,7 @@ import h5py as h5
 import numpy as np
 
 from logger import simulationLogger
+from utility import load_constants, load_client_data
 
 """
 Input-Output Tools
@@ -46,16 +47,6 @@ OUTPUT_HEADERS = dict(
                       "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
                       "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
         )
-
-
-def load_constants(path):
-    """Utility function to load constants files"""
-    return np.loadtxt(path, comments="%")
-
-
-def load_client_data(path):
-    """Utility function to load client-data files"""
-    return np.load(path)
 
 
 class io:
