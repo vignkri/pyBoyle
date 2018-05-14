@@ -303,45 +303,55 @@ class io:
         self.__recompute_mu_max(temp=temp)
         self.__recompute_hconstants(temp=temp)
 
-    def persist(self):
+    def save_to_file(self):
         """Store the data as a pickle."""
-        otime = time.gmtime()
-        file_name = "output_Y{year}M{month}D{day}_{hour}h{min}m.hdf5".format(
-            year=otime.tm_year, month=otime.tm_mon, day=otime.tm_mday,
-            hour=otime.tm_hour, min=otime.tm_min)
+        # Get time of output for setting file name
+        output_time = time.gmtime()
+        # - get identifiers from the values.
+        _year = output_time.tm_year
+        _month = output_time.tm_mon
+        _day = output_time.tm_mday
+        _hour = output_time.tm_hour
+        _minute = output_time.tm_min
+        # - generate file name
+        file_name = "output_Y{year}M{month}D{day}_{hour}H{m}M.hdf5".format(
+            year=_year, month=_month, day=_day, hour=_hour, m=_minute
+        )
+        # - create path to the filename
         output_path = os.path.join(self._path, file_name)
+        # -- creating file by trying
         try:
-            of = h5.File(output_path, "w")
+            out_ = h5.File(output_path, "w")
         except OSError as e:
             simulationLogger.error("OSError: Output file exists."
                                    "Creating a new output file.")
         else:
-            of.attrs["Experiment"] = np.string_(self.__experiment_name)
-            of.attrs["CreationTime"] = self.__creation_time
+            out_.attrs["Experiment"] = np.string_(self.__experiment_name)
+            out_.attrs["CreationTime"] = self.__creation_time
             ending_time = time.time()
-            of.attrs["FinishTime"] = ending_time
-            of.attrs["Duration"] = ending_time - self.__creation_time
-            of.attrs["Description"] = self.__description
-            of.attrs["Tags"] = np.string_(self.__experiment_tags)
+            out_.attrs["FinishTime"] = ending_time
+            out_.attrs["Duration"] = ending_time - self.__creation_time
+            out_.attrs["Description"] = self.__description
+            out_.attrs["Tags"] = np.string_(self.__experiment_tags)
             # --
-            headers = of.create_group("Headers")
+            headers = out_.create_group("Headers")
             headers["debug"] = [np.string_(item) for item in
                                 OUTPUT_HEADERS.get("debug")]
             headers["solution"] = [np.string_(item) for item in
                                    OUTPUT_HEADERS.get("solution")]
             # --
-            out_grp = of.create_group("Output")
-            out_grp["debug"] = self.debug[1:]
-            out_grp["solution"] = self.solution[1:]
+            output_group = out_.create_group("Output")
+            output_group["debug"] = self.debug[1:]
+            output_group["solution"] = self.solution[1:]
             # -- Deprecate this:
             if self.__experiment_status == "debug":
-                out_grp["debug_solution"] = np.array(self.debug_solution)
+                output_group["debug_solution"] = np.array(self.debug_solution)
             else:
                 pass
             # --
-            in_grp = of.create_group("Input")
-            in_grp["regulate"] = self.feed.get("value")
-            in_grp["initial"] = self.inoculum.get("value")
+            input_group = out_.create_group("Input")
+            input_group["regulate"] = self.feed.get("value")
+            input_group["initial"] = self.inoculum.get("value")
 
     def _update(self, attrname, value):
         """Update the attribute if the value exists"""

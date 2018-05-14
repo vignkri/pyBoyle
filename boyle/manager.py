@@ -132,6 +132,6 @@ class Manager:
         simulationLogger.info("Starting post-processing")
         # --
         self.post_process()
-        self._frame.persist()
+        self._frame.save_to_file()
         simulationLogger.info("Post processing of data finished.")
         simulationLogger.info("Finishing up simulation. Closing.")
