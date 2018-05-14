@@ -109,6 +109,27 @@ class io:
         # Start the processing of the imported data paths now
         self.setup_inputs(dataLocn=_input_data)
 
+    def _update(self, attrname, value):
+        """Update the attribute if the value exists"""
+        try:
+            getattr(self, attrname)  # Try to get the attribute of given name
+        except AttributeError as e:
+            # If there is an attribute error, catch it
+            simulationLogger.warning("Attribute {} missing.".format(attrname))
+            simulationLogger.info("Creating attribute {}".format(attrname))
+            # Check if the attribute exists in the headers file
+            # if it exists, then get that value to be updated.
+            if attrname in OUTPUT_HEADERS.keys():
+                setattr(self, attrname, [OUTPUT_HEADERS.get(attrname)])
+            else:
+                # The Set the attribute with the value if not found
+                # in the output_headers file.
+                setattr(self, attrname, value)
+        else:
+            # The below is for setting list attributes with an
+            # additional value.
+            getattr(self, attrname).append(value)
+
     def __set(self, _text, _path, _dType):
         if _dType == "constant":
             if not _path.endswith("constant"):
@@ -352,20 +373,3 @@ class io:
             input_group = out_.create_group("Input")
             input_group["regulate"] = self.feed.get("value")
             input_group["initial"] = self.inoculum.get("value")
-
-    def _update(self, attrname, value):
-        """Update the attribute if the value exists"""
-        try:
-            getattr(self, attrname)
-        except AttributeError as e:
-            simulationLogger.warning("BoyleOutput: attribute '%s' not found"
-                                     % (attrname))
-            simulationLogger.info("BoyleOutput: creating attribute %s" %
-                                  (attrname))
-            if attrname in OUTPUT_HEADERS.keys():
-                setattr(self, attrname, [OUTPUT_HEADERS.get(attrname)])
-            else:
-                setattr(self, attrname, value)
-            # -- log the error in the logging file.
-        else:
-            getattr(self, attrname).append(value)
