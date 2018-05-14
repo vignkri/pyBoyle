@@ -303,7 +303,7 @@ class io:
         self.__recompute_mu_max(temp=temp)
         self.__recompute_hconstants(temp=temp)
 
-    def persist(self, status="debug"):
+    def persist(self):
         """Store the data as a pickle."""
         otime = time.gmtime()
         file_name = "output_Y{year}M{month}D{day}_{hour}h{min}m.hdf5".format(
