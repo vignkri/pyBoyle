@@ -107,9 +107,11 @@ class Manager:
         simulationLogger.info("Setting function parameters for the model")
 
     def start(self):
-        simulationLogger.info("Starting experiment simulation.")
-        # -- set timing by regulation settings
+        simulationLogger.info("Starting experiment.")
+        # Create result object to store results in
         self.result = []
+        # -- loop through all available time-points to generate
+        # the simulation of feeding on multiple different days.
         for idx in range(0, len(self._frame.regulation_values["tp"])):
             simulationLogger.info("Running Simulation Frame: {}".format(idx))
             if idx == 0:
@@ -123,11 +125,17 @@ class Manager:
                 self._initial_time = self._end_time
                 self._end_time = self._frame.regulation_values["tp"][idx]
             # --
+            # -- move the io-object one index to get the required data
             self._frame.move_index_for_iteration(index=idx)
+            # -- get new inoculum value from the io-object
             self.initial_value = self._frame.inoculum.get("value")
+            # -- initialise the solver and the details of the solver
             self.initialize_solver(iname="vode")
+            # -- set up function parameters for a particular run_no
             self.function_parameters(run_no=idx)
+            # -- start the solver with teh current run_no
             self.__solver_start(run_no=idx)
+            # -- Log that the simulation ended correctly.
             simulationLogger.info("Simulation finished successfully.")
         # --
         simulationLogger.info("Starting post-processing")
