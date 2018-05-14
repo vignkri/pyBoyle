@@ -25,15 +25,19 @@ class Manager:
         """
         self._model = model
         self._frame = frame
-        try:
-            self._step = frame._simulation_config.get("step")
-            self._meta = frame._simulation_config.get("metadata")
-        except KeyError as e:
-            simulationLogger.error("KeyError: Check Configuration File"
-                                   "Key is missing.", e)
-            raise
+        if not self._frame._simulation_config.get("step"):
+            er = "KeyError: Step Size key missing from configuration."
+            raise(er)
         else:
-            simulationLogger.info("Set up experiment: '%s'" % self._meta)
+            self._step = frame._simulation_config.get("step")
+
+        if not self._frame._simulation_config.get("metadata"):
+            er = "KeyError: Metadata key is missing from configuration."
+            raise(er)
+        else:
+            self._meta = frame._simulation_config.get("metadata")
+
+        simulationLogger.info("Set up experiment: '%s'" % self._meta)
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
