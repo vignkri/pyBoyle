@@ -238,7 +238,7 @@ class io:
         # -- update logs
         simulationLogger.info("Input parameters created.")
 
-    def __mu_max_compute(self, temp):
+    def __recompute_mu_max(self, temp):
         """Compute Temperature Dependent Constants"""
         const1 = self.Const1.get("value")
         mu_max = np.zeros((10, 1))
@@ -266,7 +266,7 @@ class io:
         ))
         simulationLogger.info("Process variable mu_max created.")
 
-    def __compute_hconstants(self, temp):
+    def __recompute_hconstants(self, temp):
         """Compuate henry constants"""
         # -- delta tempature
         const2 = self.Const2.get("value")
@@ -300,8 +300,8 @@ class io:
         self.flow_out = self.regulation_values["flows"][index, 1]
         self.substrate_flow = self.regulation_values["substrates"][index]
         # -- Update functions
-        self.__mu_max_compute(temp=temp)
-        self.__compute_hconstants(temp=temp)
+        self.__recompute_mu_max(temp=temp)
+        self.__recompute_hconstants(temp=temp)
 
     def persist(self, status="debug"):
         """Store the data as a pickle."""
