@@ -25,8 +25,8 @@ def main(cfg_path):
     dataset = io(configuration)
     simulationLogger.info("Loaded Input data into frame.")
 
-    solver = Manager(model.standard, frame=dataset)
-    solver.start()
+    _manager = Manager(model.standard, frame=dataset)
+    _manager.start()
 
 
 if __name__ == "__main__":
