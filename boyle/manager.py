@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import model
 import numpy as np
 import scipy.integrate
 from logger import simulationLogger
@@ -14,7 +15,7 @@ to the main application.
 
 
 class Manager:
-    def __init__(self, model, frame):
+    def __init__(self, frame, model=model.standard):
         """Initialize manager for creating a simulation
 
         PARAMETERS
