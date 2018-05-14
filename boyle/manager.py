@@ -102,13 +102,9 @@ class Manager:
 
     def function_parameters(self, run_no):
         """Pass function parameters to the simulator"""
-        try:
-            self._solver.set_f_params(*[self._frame, self._frame,
-                                        run_no, self._frame._ph_method])
-        except:
-            raise
-        finally:
-            simulationLogger.info("Setting function parameters for the model")
+        args = [self._frame, run_no, self._frame._ph_method]
+        self._solver.set_f_params(*args)
+        simulationLogger.info("Setting function parameters for the model")
 
     def start(self):
         simulationLogger.info("Starting experiment simulation.")

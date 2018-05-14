@@ -9,7 +9,7 @@ Standard Computation Model
 """
 
 
-def standard(time, y0, dataset, output, run_no, ph_mode):
+def standard(time, y0, dataset, run_no, ph_mode):
     """Standard Integrator Model
 
     PARAMETERS
@@ -243,7 +243,7 @@ def standard(time, y0, dataset, output, run_no, ph_mode):
     #
     # --------------------------------------------
 
-    output._update("debug", [run_no, time] +
-                   mu[:, 0].tolist() + [pH] + y_dot.tolist())
+    dataset._update("debug", [run_no, time] +
+                    mu[:, 0].tolist() + [pH] + y_dot.tolist())
 
     return y_dot
