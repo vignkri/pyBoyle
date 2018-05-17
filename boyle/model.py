@@ -64,9 +64,23 @@ def standard(time, y0, dataset, run_no, ph_mode):
     substrate = y0[1:20]
 
     # y0 Chemical Concentrations
-    carbo_is, carbo_in, carbon, lipids, lcfa, \
-        prot_is, prot_in, amino, nh3, hac, hpr, hbut, hval, \
-        ch4, co2, h2s, z, h2po4, a = substrate
+
+    # current order: carbis, carbin, carbon, prot.s, prot.in, amino, lipids,
+    # lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
+
+    # old order: carbis, carbin, carbon, lipids, lcfa, protis, protin,
+    # amino, nh3, hac, hpr, hbut, hval, ch4, co2, h2s, Z+, h2po4, A-
+
+    # old order definition
+    # carbo_is, carbo_in, carbon, lipids, lcfa, \
+    #     prot_is, prot_in, amino, nh3, hac, hpr, hbut, hval, \
+    #     ch4, co2, h2s, z, h2po4, a = substrate
+
+    # new order definition
+    carbo_is, carbo_in, carbon, prot_is, prot_in, amino, lipids, \
+        lcfa, hpr, hbut, hval, hac, nh3, ch4, co2, h2s, z, \
+        h2po4, a = substrate
+    # --
     dead_cells = y0[20]
 
     # Constant One Argument
