@@ -257,6 +257,7 @@ def standard(time, y0, dataset, run_no, ph_mode):
     # --------------------------------------------
 
     dataset._update("debug", [run_no, time] +
-                    mu[:, 0].tolist() + [pH] + y_dot.tolist())
+                    mu[:, 0].tolist() + [pH, dataset.flow_in, flow_in] +
+                    y_dot.tolist())
 
     return y_dot

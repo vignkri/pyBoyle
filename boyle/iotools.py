@@ -33,7 +33,7 @@ STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
 HEADER_START = ["run_no", "time"]
 
 HEADER_DEBUG = ["mu_1", "mu_2", "mu_3", "mu_4", "mu_5", "mu_6",
-                "mu_7", "mu_8", "pH"]
+                "mu_7", "mu_8", "pH", "raw_flow", "T_flow_in"]
 
 HEADER_VOL = ["volume"]
 
