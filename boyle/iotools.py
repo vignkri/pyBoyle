@@ -19,6 +19,8 @@ a dataset that is friendly to analyse and attach metadata
 to.
 """
 
+# order: carbis, carbin, gluc.s, prot.s, prot.in, amino, lipids,
+# lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
 
 # Define globals for files required
 SUPPORTED_EXTENSIONS = ("npy", "npz", "constant")
@@ -27,26 +29,34 @@ SUPPORTED_EXTENSIONS = ("npy", "npz", "constant")
 STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
                             "relative": 1e-4, "absolute": 1e-8}
 
+# Splitting Header Items
+HEADER_START = ["run_no", "time"]
+
+HEADER_DEBUG = ["mu_1", "mu_2", "mu_3", "mu_4", "mu_5", "mu_6",
+                "mu_7", "mu_8", "pH"]
+
+HEADER_VOL = ["volume"]
+
+HEADER_CORE = ["carb_ins", "carb_ine", "carb_sol",
+               "prot_ins", "prot_ine", "amino", "lipids",
+               "ac_lcfa", "ac_prop", "ac_buty", "ac_val", "ac_ace",
+               "dg_nh4", "dg_ch4", "dg_co2", "dg_h2s", "io_z", "io_p",
+               "io_a"]
+
+HEADER_DEGRADERS = ["dead_cell", "degr_carb", "degr_amino", "degr_lipid",
+                    "degr_lcfa", "degr_hprop", "degr_butyr", "degr_valer",
+                    "degr_acet", "gf_nh3", "gf_ch4", "gf_co2", "gf_h2s"]
+
+HEADER_END = ["gasrate"]
+
 # Set a dictionary of headers that are to be set when saving
 # outputs to file.
 OUTPUT_HEADERS = dict(
-            debug=["run_no", "time", "mu_1", "mu_2", "mu_3", "mu_4", "mu_5",
-                   "mu_6", "mu_7", "mu_8", "ph", "volume", "carbois",
-                   "carboin", "carbon", "lipids", "lcfa", "protis",
-                   "protin", "amino", "nh3", "hac", "hpr", "hbut",
-                   "hval", "ch4", "co2", "h2s", "zplus", "h2po4",
-                   "aminus", "deadcell", "carb_degr", "amino_degr",
-                   "lipid_degr", "lcfa_degr", "prop_degr", "butyr_degr",
-                   "valer_degr", "acet_degr", "gfnh3", "gfch4",
-                   "gfco2", "gfh2s"],
-            solution=["run_no", "time", "volume", "carbois", "carboin",
-                      "carbon", "lipids", "lcfa", "protis", "protin", "amino",
-                      "nh3", "hac", "hpr", "hbut", "hval", "ch4",
-                      "co2", "h2s", "zplus", "h2po4", "aminus", "deadcell",
-                      "carb_degr", "amino_degr", "lipid_degr", "lcfa_degr",
-                      "prop_degr", "butyr_degr", "valer_degr", "acet_degr",
-                      "gfnh3", "gfch4", "gfco2", "gfh2s", "gasrate"],
-        )
+    debug=HEADER_START + HEADER_DEBUG + HEADER_VOL + HEADER_CORE +
+    HEADER_DEGRADERS,
+    solution=HEADER_START + HEADER_VOL + HEADER_CORE + HEADER_DEGRADERS +
+    HEADER_END
+)
 
 
 class io:
