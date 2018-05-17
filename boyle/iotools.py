@@ -158,9 +158,7 @@ class io:
         else:
             # Returns standard pH method if there is no
             # defined pH method.
-            # TODO: Standard should be renamed to newton-raphson
-            # in future versions.
-            return "standard"
+            return "newton-raphson"
 
     @property
     def _solver(self):
