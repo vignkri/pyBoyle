@@ -41,14 +41,10 @@ class Manager:
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
-        try:
-            self._solver = scipy.integrate.ode(self._model) \
-                .set_integrator(iname, **self._frame._solver)
-        except:
-            raise
-        finally:
-            self._solver.set_initial_value(y=self.initial_value,
-                                           t=self._initial_time)
+        self._solver = scipy.integrate.ode(self._model) \
+            .set_integrator(iname, **self._frame._solver)
+        self._solver.set_initial_value(y=self.initial_value,
+                                       t=self._initial_time)
 
     def post_process(self):
         """Computes the change in values
