@@ -264,7 +264,10 @@ def standard(time, y0, dataset, run_no, ph_mode):
 
     # --
     y_dot[[29, 30, 31, 32]] = gasflow
-    y_dot[9] = y_dot[9] - gasloss[0]
+    # y_dot[9] in the old version was NH3. That is now in 13
+    y_dot[13] = y_dot[13] - gasloss[0]
+    # y_dot[14, 15, 16] are ch4, co2, h2s in the old code
+    # in the new code, CH4, CO2, H2S are in
     y_dot[[14, 15, 16]] = y_dot[[14, 15, 16]] - gasloss[[1, 2, 3]]
 
     # --------------------------------------------
