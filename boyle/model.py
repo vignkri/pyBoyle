@@ -43,9 +43,9 @@ def standard(time, y0, dataset, run_no, ph_mode):
              "ka1_co2", "ka2_co2", "ka_h2s", "ka_h2po4", "kw"]
     xxval = [dataset.henry_constants.get(item) for item in names]
 
-    inflow = dataset.substrate_flow
     flow_in = dataset.flow_in
     flow_out = dataset.flow_out
+    inflow = dataset.substrate_flow
 
     # Define reaction rates and growth factors
     k0_carbon = dataset.mu_max.get("params").get("k0_carbon")
@@ -60,8 +60,8 @@ def standard(time, y0, dataset, run_no, ph_mode):
     kd0 = 0.05
     # -- set up parts of values
     volume = y0[0]
-    degraders = y0[21:29]
     substrate = y0[1:20]
+    degraders = y0[21:29]
 
     # y0 Chemical Concentrations
 
@@ -108,6 +108,9 @@ def standard(time, y0, dataset, run_no, ph_mode):
              "Other": [a, z, kw], "h2po4": [h2po4, ka_h2po4],
              "NH3": [nh3, ka_nh4]}
     # --
+    # TODO: Most cases, the pH fails horribly due to some external factors
+    # which could either be the constants not working properly or other
+    # issues that are stemming from the substrate / feed definitions.
     if ph_mode == "newton-raphson":
         while abs(Hfunc - H) > 1e-12 or pH is None:
             H, Hfunc = ph.newton_raphson(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
