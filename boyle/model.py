@@ -225,12 +225,23 @@ def standard(time, y0, dataset, run_no, ph_mode):
         ka_h2s / (H + ka_h2s)**2
     ]) / k_h
     # --
-    dH_dt = - (ka_hac / (ka_hac + H) * y_dot[10] / 60 +
-               ka_hpr / (ka_hac + H) * y_dot[11] / 74 +
-               ka_hbut / (ka_hac + H) * y_dot[12] / 88 +
-               ka_hval / (ka_hac + H) * y_dot[13] / 102 +
-               y_dot[19] / 35.5 -
-               y_dot[17] / 39 +
+    # Old Format
+    # y_dot[10] = HAC, y_dot[11] = HPR,
+    # y_dot[12] = HBUT, y_dot[13] = HVAL,
+    # y_dot[19] = A, y_dot[17] = Z,
+    # y_dot[18] = H2PO4
+
+    # New Format
+    # HAC = y_dot[12], HPR = y_dot[9],
+    # HBUT = y_dot[10], HVAL = y_dot[11]
+    # A- = y_dot[19], Z = y_dot[17],
+    # H2PO4 = y_dot[18]
+    dH_dt = - (ka_hac / (ka_hac + H) * y_dot[12] / 60 +  # HAC
+               ka_hpr / (ka_hac + H) * y_dot[9] / 74 +  # HPR
+               ka_hbut / (ka_hac + H) * y_dot[10] / 88 +  # HBut
+               ka_hval / (ka_hac + H) * y_dot[11] / 102 +  # HVal
+               y_dot[19] / 35.5 -  # A-
+               y_dot[17] / 39 +  # Z+ and H2PO4 below
                (1 + ka_h2po4 / (ka_h2po4 - H)) * y_dot[18] / 31) / \
         (
             ((ka1_co2 - 1) * ka2_co2 - H * H) * co2 / 44 /
