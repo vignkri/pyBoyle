@@ -90,9 +90,12 @@ class Manager:
                 # [self._solver.t] + list(y_dot))
                 row = np.hstack([np.array([run_no, self._solver.t]), y_dot])
                 self.result.append(row)
-        except:
-            print("Current Iteration {}".format(self._solver.t))
-            raise
+        except KeyboardInterrupt as e:
+            er = "KEYBOARD INTERRUPT: Stopped."
+            er += " Current Iteration {}".format(self._solver.t)
+            simulationLogger.info(er)
+            print(er)
+            raise(e)
         # --
         # The result chooses the elements from the start of y_dot instead
         # of the initial value set. Forcing to use the result setup is probably
