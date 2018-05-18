@@ -113,13 +113,7 @@ def standard(time, y0, dataset, run_no, ph_mode):
     # issues that are stemming from the substrate / feed definitions.
     if ph_mode == "newton-raphson":
         while abs(Hfunc - H) > 1e-12 or pH is None:
-            H, Hfunc = ph.newton_raphson(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
-                                         HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
-                                         HBut=[hbut, ka_hbut],
-                                         HVal=[hval, ka_hval],
-                                         Other=[a, z, kw],
-                                         h2po4=[h2po4, ka_h2po4],
-                                         NH3=[nh3, ka_nh4])
+            H, Hfunc = ph.newton_raphson(H, Hfunc, **_data)
             pH = - np.log10(Hfunc)
     elif ph_mode == "fsolve":
         pH = ph.find_roots(data=_data)
