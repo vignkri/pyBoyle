@@ -41,8 +41,15 @@ class Manager:
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
-        self._solver = scipy.integrate.ode(self._model) \
-            .set_integrator(iname, **self._frame._solver)
+        if iname == "vode":
+            self._solver = scipy.integrate.ode(self._model) \
+                .set_integrator(iname, **self._frame._solver)
+        elif iname == "lsoda":
+            self._solver = scipy.integrate.ode(self._model) \
+                .set_integrator(iname, **self._frame._solver)
+        else:
+            e = "ValueError: Unknown Solver provide"
+            raise(e)
         self._solver.set_initial_value(y=self.initial_value,
                                        t=self._initial_time)
 
@@ -81,7 +88,7 @@ class Manager:
         try:
             while self._solver.successful() and self._solver.t < self._end_time:
                 y_dot = self._solver.integrate(self._solver.t + self._step,
-                                               step=True)
+                                               step=True, relax=True)
                 # self._data_output._update("result",
                 # [self._solver.t] + list(y_dot))
                 row = np.hstack([np.array([run_no, self._solver.t]), y_dot])
