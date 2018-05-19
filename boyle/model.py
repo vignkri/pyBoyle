@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import ph
 import numpy as np
 
 """
@@ -7,63 +8,7 @@ Standard Computation Model
 """
 
 
-def newton_pH(H, Hfunc, i=0, **kwargs):
-    """pH Computation using Newton-Raphson method"""
-    # -- set up variables
-    co2, ka1_co2, ka2_co2 = kwargs.get("co2")
-    hac, ka_hac = kwargs.get("HAc")
-    hpr, ka_hpr = kwargs.get("HPr")
-    hbut, ka_hbut = kwargs.get("HBut")
-    hval, ka_hval = kwargs.get("HVal")
-    a, z, kw = kwargs.get("Other")
-    h2po4, ka_h2po4 = kwargs.get("h2po4")
-    nh3, ka_nh4 = kwargs.get("NH3")
-    # --
-    Hfunc = co2 / 44 * ka1_co2 * (H + 2 * ka2_co2) / (H * (H + ka1_co2) +
-                                                      ka1_co2 * ka2_co2) + \
-        hac / 60 * ka_hac / (H + ka_hac) + \
-        hpr / 74 * ka_hpr / (H + ka_hpr) + \
-        hbut / 88 * ka_hbut / (H + ka_hbut) + \
-        hval / 102 * ka_hval / (H + ka_hval) + \
-        a / 35.5 + \
-        h2po4 / 31 * (H + 2 * ka_h2po4) / (H + ka_h2po4) - \
-        nh3 / 14 * H / (H + ka_nh4) - \
-        z / 39 + \
-        kw / H
-    # --
-    dhfunc_dh = - co2 / 44 * ka1_co2 * (H * (H + 4 * ka2_co2) + ka1_co2 *
-                                        ka2_co2) / (H * (H + ka1_co2) +
-                                                    ka1_co2 * ka2_co2)**2 - \
-        hac / 60 * ka_hac / (H + ka_hac)**2 - \
-        hpr / 74 * ka_hpr / (H + ka_hpr)**2 - \
-        hbut / 88 * ka_hbut / (H + ka_hbut)**2 - \
-        hval / 102 * ka_hval / (H + ka_hval)**2 - \
-        kw / (H**2) - \
-        h2po4 / 31 * ka_h2po4 / (H + ka_h2po4)**2 - \
-        nh3 / 14 * ka_nh4 / (H + ka_nh4)**2
-    # --
-    H = H - (Hfunc - H) / (dhfunc_dh - 1)
-    return H, Hfunc
-    # --
-    # pH = - np.log10(H)
-    # if 1e-12 < abs(Hfunc - H):
-    #     new_args = kwargs
-    #     new_H = H
-    #     new_Hfunc = Hfunc
-    #     newton_pH(new_H, new_Hfunc, i=i, **new_args)
-
-    # try:
-    #     assert pH is not None
-    # except AssertionError as e:/ 100i
-    #     new_args = kwargs
-    #     new_H = H
-    #     new_Hfunc = Hfunc
-    #     newton_pH(new_H, new_Hfunc, i=1, **new_args)
-    # finally:
-    #     return H
-
-
-def standard(time, y0, dataset, output):
+def standard(time, y0, dataset, run_no, ph_mode):
     """Standard Integrator Model
 
     PARAMETERS
@@ -98,9 +43,9 @@ def standard(time, y0, dataset, output):
              "ka1_co2", "ka2_co2", "ka_h2s", "ka_h2po4", "kw"]
     xxval = [dataset.henry_constants.get(item) for item in names]
 
-    inflow = dataset.substrate_flow
     flow_in = dataset.flow_in
     flow_out = dataset.flow_out
+    inflow = dataset.substrate_flow
 
     # Define reaction rates and growth factors
     k0_carbon = dataset.mu_max.get("params").get("k0_carbon")
@@ -115,13 +60,27 @@ def standard(time, y0, dataset, output):
     kd0 = 0.05
     # -- set up parts of values
     volume = y0[0]
-    degraders = y0[21:29]
     substrate = y0[1:20]
+    degraders = y0[21:29]
 
     # y0 Chemical Concentrations
-    carbo_is, carbo_in, carbon, lipids, lcfa, \
-        prot_is, prot_in, amino, nh3, hac, hpr, hbut, hval, \
-        ch4, co2, h2s, z, h2po4, a = substrate
+
+    # current order: carbis, carbin, carbon, prot.s, prot.in, amino, lipids,
+    # lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
+
+    # old order: carbis, carbin, carbon, lipids, lcfa, protis, protin,
+    # amino, nh3, hac, hpr, hbut, hval, ch4, co2, h2s, Z+, h2po4, A-
+
+    # old order definition
+    # carbo_is, carbo_in, carbon, lipids, lcfa, \
+    #     prot_is, prot_in, amino, nh3, hac, hpr, hbut, hval, \
+    #     ch4, co2, h2s, z, h2po4, a = substrate
+
+    # new order definition
+    carbo_is, carbo_in, carbon, prot_is, prot_in, amino, lipids, \
+        lcfa, hpr, hbut, hval, hac, nh3, ch4, co2, h2s, z, \
+        h2po4, a = substrate
+    # --
     dead_cells = y0[20]
 
     # Constant One Argument
@@ -142,22 +101,29 @@ def standard(time, y0, dataset, output):
     Hfunc = 1
     pH = 8
 
-    while abs(Hfunc - H) > 1e-12 or pH is None:
-        H, Hfunc = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
-                             HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
-                             HBut=[hbut, ka_hbut],
-                             HVal=[hval, ka_hval], Other=[a, z, kw],
-                             h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
-        pH = - np.log10(Hfunc)
-
-    # -- call pH computation function using newton-raphson
-    # -- this function is recursive and therefore additional information
-    # -- and logging should be added to get best data possible
-    # pH = newton_pH(H, Hfunc, co2=[co2, ka1_co2, ka2_co2],
-    #                HAc=[hac, ka_hac], HPr=[hpr, ka_hpr],
-    #                HBut=[hbut, ka_hbut],
-    #                HVal=[hval, ka_hval], Other=[a, z, kw],
-    #                h2po4=[h2po4, ka_h2po4], NH3=[nh3, ka_nh4])
+    # -- Create data for arguments
+    _data = {"co2": [co2, ka1_co2, ka2_co2],
+             "HAc": [hac, ka_hac], "HPr": [hpr, ka_hpr],
+             "HBut": [hbut, ka_hbut], "HVal": [hval, ka_hval],
+             "Other": [a, z, kw], "h2po4": [h2po4, ka_h2po4],
+             "NH3": [nh3, ka_nh4]}
+    # --
+    # TODO: Most cases, the pH fails horribly due to some external factors
+    # which could either be the constants not working properly or other
+    # issues that are stemming from the substrate / feed definitions.
+    if ph_mode == "newton-raphson":
+        while abs(Hfunc - H) > 1e-12 or pH is None:
+            H, Hfunc = ph.newton_raphson(H, Hfunc, **_data)
+            pH = - np.log10(Hfunc)
+    elif ph_mode == "fsolve":
+        pH = ph.find_roots(data=_data)
+    elif ph_mode == "brentq":
+        pH = ph.brent_dekker(data=_data)
+    elif ph_mode == "fixed":
+        pH = 8
+    else:
+        print("Unknown method")
+        raise
 
     try:
         assert pH is not None
@@ -226,7 +192,7 @@ def standard(time, y0, dataset, output):
     # -- flow in y_value
     y_dot = np.zeros((33,))
     y_dot[0] = flow_in - flow_out
-    y_dot[1:17] = (yieldc.transpose()).dot(z)
+    y_dot[1:17] = (yieldc.transpose()) @ (z)
     y_dot[20] = np.sum(cell_death) - cell_decay
     y_dot[21:29] = z[3:] - cell_death.reshape(-1)
     y_dot[1:29] = y_dot[1:29] + (inflow - flow_in * y0[1:29]) / volume
@@ -253,12 +219,23 @@ def standard(time, y0, dataset, output):
         ka_h2s / (H + ka_h2s)**2
     ]) / k_h
     # --
-    dH_dt = - (ka_hac / (ka_hac + H) * y_dot[10] / 60 +
-               ka_hpr / (ka_hac + H) * y_dot[11] / 74 +
-               ka_hbut / (ka_hac + H) * y_dot[12] / 88 +
-               ka_hval / (ka_hac + H) * y_dot[13] / 102 +
-               y_dot[19] / 35.5 -
-               y_dot[17] / 39 +
+    # Old Format
+    # y_dot[10] = HAC, y_dot[11] = HPR,
+    # y_dot[12] = HBUT, y_dot[13] = HVAL,
+    # y_dot[19] = A, y_dot[17] = Z,
+    # y_dot[18] = H2PO4
+
+    # New Format
+    # HAC = y_dot[12], HPR = y_dot[9],
+    # HBUT = y_dot[10], HVAL = y_dot[11]
+    # A- = y_dot[19], Z = y_dot[17],
+    # H2PO4 = y_dot[18]
+    dH_dt = - (ka_hac / (ka_hac + H) * y_dot[12] / 60 +  # HAC
+               ka_hpr / (ka_hac + H) * y_dot[9] / 74 +  # HPR
+               ka_hbut / (ka_hac + H) * y_dot[10] / 88 +  # HBut
+               ka_hval / (ka_hac + H) * y_dot[11] / 102 +  # HVal
+               y_dot[19] / 35.5 -  # A-
+               y_dot[17] / 39 +  # Z+ and H2PO4 below
                (1 + ka_h2po4 / (ka_h2po4 - H)) * y_dot[18] / 31) / \
         (
             ((ka1_co2 - 1) * ka2_co2 - H * H) * co2 / 44 /
@@ -281,7 +258,10 @@ def standard(time, y0, dataset, output):
 
     # --
     y_dot[[29, 30, 31, 32]] = gasflow
-    y_dot[9] = y_dot[9] - gasloss[0]
+    # y_dot[9] in the old version was NH3. That is now in 13
+    y_dot[13] = y_dot[13] - gasloss[0]
+    # y_dot[14, 15, 16] are ch4, co2, h2s in the old code
+    # in the new code, CH4, CO2, H2S are in
     y_dot[[14, 15, 16]] = y_dot[[14, 15, 16]] - gasloss[[1, 2, 3]]
 
     # --------------------------------------------
@@ -290,6 +270,8 @@ def standard(time, y0, dataset, output):
     #
     # --------------------------------------------
 
-    output._update("debug", [time] + mu[:, 0].tolist() + [pH] + y_dot.tolist())
+    dataset._update("debug", [run_no, time] +
+                    mu[:, 0].tolist() + [pH, dataset.flow_in, flow_in] +
+                    y_dot.tolist())
 
     return y_dot

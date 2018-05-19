@@ -4,7 +4,6 @@ import os
 import yaml
 import argparse
 
-import model
 from iotools import io
 from logger import simulationLogger
 from manager import Manager
@@ -25,8 +24,8 @@ def main(cfg_path):
     dataset = io(configuration)
     simulationLogger.info("Loaded Input data into frame.")
 
-    solver = Manager(model.standard, frame=dataset)
-    solver.start()
+    _manager = Manager(frame=dataset)
+    _manager.start()
 
 
 if __name__ == "__main__":

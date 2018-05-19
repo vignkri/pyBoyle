@@ -90,5 +90,8 @@ logs/
 # Spyder project settings
 .spyderproject
 
+# Local simulation files
+_sim.yaml
+
 # Rope project settings
 .ropeproject

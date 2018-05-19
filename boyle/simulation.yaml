@@ -1,22 +1,19 @@
 # Simulation Settings
-# Author: Vignesh
-# Version: Alpha
 
-name: Test
-data: ./sample/sample
+metadata:
+    name: Test
+    data: ./sample/sample
+    description: List of changes or file changes in the input folder to be aware of for analysis
+    tags: test, sample-data
 settings:
-    t_initial: 0
-    t_final: 192
+    process: debug
+    constants: standard
     step_size: 0.5
-
-solver:
-    method: bdf 
-    order: 1
-    nsteps: 2
-    relative: 1e-4
-    absolute: 1e-8
-
-regulate:
-    temperature: 37
-    flow_in: 0
-    flow_out: 0
+    ph:
+        method: fsolve
+    solver:
+        method: bdf
+        order: 1
+        nsteps: 2
+        relative: 1e-4
+        absolute: 1e-8
