@@ -2,6 +2,7 @@
 
 import ph
 import numpy as np
+from logger import simulationLogger
 
 """
 Standard Computation Model
@@ -118,7 +119,13 @@ def standard(time, y0, dataset, run_no, ph_mode):
     elif ph_mode == "fsolve":
         pH = ph.find_roots(data=_data)
     elif ph_mode == "brentq":
-        pH = ph.brent_dekker(data=_data)
+        try:
+            pH = ph.brent_dekker(data=_data)
+        except ValueError:
+            simulationLogger.warn("pH out of bounds in {r} at {t}".format(
+                r=run_no, t=time))
+            pH = 8
+            simulationLogger.warn("Setting pH to {}".format(8))
     elif ph_mode == "fixed":
         pH = 8
     else:
