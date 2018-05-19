@@ -219,7 +219,11 @@ class io:
 
         # -- Get other specific information
         temperatures = self.feed.get("value")[:, 1]
+        # Divide flows by 24 to get the hourly input flow rate for
+        # dataset
         flows = self.feed.get("value")[:, [2, 3]] / 24
+        # Multiply the feed concentration with the actual flow
+        # rate to get the flow magnitude
         substrate = flows[:, 0].reshape(-1, 1) * \
             self.feed.get("value")[:, 4:]
 
