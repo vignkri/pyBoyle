@@ -291,22 +291,24 @@ class io:
         # -- delta tempature
         const2 = self.Const2.get("value")
         delta_temp = temp - const2[:, 1]
+        # Uses the following columns: X(T0), a, b, c
+        # This does the equation hc = T + dt * a + dt^2 * b + dt^3 * c
         henry_constants = const2[:, 0] + delta_temp * const2[:, 2] + \
             delta_temp**2 * const2[:, 3] + delta_temp**3 * const2[:, 4]
         # --
         hc = dict(
-            k_h=henry_constants[[1, 7, 8, 11]],
+            k_h=henry_constants[[5, 7, 8, 11]],  # K_H results
             # -- log inverse values
-            ka1_lcfa=10**(-henry_constants[0]),
-            ka_nh4=10**(-henry_constants[2]),
-            ka_hac=10**(-henry_constants[3]),
-            ka_hpr=10**(-henry_constants[4]),
-            ka_hbut=10**(-henry_constants[5]),
-            ka_hval=10**(-henry_constants[6]),
-            ka1_co2=10**(-henry_constants[9]),
-            ka2_co2=10**(-henry_constants[10]),
-            ka_h2s=10**(-henry_constants[12]),
-            ka_h2po4=10**(-henry_constants[13]),
+            ka1_lcfa=10**(-henry_constants[0]),  # LCFA
+            ka_nh4=10**(-henry_constants[6]),  # NH4+
+            ka_hac=10**(-henry_constants[1]),  # HAC
+            ka_hpr=10**(-henry_constants[2]),  # HPr
+            ka_hbut=10**(-henry_constants[3]),  # HBut
+            ka_hval=10**(-henry_constants[4]),  # HVal
+            ka1_co2=10**(-henry_constants[9]),  # pKa1 CO2
+            ka2_co2=10**(-henry_constants[10]),  # pKa2 CO2
+            ka_h2s=10**(-henry_constants[12]),  # pKa H2S
+            ka_h2po4=10**(-henry_constants[13]),  # pKa H2PO4-
             kw=10**(-henry_constants[14])
         )
         setattr(self, "henry_constants", hc)
