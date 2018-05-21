@@ -81,14 +81,14 @@ class Manager:
             self._frame._update("solution", self.final_result)
         # --
 
-    def __solver_start(self, run_no):
+    def __solver_start(self, run_no, _relax=True, _step=True):
         """Start the solver"""
         simulationLogger.info("Starting the solver")
         # --
         try:
             while self._solver.successful() and self._solver.t < self._end_time:
                 y_dot = self._solver.integrate(self._solver.t + self._step,
-                                               step=True, relax=True)
+                                               step=_step, relax=_relax)
                 # self._data_output._update("result",
                 # [self._solver.t] + list(y_dot))
                 row = np.hstack([np.array([run_no, self._solver.t]), y_dot])
