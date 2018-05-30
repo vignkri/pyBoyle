@@ -1,8 +1,8 @@
 #!/usr/bin/python
 
-import ph
 import numpy as np
-from logger import simulationLogger
+from boyle import ph
+from boyle.tools.logger import simulationLogger
 
 """
 Standard Computation Model

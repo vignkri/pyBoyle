@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-import model
-import numpy as np
-import scipy.integrate
-from logger import simulationLogger
-
 """
 Simulation Manager
 
@@ -12,6 +7,12 @@ Tools to manage the simulation started using boyle. This
 enables the control of the simulation and connects the model
 to the main application.
 """
+
+
+import numpy as np
+import scipy.integrate
+from boyle import model
+from boyle.tools.logger import simulationLogger
 
 
 class Manager:
