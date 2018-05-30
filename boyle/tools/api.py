@@ -1,1 +1,3 @@
-from boyle.logger import SimulationLogger
+# -- API Imports
+
+from boyle.tools.logger import simulationLogger
