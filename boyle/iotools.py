@@ -88,11 +88,19 @@ class io:
             simulationLogger.critical(_e)
             raise IOError(_e)
 
+        folder = metadata.get("data")
+
         items = list(os.walk(folder))
         fldr, lst, files = items[0]
         # -- Create tuple of file names to load and handle
-        _input_data = [(_f.split(".")[0], os.path.join(fldr, _f))
-                       for _f in files if _f.endswith(SUPPORTED_EXTENSIONS)]
+        for _f in files:
+            if _f.endswith(SUPPORTED_EXTENSIONS):
+                name = _f.split(".")[0]
+                file_path = os.path.join(fldr, _f)
+            if not (name.startswith("feed") or name.startswith("inoculum")):
+                self.__set(_text=name, _path=file_path, _dType="constant")
+            else:
+                self.__set(_text=name, _path=file_path, _dType="numpy")
         # The above code generates a tuple of file_name and file_path
         # for setting the correct attributes for the program.
 
@@ -105,8 +113,14 @@ class io:
 
         self._path = output_folder_
 
-        # Start the processing of the imported data paths now
-        self.setup_inputs(dataLocn=_input_data)
+        # Perform required computations for processing input
+        # data. Each constant file requires a series of processing
+        # and the client data requires a different series of processing
+        # in order to make sure the data is usable for the simulation.
+        self.__process_constants()
+
+        # -- process client data
+        self.__process_client_data()
 
     def _update(self, attrname, value):
         """Update the attribute if the value exists"""
@@ -238,27 +252,6 @@ class io:
                                      np.zeros(4, )))
         _value = {"value": _extension}
         self.inoculum.update(_value)
-
-    def setup_inputs(self, dataLocn):
-        """Setup all Simulation Model Inputs"""
-        for name, _file in dataLocn:
-            if not (name.startswith("feed") or name.startswith("inoculum")):
-                self.__set(_text=name, _path=_file, _dType="constant")
-            else:
-                self.__set(_text=name, _path=_file, _dType="numpy")
-        # --
-
-        # Perform required computations for processing input
-        # data. Each constant file requires a series of processing
-        # and the client data requires a different series of processing
-        # in order to make sure the data is usable for the simulation.
-        self.__process_constants()
-
-        # -- process client data
-        self.__process_client_data()
-
-        # -- update logs
-        simulationLogger.info("Input parameters created.")
 
     def __recompute_mu_max(self, temp):
         """Compute Temperature Dependent Constants"""
