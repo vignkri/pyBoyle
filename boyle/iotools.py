@@ -83,12 +83,10 @@ class io:
         self.__creation_time = time.time()
 
         # -- Get path to the correct folder for accessing the files
-        folder = metadata.get("data")
-        if not os.path.exists(folder):
-            _e = "The folder mentioned does not exist."
-            _error = _e + "\nProvided folder: {}".format(folder)
+        if not os.path.exists(metadata.get("data")):
+            _e = "Folder does not exist"
             simulationLogger.critical(_e)
-            raise IOError(_error)
+            raise IOError(_e)
 
         items = list(os.walk(folder))
         fldr, lst, files = items[0]
