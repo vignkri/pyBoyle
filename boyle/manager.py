@@ -82,32 +82,6 @@ class Manager:
             self._frame._update("solution", self.final_result)
         # --
 
-    def __solver_start(self, run_no, _relax=True, _step=True):
-        """Start the solver"""
-        simulationLogger.info("Starting the solver")
-        # --
-        try:
-            while self._solver.successful() and self._solver.t < self._end_time:
-                y_dot = self._solver.integrate(self._solver.t + self._step,
-                                               step=_step, relax=_relax)
-                # self._data_output._update("result",
-                # [self._solver.t] + list(y_dot))
-                row = np.hstack([np.array([run_no, self._solver.t]), y_dot])
-                self.result.append(row)
-        except KeyboardInterrupt as e:
-            er = "KEYBOARD INTERRUPT: Stopped."
-            er += " Current Iteration {}".format(self._solver.t)
-            simulationLogger.info(er)
-            print(er)
-            raise(e)
-        # --
-        self._end_time = self._solver.t
-        # The result chooses the elements from the start of y_dot instead
-        # of the initial value set. Forcing to use the result setup is probably
-        # not useful
-        # self._frame.inoculum.update({"value": self.result[-1][2:]})
-        self._frame.inoculum.update({"value": y_dot})
-
     def function_parameters(self, run_no):
         """Pass function parameters to the simulator"""
         args = [self._frame, run_no, self._frame._ph_method]
@@ -142,7 +116,28 @@ class Manager:
             # -- set up function parameters for a particular run_no
             self.function_parameters(run_no=idx)
             # -- start the solver with teh current run_no
-            self.__solver_start(run_no=idx)
+            _step = True
+            _relax = True
+            try:
+                while self._solver.successful() and self._solver.t < self._end_time:
+                    y_dot = self._solver.integrate(self._solver.t + self._step,
+                                                   step=_step, relax=_relax)
+                    # self._data_output._update("result",
+                    # [self._solver.t] + list(y_dot))
+                    row = np.hstack([np.array([idx, self._solver.t]), y_dot])
+                    self.result.append(row)
+            except KeyboardInterrupt as e:
+                er = "KEYBOARD INTERRUPT: Stopped."
+                er += " Current Iteration {}".format(self._solver.t)
+                simulationLogger.info(er)
+                print(er)
+                raise(e)
+            self._end_time = self._solver.t
+            # The result chooses the elements from the start of y_dot instead
+            # of the initial value set. Forcing to use the result setup is probably
+            # not useful
+            # self._frame.inoculum.update({"value": self.result[-1][2:]})
+            self._frame.inoculum.update({"value": y_dot})
             # -- Log that the simulation ended correctly.
             simulationLogger.info("Simulation finished successfully.")
         # --
