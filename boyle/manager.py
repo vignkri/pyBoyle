@@ -82,12 +82,6 @@ class Manager:
             self._frame._update("solution", self.final_result)
         # --
 
-    def function_parameters(self, run_no):
-        """Pass function parameters to the simulator"""
-        args = [self._frame, run_no, self._frame._ph_method]
-        self._solver.set_f_params(*args)
-        simulationLogger.info("Setting function parameters for the model")
-
     def start(self):
         simulationLogger.info("Starting experiment.")
         # Create result object to store results in
@@ -114,7 +108,9 @@ class Manager:
             # -- initialise the solver and the details of the solver
             self.initialize_solver(iname="vode")
             # -- set up function parameters for a particular run_no
-            self.function_parameters(run_no=idx)
+            _args_ = [self._frame, idx, self._frame._ph_method]
+            self._solver.set_f_params(*_args_)
+            simulationLogger.info("Setting function parameters for the model")
             # -- start the solver with teh current run_no
             _step = True
             _relax = True
