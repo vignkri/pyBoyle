@@ -100,10 +100,11 @@ class Manager:
             print(er)
             raise(e)
         # --
+        self._end_time = self._solver.t
         # The result chooses the elements from the start of y_dot instead
         # of the initial value set. Forcing to use the result setup is probably
         # not useful
-        # self._frame.Initial.update({"value": self.result[-1][2:]})
+        # self._frame.inoculum.update({"value": self.result[-1][2:]})
         self._frame.inoculum.update({"value": y_dot})
 
     def function_parameters(self, run_no):
