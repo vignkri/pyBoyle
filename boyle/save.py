@@ -9,6 +9,8 @@ process in different variables for storing on disk
 or saving to disk for later.
 """
 
+import operator
+import itertools
 import h5py as h5
 from numpy import array, string_
 
@@ -43,6 +45,12 @@ OUTPUT_HEADERS = dict(
 )
 
 
+def accumulate(l):
+    it = itertools.groupby(l, operator.itemgetter(0))
+    for key, subiter in it:
+       yield key, sum(item[1] for item in subiter)
+
+
 def to_hdf5(path, dataset):
     """Save the dataset to hdf5 file"""
     _out_ = h5.File(path, "w")
@@ -61,3 +69,25 @@ def to_hdf5(path, dataset):
                         OUTPUT_HEADERS.get("debug")]
     headers["solution"] = [string_(item) for item in
                            OUTPUT_HEADERS.get("solution")]
+    # --
+    _hc_out_ = []
+    for key in dataset.hc_data[0].keys():
+        for row in dataset.hc_data:
+            _hc_out_.append((key, row.get(key)))
+    # --
+    hc_accumulate = list(accumulate(_hc_out_))
+    # --
+    _mm_out_ = []
+    for key in dataset.mu_max_data[0].keys():
+        for row in dataset.mu_max_data:
+            _mm_out_.append((key, row.get(key)))
+    # --
+    mm_accumulate = list(accumulate(_mm_out_))
+    # --
+    mu_max_group = _out_.create_group("mu_max")
+    for name, value in mm_accumulate:
+        mu_max_group[name] = value
+    # --
+    hc_group = _out_.create_group("hc")
+    for name, value in hc_accumulate:
+        hc_group[name] = value

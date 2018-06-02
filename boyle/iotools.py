@@ -4,7 +4,7 @@ import os
 import time
 import numpy as np
 
-from boyle.save import to_hdf5
+from boyle.save import to_hdf5, OUTPUT_HEADERS
 from boyle.tools.logger import simulationLogger
 from boyle.utility import load_constants, load_client_data
 
