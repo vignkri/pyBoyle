@@ -2,9 +2,9 @@
 
 import os
 import time
-import h5py as h5
 import numpy as np
 
+from boyle.save import to_hdf5
 from boyle.tools.logger import simulationLogger
 from boyle.utility import load_constants, load_client_data
 
@@ -29,39 +29,12 @@ SUPPORTED_EXTENSIONS = ("npy", "npz", "constant")
 STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
                             "relative": 1e-4, "absolute": 1e-8}
 
-# Splitting Header Items
-HEADER_START = ["run_no", "time"]
-
-HEADER_DEBUG = ["mu_1", "mu_2", "mu_3", "mu_4", "mu_5", "mu_6",
-                "mu_7", "mu_8", "pH", "raw_flow", "T_flow_in"]
-
-HEADER_VOL = ["volume"]
-
-HEADER_CORE = ["carb_ins", "carb_ine", "carb_sol",
-               "prot_ins", "prot_ine", "amino", "lipids",
-               "ac_lcfa", "ac_prop", "ac_buty", "ac_val", "ac_ace",
-               "dg_nh4", "dg_ch4", "dg_co2", "dg_h2s", "io_z", "io_p",
-               "io_a"]
-
-HEADER_DEGRADERS = ["dead_cell", "degr_carb", "degr_amino", "degr_lipid",
-                    "degr_lcfa", "degr_hprop", "degr_butyr", "degr_valer",
-                    "degr_acet", "gf_nh3", "gf_ch4", "gf_co2", "gf_h2s"]
-
-HEADER_END = ["gasrate"]
-
-# Set a dictionary of headers that are to be set when saving
-# outputs to file.
-OUTPUT_HEADERS = dict(
-    debug=HEADER_START + HEADER_DEBUG + HEADER_VOL + HEADER_CORE +
-    HEADER_DEGRADERS,
-    solution=HEADER_START + HEADER_VOL + HEADER_CORE + HEADER_DEGRADERS +
-    HEADER_END
-)
-
 
 class io:
     def __init__(self, configuration):
         """Set up Frame for setting up process information"""
+        self.mu_max_data = []
+        self.hc_data = []
         # -- Experiment information for metadata
         metadata = configuration.get("metadata")
         self.__experiment_name = metadata.get("name")  # experiment name
@@ -273,12 +246,12 @@ class io:
         # --
         setattr(self, "mu_max", dict(value=mu_max))
         # --
+        payload = {"k0_carbon": mu_max[0, 0], "k0_prot": mu_max[1, 0],
+                   "mu_max_t0": mu_max_t0[2:, ], "mu_max": mu_max[2:]}
         self.mu_max.update(dict(
-            params=dict(
-                k0_carbon=mu_max[0, 0], k0_prot=mu_max[1, 0],
-                mu_max_t0=mu_max_t0[2:, ], mu_max=mu_max[2:]
-            )
-        ))
+            params=payload))
+        # --
+        self.mu_max_data.append(payload)
         simulationLogger.info("Process variable mu_max created.")
 
     def __recompute_hconstants(self, temp):
@@ -307,6 +280,7 @@ class io:
             kw=10**(-henry_constants[14])
         )
         setattr(self, "henry_constants", hc)
+        self.hc_data.append(hc)
         simulationLogger.info("Process variable Henry-Constants created.")
 
     def move_index_for_iteration(self, index):
@@ -338,34 +312,7 @@ class io:
         output_path = os.path.join(self._path, file_name)
         # -- creating file by trying
         try:
-            out_ = h5.File(output_path, "w")
+            to_hdf5(path=output_path, dataset=self)
         except OSError as e:
             simulationLogger.error("OSError: Output file exists."
                                    "Creating a new output file.")
-        else:
-            out_.attrs["Experiment"] = np.string_(self.__experiment_name)
-            out_.attrs["CreationTime"] = self.__creation_time
-            ending_time = time.time()
-            out_.attrs["FinishTime"] = ending_time
-            out_.attrs["Duration"] = ending_time - self.__creation_time
-            out_.attrs["Description"] = self.__description
-            out_.attrs["Tags"] = np.string_(self.__experiment_tags)
-            # --
-            headers = out_.create_group("Headers")
-            headers["debug"] = [np.string_(item) for item in
-                                OUTPUT_HEADERS.get("debug")]
-            headers["solution"] = [np.string_(item) for item in
-                                   OUTPUT_HEADERS.get("solution")]
-            # --
-            output_group = out_.create_group("Output")
-            output_group["debug"] = self.debug[1:]
-            output_group["solution"] = self.solution[1:]
-            # -- Deprecate this:
-            if self.__experiment_status == "debug":
-                output_group["debug_solution"] = np.array(self.debug_solution)
-            else:
-                pass
-            # --
-            input_group = out_.create_group("Input")
-            input_group["regulate"] = self.feed.get("value")
-            input_group["initial"] = self.inoculum.get("value")
