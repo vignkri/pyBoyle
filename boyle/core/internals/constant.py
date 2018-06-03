@@ -30,3 +30,13 @@ class KineticConstants(np.ndarray):
         if obj is None:
             return
         self.info = getattr(obj, 'info', None)
+
+    def get_payload(self):
+        payload_ = dict(
+            kd0=self.kd0, ks=self[2:, 5], ks_nh3=self[2:, 6],
+            pk_low=self[2:, 9], pk_high=self[2:, 10],
+            ki_carbon=self[0, 7], ki_prot=self[1, 7],
+            ki_hac_hpr=self[6, 7], ki_hac_hbut=self[7, 7],
+            ki_nh3_hac=self[9, 7], ki_hac_hval=self[8, 7],
+            ki_lcfa=self[2:, 8])
+        return payload_
