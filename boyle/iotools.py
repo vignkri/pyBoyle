@@ -232,7 +232,7 @@ class io:
             kw=10**(-henry_constants[14])
         )
         setattr(self, "henry_constants", hc)
-        self.hc_data.append(hc)
+        self.hc_data.append(henry_constants)
         simulationLogger.info("Process variable Henry-Constants created.")
 
     def move_index_for_iteration(self, index):
