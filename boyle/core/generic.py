@@ -6,7 +6,7 @@ import numpy as np
 
 from boyle.tools.logger import simulationLogger
 from boyle.core.save import to_hdf5, OUTPUT_HEADERS
-from boyle.utility import load_constants, load_client_data
+from boyle.tools.utility import load_constants, load_client_data
 
 """
 Input-Output Tools
