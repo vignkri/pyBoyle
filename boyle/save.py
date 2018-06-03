@@ -9,8 +9,6 @@ process in different variables for storing on disk
 or saving to disk for later.
 """
 
-import operator
-import itertools
 import h5py as h5
 from numpy import array, string_
 
@@ -63,3 +61,14 @@ def to_hdf5(path, dataset):
                         OUTPUT_HEADERS.get("debug")]
     headers["solution"] = [string_(item) for item in
                            OUTPUT_HEADERS.get("solution")]
+    # -- save functions for process computations
+    hc = _out_.create_group("HenryConstants")
+    hc["data"] = dataset.hc_data
+    # -- mu_max dataset
+    mu_max = _out_.create_group("GrowthData")
+    for key in dataset.mu_max_data[0]:
+        payload = []
+        for row in dataset.mu_max_data:
+            payload.append(row.get(key))
+        # --
+        mu_max[key] = payload
