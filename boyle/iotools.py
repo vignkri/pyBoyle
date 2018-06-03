@@ -70,10 +70,10 @@ class io:
             if _f.endswith(SUPPORTED_EXTENSIONS):
                 name = _f.split(".")[0]
                 file_path = os.path.join(fldr, _f)
-            if not (name.startswith("feed") or name.startswith("inoculum")):
-                self.__set(_text=name, _path=file_path, _dType="constant")
-            else:
-                self.__set(_text=name, _path=file_path, _dType="numpy")
+                if not (name.startswith("feed") or name.startswith("inoculum")):
+                    self.__set(_text=name, _path=file_path, _dType="constant")
+                else:
+                    self.__set(_text=name, _path=file_path, _dType="numpy")
         # The above code generates a tuple of file_name and file_path
         # for setting the correct attributes for the program.
 
