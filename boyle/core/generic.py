@@ -1,13 +1,5 @@
 #!/usr/bin/env
 
-import os
-import time
-import numpy as np
-
-from boyle.tools.logger import simulationLogger
-from boyle.core.save import to_hdf5, OUTPUT_HEADERS
-from boyle.tools.utility import load_constants, load_client_data
-
 """
 Input-Output Tools
 
@@ -18,6 +10,16 @@ simulation-friendly data while the export strives to create
 a dataset that is friendly to analyse and attach metadata
 to.
 """
+
+
+import os
+import time
+import numpy as np
+
+from boyle.tools.logger import simulationLogger
+from boyle.core.save import to_hdf5, OUTPUT_HEADERS
+from boyle.core.internals.constant import KineticConstants
+from boyle.tools.utility import load_constants, load_client_data
 
 # order: carbis, carbin, gluc.s, prot.s, prot.in, amino, lipids,
 # lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
@@ -110,7 +112,11 @@ class Dataset:
                 raise IOError(er_)
             # Create the required dictionary to be loaded at the
             # attribute name and set up the data payload
-            payload = {"path": _path, "value": load_constants(_path)}
+            if _text == "Const1":
+                _d = KineticConstants(load_constants(_path))
+            else:
+                _d = load_constants(_path)
+            payload = {"path": _path, "value": _d}
             # -- set attribute to self with the above payload
             setattr(self, _text, payload)
 
