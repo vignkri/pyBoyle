@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 import numpy as np
-from boyle import ph
+from boyle.core.computations import ph
 from boyle.tools.logger import simulationLogger
 
 """
