@@ -45,12 +45,15 @@ def test_initialisation():
     for k in _settings_.get("solver").keys():
         if k == "relative":
             dk = "rtol"
-            assert manager._solver.get(dk) == _settings_.get("solver").get(k)
+            assert manager._solver_setting.get(dk) == \
+                _settings_.get("solver").get(k)
         elif k == "absolute":
             dk = "atol"
-            assert manager._solver.get(dk) == _settings_.get("solver").get(k)
+            assert manager._solver_setting.get(dk) == \
+                _settings_.get("solver").get(k)
         else:
-            assert manager._solver.get(k) == _settings_.get("solver").get(k)
+            assert manager._solver_setting.get(k) == \
+                _settings_.get("solver").get(k)
     # -- Assert values stored as simulation configuration data
     assert manager._step == _settings_.get("step_size")
     assert manager._meta.get("name") == _metadata_.get("name")
