@@ -35,7 +35,7 @@ class Manager:
         self._sttn = self._config.get("settings")
         # -- solver settings
         solver = self._config.get("settings").get("solver")
-        self._solver = dict(
+        self._solver_setting = dict(
             method=solver.get("method"),
             order=solver.get("order"),
             rtol=solver.get("relative"),
@@ -49,10 +49,10 @@ class Manager:
         """Initialize the solver for computation"""
         if iname == "vode":
             self._solver = scipy.integrate.ode(self._model) \
-                .set_integrator(iname, **self._solver)
+                .set_integrator(iname, **self._solver_setting)
         elif iname == "lsoda":
             self._solver = scipy.integrate.ode(self._model) \
-                .set_integrator(iname, **self._solver)
+                .set_integrator(iname, **self._solver_setting)
         else:
             e = "ValueError: Unknown Solver provide"
             raise(e)
