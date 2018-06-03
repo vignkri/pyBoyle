@@ -128,37 +128,6 @@ class io:
             # -- set attribute to self with the above payload
             setattr(self, _text, payload)
 
-    @property
-    def _ph_method(self):
-        """Return pH method if defined in configuration file"""
-        if self.__ph_settings.get("method"):
-            return self.__ph_settings.get("method")
-        else:
-            # Returns standard pH method if there is no
-            # defined pH method.
-            return "newton-raphson"
-
-    @property
-    def _solver(self):
-        """Return Solver settings for starting the simulation"""
-        _solver_params = dict(
-            method=self.__solver_settings.get("method"),
-            order=self.__solver_settings.get("order"),
-            rtol=self.__solver_settings.get("relative"),
-            atol=self.__solver_settings.get("absolute"),
-            nsteps=self.__solver_settings.get("nsteps")
-        )
-        return _solver_params
-
-    @property
-    def _simulation_config(self):
-        """Simulation configuration dictionary"""
-        _simulation_config = dict(
-            step=self.__step_size,
-            metadata=self.__experiment_name
-        )
-        return _simulation_config
-
     def __process_constants(self):
         const1 = self.Const1.get("value")
         const_one_payload = dict(
