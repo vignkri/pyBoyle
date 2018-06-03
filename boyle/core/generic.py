@@ -30,7 +30,7 @@ STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
                             "relative": 1e-4, "absolute": 1e-8}
 
 
-class io:
+class Dataset:
     def __init__(self, path):
         """Set up Frame for setting up process information"""
         self.mu_max_data = []
