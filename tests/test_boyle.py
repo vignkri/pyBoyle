@@ -1,4 +1,5 @@
 from boyle import io
+from boyle.manager import Manager
 from boyle import __version__
 
 dataset = None
@@ -31,7 +32,8 @@ def test_initialisation():
     _config_ = {"metadata": _metadata_, "settings": _settings_}
     # --
     global dataset
-    dataset = io(_config_)
+    manager = Manager(_config_)
+    dataset = manager._frame
     # --
     const_one = np.loadtxt("data/Const1.constant", comments="%")
     const_two = np.loadtxt("data/Const2.constant", comments="%")
@@ -39,16 +41,16 @@ def test_initialisation():
     checkConstants(ds=dataset.Const1.get("value"), raw=const_one)
     checkConstants(ds=dataset.Const2.get("value"), raw=const_two)
     # -- Assert values stored as solver settings data
-    assert dataset._ph_method == _settings_.get("ph").get("method")
+    assert manager._ph_settings == _settings_.get("ph").get("method")
     for k in _settings_.get("solver").keys():
         if k == "relative":
             dk = "rtol"
-            assert dataset._solver.get(dk) == _settings_.get("solver").get(k)
+            assert manager._solver.get(dk) == _settings_.get("solver").get(k)
         elif k == "absolute":
             dk = "atol"
-            assert dataset._solver.get(dk) == _settings_.get("solver").get(k)
+            assert manager._solver.get(dk) == _settings_.get("solver").get(k)
         else:
-            assert dataset._solver.get(k) == _settings_.get("solver").get(k)
+            assert manager._solver.get(k) == _settings_.get("solver").get(k)
     # -- Assert values stored as simulation configuration data
-    assert dataset._simulation_config.get("step") == _settings_.get("step_size")
-    assert dataset._simulation_config.get("metadata") == _metadata_.get("name")
+    assert manager._step == _settings_.get("step_size")
+    assert manager._meta.get("name") == _metadata_.get("name")
