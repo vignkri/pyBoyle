@@ -9,7 +9,7 @@ Standard Computation Model
 """
 
 
-def standard(time, y0, dataset, run_no, ph_mode):
+def Standard(time, y0, dataset, run_no, ph_mode):
     """Standard Integrator Model
 
     PARAMETERS

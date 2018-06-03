@@ -11,13 +11,13 @@ to the main application.
 
 import numpy as np
 import scipy.integrate
-from boyle import model
 from boyle.iotools import io
+from boyle.core.model.standard import Standard
 from boyle.tools.logger import simulationLogger
 
 
 class Manager:
-    def __init__(self, config, model=model.standard):
+    def __init__(self, config, model=Standard):
         """Initialize manager for creating a simulation
 
         PARAMETERS
