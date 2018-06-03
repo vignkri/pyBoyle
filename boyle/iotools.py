@@ -31,37 +31,20 @@ STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
 
 
 class io:
-    def __init__(self, configuration):
+    def __init__(self, path):
         """Set up Frame for setting up process information"""
         self.mu_max_data = []
         self.hc_data = []
-        # -- Experiment information for metadata
-        metadata = configuration.get("metadata")
-        self.__experiment_name = metadata.get("name")  # experiment name
-        self.__description = metadata.get("description")  # description
-        self.__experiment_tags = metadata.get("tags")  # tags for searching
-
-        # -- Experiment settings for additional information
-        settings = configuration.get("settings")
-        self.__experiment_status = settings.get("process")
-        self.__step_size = settings.get("step_size")
-        self.__ph_settings = settings.get("ph")
-        self.__solver_settings = settings.get("solver")
-
-        # -- default to standard if solver settings is given as none
-        if not self.__solver_settings:
-            self.__solver_settings = STANDARD_SOLVER_SETTINGS
-
         # -- Created metadata in time of simulation
         self.__creation_time = time.time()
 
         # -- Get path to the correct folder for accessing the files
-        if not os.path.exists(metadata.get("data")):
+        if not os.path.exists(path):
             _e = "Folder does not exist"
             simulationLogger.critical(_e)
             raise IOError(_e)
-
-        folder = metadata.get("data")
+        else:
+            folder = path
 
         items = list(os.walk(folder))
         fldr, lst, files = items[0]

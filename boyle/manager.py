@@ -12,11 +12,12 @@ to the main application.
 import numpy as np
 import scipy.integrate
 from boyle import model
+from boyle.iotools import io
 from boyle.tools.logger import simulationLogger
 
 
 class Manager:
-    def __init__(self, frame, model=model.standard):
+    def __init__(self, config, model=model.standard):
         """Initialize manager for creating a simulation
 
         PARAMETERS
@@ -25,29 +26,33 @@ class Manager:
         config : dict
         """
         self._model = model
-        self._frame = frame
-        if not self._frame._simulation_config.get("step"):
-            er = "KeyError: Step Size key missing from configuration."
-            raise(er)
-        else:
-            self._step = frame._simulation_config.get("step")
-
-        if not self._frame._simulation_config.get("metadata"):
-            er = "KeyError: Metadata key is missing from configuration."
-            raise(er)
-        else:
-            self._meta = frame._simulation_config.get("metadata")
-
+        # --
+        self._config = config
+        self._frame = io(self._config.get("metadata").get("data"))
+        # -- Get simulation configuration
+        self._step = self._config.get("settings").get("step_size")
+        self._meta = self._config.get("metadata")
+        self._sttn = self._config.get("settings")
+        # -- solver settings
+        solver = self._config.get("settings").get("solver")
+        self._solver = dict(
+            method=solver.get("method"),
+            order=solver.get("order"),
+            rtol=solver.get("relative"),
+            atol=solver.get("absolute"),
+            nsteps=solver.get("nsteps")
+        )
+        self._ph_settings = self._sttn.get("ph").get("method")
         simulationLogger.info("Set up experiment: '%s'" % self._meta)
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
         if iname == "vode":
             self._solver = scipy.integrate.ode(self._model) \
-                .set_integrator(iname, **self._frame._solver)
+                .set_integrator(iname, **self._solver)
         elif iname == "lsoda":
             self._solver = scipy.integrate.ode(self._model) \
-                .set_integrator(iname, **self._frame._solver)
+                .set_integrator(iname, **self._solver)
         else:
             e = "ValueError: Unknown Solver provide"
             raise(e)
@@ -108,7 +113,7 @@ class Manager:
             # -- initialise the solver and the details of the solver
             self.initialize_solver(iname="vode")
             # -- set up function parameters for a particular run_no
-            _args_ = [self._frame, idx, self._frame._ph_method]
+            _args_ = [self._frame, idx, self._ph_settings]
             self._solver.set_f_params(*_args_)
             simulationLogger.info("Setting function parameters for the model")
             # -- start the solver with teh current run_no
