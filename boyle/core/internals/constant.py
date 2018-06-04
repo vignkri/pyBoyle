@@ -13,7 +13,7 @@ computation changes instead of fixed computations.
 import numpy as np
 
 
-class KineticConstants(np.ndarray):
+class KineticConstant(np.ndarray):
 
     def __new__(cls, input_array, info="Kinetic Constants", kd0=0.05):
         # Input array is an already formed ndarray instance
@@ -40,3 +40,23 @@ class KineticConstants(np.ndarray):
             ki_nh3_hac=self[9, 7], ki_hac_hval=self[8, 7],
             ki_lcfa=self[2:, 8])
         return payload_
+
+
+class AcidConstant(np.recarray):
+
+    def __new__(cls, input_array, info="Acid Constant"):
+        obj = np.asarray(input_array).view(cls)
+        obj.info = info
+        return obj
+
+    def __array_finalize__(self, obj):
+        if obj is None:
+            return
+        self.info = getattr(obj, "info", None)
+
+    def __getitem__(self, key):
+        if isinstance(key, tuple):
+            index = np.where(np.recarray.__getitem__(self, "name") == key[0])
+            return np.recarray.__getitem__(self, key[1])[index]
+        else:
+            return np.recarray.__getitem__(self, key)

@@ -18,7 +18,7 @@ import numpy as np
 
 from boyle.tools.logger import simulationLogger
 from boyle.core.save import to_hdf5, OUTPUT_HEADERS
-from boyle.core.internals.constant import KineticConstants
+from boyle.core.internals.constant import KineticConstant, AcidConstant
 from boyle.tools.utility import load_data
 
 # order: carbis, carbin, gluc.s, prot.s, prot.in, amino, lipids,
@@ -101,7 +101,9 @@ class Dataset:
 
     def __set(self, _text, _path):
         if _text == "Const1":
-            _d = KineticConstants(load_data(_path))
+            _d = KineticConstant(load_data(_path))
+        elif _text == "Const2":
+            _d = AcidConstant(load_data(_path))
         else:
             _d = load_data(_path)
         # -- Set payload data dictionary
@@ -178,11 +180,11 @@ class Dataset:
         """Compuate henry constants"""
         # -- delta tempature
         const2 = self.Const2.get("value")
-        delta_temp = temp - const2[:, 1]
+        delta_temp = temp - const2["t0"]
         # Uses the following columns: X(T0), a, b, c
         # This does the equation hc = T + dt * a + dt^2 * b + dt^3 * c
-        henry_constants = const2[:, 0] + delta_temp * const2[:, 2] + \
-            delta_temp**2 * const2[:, 3] + delta_temp**3 * const2[:, 4]
+        henry_constants = const2["xt0"] + delta_temp * const2["a"] + \
+            delta_temp**2 * const2["b"] + delta_temp**3 * const2["c"]
         # --
         hc = dict(
             k_h=henry_constants[[5, 7, 8, 11]],  # K_H results
