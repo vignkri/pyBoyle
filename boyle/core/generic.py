@@ -21,6 +21,7 @@ from boyle.core.save import to_hdf5, OUTPUT_HEADERS
 from boyle.core.internals.constant import KineticConstant, AcidConstant
 from boyle.tools.utility import load_data
 from boyle.core.computations.growth import mu_max_standard
+from boyle.core.computations.formula import computeHenryConstant
 
 # order: carbis, carbin, gluc.s, prot.s, prot.in, amino, lipids,
 # lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
@@ -166,32 +167,11 @@ class Dataset:
         simulationLogger.info("Process variable mu_max created.")
 
     def __recompute_hconstants(self, temp):
-        """Compuate henry constants"""
-        # -- delta tempature
-        const2 = self.Const2.get("value")
-        delta_temp = temp - const2["t0"]
-        # Uses the following columns: X(T0), a, b, c
-        # This does the equation hc = T + dt * a + dt^2 * b + dt^3 * c
-        henry_constants = const2["xt0"] + delta_temp * const2["a"] + \
-            delta_temp**2 * const2["b"] + delta_temp**3 * const2["c"]
-        # --
-        hc = dict(
-            k_h=henry_constants[[5, 7, 8, 11]],  # K_H results
-            # -- log inverse values
-            ka1_lcfa=10**(-henry_constants[0]),  # LCFA
-            ka_nh4=10**(-henry_constants[6]),  # NH4+
-            ka_hac=10**(-henry_constants[1]),  # HAC
-            ka_hpr=10**(-henry_constants[2]),  # HPr
-            ka_hbut=10**(-henry_constants[3]),  # HBut
-            ka_hval=10**(-henry_constants[4]),  # HVal
-            ka1_co2=10**(-henry_constants[9]),  # pKa1 CO2
-            ka2_co2=10**(-henry_constants[10]),  # pKa2 CO2
-            ka_h2s=10**(-henry_constants[12]),  # pKa H2S
-            ka_h2po4=10**(-henry_constants[13]),  # pKa H2PO4-
-            kw=10**(-henry_constants[14])
-        )
+        """Compute henry constants"""
+        hc, henry_c = computeHenryConstant(arr=self.Const2.get("value"),
+                                           temp=temp)
         setattr(self, "henry_constants", hc)
-        self.hc_data.append(henry_constants)
+        self.hc_data.append(henry_c)
         simulationLogger.info("Process variable Henry-Constants created.")
 
     def move_index_for_iteration(self, index):
