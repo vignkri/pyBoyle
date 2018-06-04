@@ -19,7 +19,7 @@ import numpy as np
 from boyle.tools.logger import simulationLogger
 from boyle.core.save import to_hdf5, OUTPUT_HEADERS
 from boyle.core.internals.constant import KineticConstants
-from boyle.tools.utility import load_constants, load_client_data
+from boyle.tools.utility import load_data
 
 # order: carbis, carbin, gluc.s, prot.s, prot.in, amino, lipids,
 # lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
@@ -55,10 +55,7 @@ class Dataset:
             if _f.endswith(SUPPORTED_EXTENSIONS):
                 name = _f.split(".")[0]
                 file_path = os.path.join(fldr, _f)
-                if not (name.startswith("feed") or name.startswith("inoculum")):
-                    self.__set(_text=name, _path=file_path, _dType="constant")
-                else:
-                    self.__set(_text=name, _path=file_path, _dType="numpy")
+                self.__set(_text=name, _path=file_path)
         # The above code generates a tuple of file_name and file_path
         # for setting the correct attributes for the program.
 
@@ -102,38 +99,14 @@ class Dataset:
             # additional value.
             getattr(self, attrname).append(value)
 
-    def __set(self, _text, _path, _dType):
-        if _dType == "constant":
-            if not _path.endswith("constant"):
-                # Raise error if the file is found to have an extension
-                # that is not valid for the constants file.
-                _e = "IOERROR: File Format mismatch for {}.".format("constant")
-                er_ = _e + " Given file is {}".format(_path)
-                simulationLogger.error(_e)
-                raise IOError(er_)
-            # Create the required dictionary to be loaded at the
-            # attribute name and set up the data payload
-            if _text == "Const1":
-                _d = KineticConstants(load_constants(_path))
-            else:
-                _d = load_constants(_path)
-            payload = {"path": _path, "value": _d}
-            # -- set attribute to self with the above payload
-            setattr(self, _text, payload)
-
-        elif _dType == "numpy":
-            # Raise error if the file is found to have an extension
-            # that is not valid for a numpy file.
-            if not _path.endswith(("npy", "npz")):
-                _e = "IOERROR: File Format mismatch for {}.".format("numpy")
-                er_ = _e + " Given file is {}".format(_path)
-                simulationLogger.error(_e)
-                raise IOError(er_)
-            # Create the required dictionary to be loaded at the
-            # attribute name and set up the data payload
-            payload = {"path": _path, "value": load_client_data(_path)}
-            # -- set attribute to self with the above payload
-            setattr(self, _text, payload)
+    def __set(self, _text, _path):
+        if _text == "Const1":
+            _d = KineticConstants(load_data(_path))
+        else:
+            _d = load_data(_path)
+        # -- Set payload data dictionary
+        payload = {"path": _path, "value": _d}
+        setattr(self, _text, payload)
 
     def __process_client_data(self):
         """Process client data to get feed and inoculum"""
