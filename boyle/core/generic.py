@@ -20,6 +20,7 @@ from boyle.tools.logger import simulationLogger
 from boyle.core.save import to_hdf5, OUTPUT_HEADERS
 from boyle.core.internals.constant import KineticConstant, AcidConstant
 from boyle.tools.utility import load_data
+from boyle.core.computations.growth import mu_max_standard
 
 # order: carbis, carbin, gluc.s, prot.s, prot.in, amino, lipids,
 # lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
@@ -150,30 +151,18 @@ class Dataset:
 
     def __recompute_mu_max(self, temp):
         """Compute Temperature Dependent Constants"""
-        const1 = self.Const1.get("value")
-        mu_max = np.zeros((10, 1))
-        mu_max_t0 = np.zeros((10, 1))
+        # TODO: Clean up this function. This function should
+        # return arrays instead of the currently returned
+        # dictionaries. This would cause downstream issues since
+        # dictionaries are complicated to be brief enough for
+        # future changes.
+        payload, mmax = mu_max_standard(self.Const1.get("value"),
+                                        temp=temp)
+        setattr(self, "mu_max", mmax)
         # --
-        for idx in range(0, 10):
-            mu_max_t0[idx] = const1[idx, 0]
-            alpha = const1[idx, 1]
-            t0 = const1[idx, 2]
-            t_opt = const1[idx, 3]
-            t_max = const1[idx, 4]
-            if temp < t_opt:
-                mu_max[idx] = mu_max_t0[idx] + alpha * (temp - t0)
-            else:
-                mu_max[idx] = (mu_max_t0[idx] + alpha * (t_opt - t0)) * \
-                    (t_max - temp) / (t_max - t_opt)
+        self.mu_max.update(payload)
         # --
-        setattr(self, "mu_max", dict(value=mu_max))
-        # --
-        payload = {"k0_carbon": mu_max[0, 0], "k0_prot": mu_max[1, 0],
-                   "mu_max_t0": mu_max_t0[2:, ], "mu_max": mu_max[2:]}
-        self.mu_max.update(dict(
-            params=payload))
-        # --
-        self.mu_max_data.append(payload)
+        self.mu_max_data.append(payload.get("params"))
         simulationLogger.info("Process variable mu_max created.")
 
     def __recompute_hconstants(self, temp):
