@@ -9,6 +9,7 @@ python = "*"
 numpy = "^1.14"
 scipy = "^1.1"
 h5py = "^2.7"
+pydoe = "^0.3.8"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.5"
