@@ -1,4 +1,4 @@
-from boyle import io
+from boyle import Dataset
 from boyle.manager import Manager
 from boyle import __version__
 
