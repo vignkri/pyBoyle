@@ -43,7 +43,10 @@ class KineticConstant(np.ndarray):
 
 
 class AcidConstant(np.recarray):
-
+    # TODO: AcidConstant can not be printed as of now
+    # due to issues with the tuple indexing. Also, setting
+    # specific data points is difficult as there is
+    # no __setitem__ function defined.
     def __new__(cls, input_array, info="Acid Constant"):
         obj = np.asarray(input_array).view(cls)
         obj.info = info
@@ -56,7 +59,7 @@ class AcidConstant(np.recarray):
 
     def __getitem__(self, key):
         if isinstance(key, tuple):
-            index = np.where(np.recarray.__getitem__(self, "name") == key[0])
+            index = np.where(self["name"] == key[0])
             return np.recarray.__getitem__(self, key[1])[index]
         else:
             return np.recarray.__getitem__(self, key)
