@@ -12,6 +12,7 @@ to the main application.
 import numpy as np
 import scipy.integrate
 from boyle.core.generic import Dataset
+from boyle.core.load import from_localpath
 from boyle.core.model.standard import Standard
 from boyle.tools.logger import simulationLogger
 
@@ -28,7 +29,9 @@ class Manager:
         self._model = model
         # --
         self._config = config
-        self._frame = Dataset(self._config.get("metadata").get("data"))
+        # self._frame = Dataset(self._config.get("metadata").get("data"))
+        _data = from_localpath(self._config.get("metadata").get("data"))
+        self._frame = Dataset(**_data)
         # -- Get simulation configuration
         self._step = self._config.get("settings").get("step_size")
         self._meta = self._config.get("metadata")
