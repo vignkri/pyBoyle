@@ -9,8 +9,11 @@ process in different variables for storing on disk
 or saving to disk for later.
 """
 
+import os
+import time
 import h5py as h5
 from numpy import array, string_
+from boyle.tools.logger import simulationLogger
 
 
 # Splitting Header Items
@@ -72,3 +75,30 @@ def to_hdf5(path, dataset):
             payload.append(row.get(key))
         # --
         mu_max[key] = payload
+
+
+def to_file(_path, _dset):
+    """Save as file function for sending it to file."""
+    output_time = time.gmtime()
+    # - get identifiers from the values.
+    _year = output_time.tm_year
+    _month = output_time.tm_mon
+    _day = output_time.tm_mday
+    _hour = output_time.tm_hour
+    _minute = output_time.tm_min
+    # - generate file name
+    file_name = "output_Y{year}M{month}D{day}_{hour}H{m}M.hdf5".format(
+        year=_year, month=_month, day=_day, hour=_hour, m=_minute
+    )
+    # - create path to the filename
+    output_path = os.path.join(_path, file_name)
+    # -- creating file by trying
+    try:
+        to_hdf5(path=output_path, dataset=_dset)
+    except OSError as e:
+        simulationLogger.error("OSError: Output file exists."
+                               "Creating a new output file.")
+        status_code = "FAIL"
+    else:
+        status_code = "SUCCESS"
+    return status_code

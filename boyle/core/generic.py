@@ -24,8 +24,6 @@ from boyle.core.computations.formula import computeHenryConstant
 # order: carbis, carbin, gluc.s, prot.s, prot.in, amino, lipids,
 # lcfa, hpr, hbut, hval, hac, nh4+, ch4, co2, h2s, z+, h2po4-, A-
 
-# Define globals for files required
-SUPPORTED_EXTENSIONS = ("npy", "npz", "constant")
 # Standard solver settings if settings are not provided
 # in configuration file
 STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
