@@ -15,4 +15,4 @@ from pyDOE import lhs
 
 def sampleLHS(data, shape, _samples):
     """Compute Latin Hypercube Samples"""
-    return data.ppf(lhs(shape, sample=_samples))
+    return data.ppf(lhs(shape, samples=_samples))
