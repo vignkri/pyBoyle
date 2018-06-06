@@ -155,26 +155,3 @@ class Dataset:
         # -- Update functions
         self.__recompute_mu_max(temp=temp)
         self.__recompute_hconstants(temp=temp)
-
-    def save_to_file(self):
-        """Store the data as a pickle."""
-        # Get time of output for setting file name
-        output_time = time.gmtime()
-        # - get identifiers from the values.
-        _year = output_time.tm_year
-        _month = output_time.tm_mon
-        _day = output_time.tm_mday
-        _hour = output_time.tm_hour
-        _minute = output_time.tm_min
-        # - generate file name
-        file_name = "output_Y{year}M{month}D{day}_{hour}H{m}M.hdf5".format(
-            year=_year, month=_month, day=_day, hour=_hour, m=_minute
-        )
-        # - create path to the filename
-        output_path = os.path.join(self._path, file_name)
-        # -- creating file by trying
-        try:
-            to_hdf5(path=output_path, dataset=self)
-        except OSError as e:
-            simulationLogger.error("OSError: Output file exists."
-                                   "Creating a new output file.")
