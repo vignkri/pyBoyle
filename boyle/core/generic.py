@@ -18,8 +18,6 @@ import numpy as np
 
 from boyle.tools.logger import simulationLogger
 from boyle.core.save import to_hdf5, OUTPUT_HEADERS
-from boyle.core.internals.constant import KineticConstant, AcidConstant
-from boyle.tools.utility import load_data
 from boyle.core.computations.growth import mu_max_standard
 from boyle.core.computations.formula import computeHenryConstant
 
@@ -35,40 +33,26 @@ STANDARD_SOLVER_SETTINGS = {"method": "bdf", "order": 1, "nsteps": 500,
 
 
 class Dataset:
-    def __init__(self, path):
+    def __init__(self, **kwargs):
         """Set up Frame for setting up process information"""
         self.mu_max_data = []
         self.hc_data = []
+        # --
+        for kw in kwargs:
+            payload = {"name": kw, "value": kwargs.get(kw)}
+            setattr(self, kw, payload)
+        # --
         # -- Created metadata in time of simulation
         self.__creation_time = time.time()
 
-        # -- Get path to the correct folder for accessing the files
-        if not os.path.exists(path):
-            _e = "Folder does not exist"
-            simulationLogger.critical(_e)
-            raise IOError(_e)
-        else:
-            folder = path
-
-        items = list(os.walk(folder))
-        fldr, lst, files = items[0]
-        # -- Create tuple of file names to load and handle
-        for _f in files:
-            if _f.endswith(SUPPORTED_EXTENSIONS):
-                name = _f.split(".")[0]
-                file_path = os.path.join(fldr, _f)
-                self.__set(_text=name, _path=file_path)
-        # The above code generates a tuple of file_name and file_path
-        # for setting the correct attributes for the program.
-
         # The output headers and the output folders are to be
         # created so that the results can be persisted quickly
-        output_folder_ = os.path.join(folder, "output")
-        if not os.path.exists(output_folder_):
-            os.mkdir(output_folder_)
-            simulationLogger.warn("Created missing output folder")
+        # output_folder_ = os.path.join(folder, "output")
+        # if not os.path.exists(output_folder_):
+        #     os.mkdir(output_folder_)
+        #     simulationLogger.warn("Created missing output folder")
 
-        self._path = output_folder_
+        # self._path = output_folder_
 
         # Perform required computations for processing input
         # data. Each constant file requires a series of processing
@@ -100,17 +84,6 @@ class Dataset:
             # The below is for setting list attributes with an
             # additional value.
             getattr(self, attrname).append(value)
-
-    def __set(self, _text, _path):
-        if _text == "Const1":
-            _d = KineticConstant(load_data(_path))
-        elif _text == "Const2":
-            _d = AcidConstant(load_data(_path))
-        else:
-            _d = load_data(_path)
-        # -- Set payload data dictionary
-        payload = {"path": _path, "value": _d}
-        setattr(self, _text, payload)
 
     def __process_client_data(self):
         """Process client data to get feed and inoculum"""
