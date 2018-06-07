@@ -141,3 +141,17 @@ class Dataset:
         # -- Update functions
         self.__recompute_mu_max(temp=temp)
         self.__recompute_hconstants(temp=temp)
+
+
+class SimulationResult(object):
+    def __init__(self, hdfile):
+        self._file = hdfile
+
+    def __go_down_one(self, _name_):
+        return self._file.get(_name_)
+
+    def getHeaders(self, header_type):
+        return self.__go_down_one("Headers").get(header_type).value
+
+    def getDataset(self, category):
+        return self.__go_down_one("Output").get(category).value
