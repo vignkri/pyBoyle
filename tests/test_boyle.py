@@ -1,6 +1,6 @@
-from boyle import Dataset
 from boyle.manager import Manager
 from boyle import __version__
+from boyle import load, SimulationResult, Dataset
 
 dataset = None
 
@@ -57,3 +57,9 @@ def test_initialisation():
     # -- Assert values stored as simulation configuration data
     assert manager._step == _settings_.get("step_size")
     assert manager._meta.get("name") == _metadata_.get("name")
+
+
+def test_loadResult():
+    """Load result data and check information"""
+    _path = "data/reference.hdf5"
+    imported_result = SimulationResult(load.fromHDF5(_path))
