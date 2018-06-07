@@ -12,12 +12,10 @@ to.
 """
 
 
-import os
-import time
 import numpy as np
 
 from boyle.tools.logger import simulationLogger
-from boyle.core.save import to_hdf5, OUTPUT_HEADERS
+from boyle.core.save import OUTPUT_HEADERS
 from boyle.core.computations.growth import mu_max_standard
 from boyle.core.computations.formula import computeHenryConstant
 
@@ -39,18 +37,6 @@ class Dataset:
         for kw in kwargs:
             payload = {"name": kw, "value": kwargs.get(kw)}
             setattr(self, kw, payload)
-        # --
-        # -- Created metadata in time of simulation
-        self.__creation_time = time.time()
-
-        # The output headers and the output folders are to be
-        # created so that the results can be persisted quickly
-        # output_folder_ = os.path.join(folder, "output")
-        # if not os.path.exists(output_folder_):
-        #     os.mkdir(output_folder_)
-        #     simulationLogger.warn("Created missing output folder")
-
-        # self._path = output_folder_
 
         # Perform required computations for processing input
         # data. Each constant file requires a series of processing
