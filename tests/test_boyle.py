@@ -61,5 +61,9 @@ def test_initialisation():
 
 def test_loadResult():
     """Load result data and check information"""
+    from numpy import ndarray
     _path = "data/reference.hdf5"
     imported_result = SimulationResult(load.fromHDF5(_path))
+    assert isinstance(imported_result.getDataset("debug"), ndarray)
+    assert isinstance(imported_result.getDataset("solution"), ndarray)
+    assert isinstance(imported_result.getDataset("debug_solution"), ndarray)
