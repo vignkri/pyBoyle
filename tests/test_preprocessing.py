@@ -1,8 +1,8 @@
 import numpy as np
 from numpy.testing import assert_almost_equal
 from scipy.stats import norm
-from boyle import sampleLHS
-from boyle import createNormalDistribution
+from boyle.preprocessing import sampleLHS
+from boyle.preprocessing import createNormalDistribution
 
 
 def test_sampleLHS():
