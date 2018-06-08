@@ -1,3 +1,5 @@
+import numpy as np
+from numpy import testing
 from boyle.manager import Manager
 from boyle import __version__
 from boyle import load, SimulationResult, Dataset
@@ -15,7 +17,6 @@ def checkConstants(ds, raw):
 
 def test_initialisation():
     """Simulate settings of the testing folder."""
-    import numpy as np
     # --
     data_path = "data/"
     # -- Create sample dataset
@@ -57,13 +58,19 @@ def test_initialisation():
     # -- Assert values stored as simulation configuration data
     assert manager._step == _settings_.get("step_size")
     assert manager._meta.get("name") == _metadata_.get("name")
+    # -- load reference output
+    _path = "data/reference.hdf5"
+    reference = SimulationResult(load.fromHDF5(_path))
+    result = manager.start()
+    # -- Check if the data is within thresholds
+    testing.assert_allclose(reference.getDataset("solution"),
+                            result.debug_solution)
 
 
 def test_loadResult():
     """Load result data and check information"""
-    from numpy import ndarray
     _path = "data/reference.hdf5"
     imported_result = SimulationResult(load.fromHDF5(_path))
-    assert isinstance(imported_result.getDataset("debug"), ndarray)
-    assert isinstance(imported_result.getDataset("solution"), ndarray)
-    assert isinstance(imported_result.getDataset("debug_solution"), ndarray)
+    assert isinstance(imported_result.getDataset("debug"), np.ndarray)
+    assert isinstance(imported_result.getDataset("solution"), np.ndarray)
+    assert isinstance(imported_result.getDataset("debug_solution"), np.ndarray)
