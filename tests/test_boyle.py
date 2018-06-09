@@ -1,6 +1,7 @@
 import numpy as np
 from numpy import testing
 from boyle.manager import Manager
+from boyle.tools.utility import load_data
 from boyle import __version__
 from boyle import load, SimulationResult, Dataset
 
@@ -36,8 +37,8 @@ def test_initialisation():
     manager = Manager(_config_)
     dataset = manager._frame
     # --
-    const_one = np.loadtxt("data/Const1.constant", comments="%")
-    const_two = np.loadtxt("data/Const2.constant", comments="%")
+    const_one = load_data("data/Const1.constant")
+    const_two = load_data("data/Const2.npy")
     # print(dataset.Const1.get("value"))
     checkConstants(ds=dataset.Const1.get("value"), raw=const_one)
     checkConstants(ds=dataset.Const2.get("value"), raw=const_two)
@@ -64,7 +65,7 @@ def test_initialisation():
     result = manager.start()
     # -- Check if the data is within thresholds
     testing.assert_allclose(reference.getDataset("solution"),
-                            result.debug_solution)
+                            result.solution)
 
 
 def test_loadResult():
