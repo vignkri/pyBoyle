@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "boyle"
-version = "0.5.0"
+version = "0.6.0"
 description = "Simulation model for biogas production."
 authors = ["Vignesh Krishnamoorthy <k.vignesh.krish@gmail.com>"]
 
