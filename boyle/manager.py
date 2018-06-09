@@ -11,6 +11,7 @@ to the main application.
 
 import numpy as np
 import scipy.integrate
+from collections import namedtuple
 from boyle.core.generic import Dataset
 from boyle.core.load import from_localpath
 from boyle.core.model.standard import Standard
@@ -45,7 +46,9 @@ class Manager:
             atol=solver.get("absolute"),
             nsteps=solver.get("nsteps")
         )
-        self._ph_settings = self._sttn.get("ph").get("method")
+        phValue = namedtuple("pH", "method value")
+        self._ph_settings = phValue(self._sttn.get("ph").get("method"),
+                                    self._sttn.get("ph").get("value"))
         simulationLogger.info("Set up experiment: '%s'" % self._meta)
 
     def initialize_solver(self, iname):
