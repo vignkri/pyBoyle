@@ -126,13 +126,23 @@ class Manager:
             _step = True
             _relax = True
             try:
-                while self._solver.successful() and self._solver.t < self._end_time:
-                    y_dot = self._solver.integrate(self._solver.t + self._step,
-                                                   step=_step, relax=_relax)
+                while self._solver.successful() and \
+                        self._solver.t < self._end_time:
+                    try:
+                        y_dot = self._solver.integrate(
+                            self._solver.t + self._step, step=_step,
+                            relax=_relax)
                     # self._data_output._update("result",
                     # [self._solver.t] + list(y_dot))
-                    row = np.hstack([np.array([idx, self._solver.t]), y_dot])
-                    self.result.append(row)
+                        row = np.hstack(
+                            [np.array([idx, self._solver.t]), y_dot])
+                        self.result.append(row)
+                    except ValueError as e:
+                        error = "ValueError: The pH is diverging."
+                        error += " Check the substrate and the pH computation."
+                        error_payload = {"result": self.result,
+                                         "internals": self._frame.debug}
+                        return error_payload
             except KeyboardInterrupt as e:
                 er = "KEYBOARD INTERRUPT: Stopped."
                 er += " Current Iteration {}".format(self._solver.t)
