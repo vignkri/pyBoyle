@@ -14,3 +14,4 @@ pydoe = "^0.3.8"
 [tool.poetry.dev-dependencies]
 pytest = "^3.5"
 pyaml = "^17.12"
+coverage = "^4.5"
