@@ -2,7 +2,6 @@
 
 import numpy as np
 from boyle.core.computations import ph
-from boyle.tools.logger import simulationLogger
 
 """
 Standard Computation Model
@@ -119,13 +118,7 @@ def Standard(time, y0, dataset, run_no, ph_mode):
     elif ph_mode.method == "fsolve":
         pH = ph.find_roots(data=_data)
     elif ph_mode.method == "brentq":
-        try:
-            pH = ph.brent_dekker(data=_data)
-        except ValueError:
-            simulationLogger.warn("pH out of bounds in {r} at {t}".format(
-                r=run_no, t=time))
-            pH = 8
-            simulationLogger.warn("Setting pH to {}".format(8))
+        pH = ph.brent_dekker(data=_data)
     elif ph_mode.method == "fixed":
         pH = ph_mode.value
     else:

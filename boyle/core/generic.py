@@ -14,7 +14,6 @@ to.
 
 import numpy as np
 
-from boyle.tools.logger import simulationLogger
 from boyle.core.save import OUTPUT_HEADERS
 from boyle.core.computations.growth import mu_max_standard
 from boyle.core.computations.formula import computeHenryConstant
@@ -54,8 +53,6 @@ class Dataset:
             getattr(self, attrname)  # Try to get the attribute of given name
         except AttributeError as e:
             # If there is an attribute error, catch it
-            simulationLogger.warning("Attribute {} missing.".format(attrname))
-            simulationLogger.info("Creating attribute {}".format(attrname))
             # Check if the attribute exists in the headers file
             # if it exists, then get that value to be updated.
             if attrname in OUTPUT_HEADERS.keys():
@@ -80,7 +77,6 @@ class Dataset:
         if time_periods.shape[0] < 1:
             e_ = "IO: Time period provided for 1 day of feed."
             er = e_ + " Multi-day feeding is only supported not 1-day feed."
-            simulationLogger.Error(e_)
             raise ValueError(er)
 
         # -- Get other specific information
@@ -121,7 +117,6 @@ class Dataset:
         self.mu_max.update(payload)
         # --
         self.mu_max_data.append(payload.get("params"))
-        simulationLogger.info("Process variable mu_max created.")
 
     def __recompute_hconstants(self, temp):
         """Compute henry constants"""
@@ -129,7 +124,6 @@ class Dataset:
                                            temp=temp)
         setattr(self, "henry_constants", hc)
         self.hc_data.append(henry_c)
-        simulationLogger.info("Process variable Henry-Constants created.")
 
     def move_index_for_iteration(self, index):
         """Process the imported dataset and update the values."""

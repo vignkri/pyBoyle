@@ -13,7 +13,6 @@ import os
 import time
 import h5py as h5
 from numpy import array, string_
-from boyle.tools.logger import simulationLogger
 
 
 # Splitting Header Items
@@ -96,8 +95,6 @@ def to_file(_path, _dset):
     try:
         to_hdf5(path=output_path, dataset=_dset)
     except OSError as e:
-        simulationLogger.error("OSError: Output file exists."
-                               "Creating a new output file.")
         status_code = "FAIL"
     else:
         status_code = "SUCCESS"

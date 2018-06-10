@@ -15,7 +15,6 @@ from collections import namedtuple
 from boyle.core.generic import Dataset
 from boyle.core.load import from_localpath
 from boyle.core.model.standard import Standard
-from boyle.tools.logger import simulationLogger
 
 
 class Manager:
@@ -49,7 +48,6 @@ class Manager:
         phValue = namedtuple("pH", "method value")
         self._ph_settings = phValue(self._sttn.get("ph").get("method"),
                                     self._sttn.get("ph").get("value"))
-        simulationLogger.info("Set up experiment: '%s'" % self._meta)
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
@@ -94,13 +92,11 @@ class Manager:
         # --
 
     def start(self):
-        simulationLogger.info("Starting experiment.")
         # Create result object to store results in
         self.result = []
         # -- loop through all available time-points to generate
         # the simulation of feeding on multiple different days.
         for idx in range(0, len(self._frame.regulation_values["tp"])):
-            simulationLogger.info("Running Simulation Frame: {}".format(idx))
             if idx == 0:
                 self._initial_time = 0
                 self._end_time = self._frame.regulation_values["tp"][idx]
@@ -121,7 +117,6 @@ class Manager:
             # -- set up function parameters for a particular run_no
             _args_ = [self._frame, idx, self._ph_settings]
             self._solver.set_f_params(*_args_)
-            simulationLogger.info("Setting function parameters for the model")
             # -- start the solver with teh current run_no
             _step = True
             _relax = True
@@ -146,22 +141,13 @@ class Manager:
             except KeyboardInterrupt as e:
                 er = "KEYBOARD INTERRUPT: Stopped."
                 er += " Current Iteration {}".format(self._solver.t)
-                simulationLogger.info(er)
-                print(er)
-                raise(e)
             self._end_time = self._solver.t
-            # The result chooses the elements from the start of y_dot instead
-            # of the initial value set. Forcing to use the result setup is probably
-            # not useful
+            # The result chooses the elements from the
+            # start of y_dot instead of the initial value set.
+            # Forcing to use the result setup is probably not useful
             # self._frame.inoculum.update({"value": self.result[-1][2:]})
             self._frame.inoculum.update({"value": y_dot})
             # -- Log that the simulation ended correctly.
-            simulationLogger.info("Simulation finished successfully.")
-        # --
-        simulationLogger.info("Starting post-processing")
         # --
         self.post_process()
-        # self._frame.save_to_file()
-        simulationLogger.info("Post processing of data finished.")
-        simulationLogger.info("Finishing up simulation. Closing.")
         return self._frame

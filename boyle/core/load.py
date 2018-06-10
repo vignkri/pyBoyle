@@ -11,7 +11,6 @@ simulations.
 import os
 import h5py as h5
 from boyle.tools.utility import load_data
-from boyle.tools.logger import simulationLogger
 from boyle.core.internals.constant import KineticConstant, AcidConstant
 
 # Create set of supported extensions to make sure data
@@ -23,7 +22,6 @@ def from_localpath(path):
     """Load files from local file path"""
     if not os.path.exists(path):
         _e = "Folder does not exist"
-        simulationLogger.critical(_e)
         raise IOError(_e)
     else:
         folder = path
@@ -54,7 +52,6 @@ def fromHDF5(path):
     """Load result file from local file path"""
     if not os.path.exists(path):
         _e = "Folder does not exist"
-        simulationLogger.critical(_e)
         raise IOError(_e)
     else:
         _path = path
