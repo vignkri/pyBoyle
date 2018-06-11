@@ -32,6 +32,7 @@ class Manager:
         # self._frame = Dataset(self._config.get("metadata").get("data"))
         _data = from_localpath(self._config.get("metadata").get("data"))
         self._frame = Dataset(**_data)
+        self._frame._update(attrname="dump_internals", value=False)
         # -- Get simulation configuration
         self._step = self._config.get("settings").get("step_size")
         self._meta = self._config.get("metadata")
@@ -62,34 +63,6 @@ class Manager:
             raise(e)
         self._solver.set_initial_value(y=self.initial_value,
                                        t=self._initial_time)
-
-    def post_process(self):
-        """Computes the change in values
-
-        The dy/dt is computed as the y is cumulative from the
-        results. Cumulative `y` is not useful for visualisation
-        as the required output is change with respect to the
-        previous step.
-
-            dy/dt = y[n] - y[n-1] / t[n] - t[n-1]
-        """
-        # TODO: This should be re-engineered. Data should not be
-        # reversed but only the values should be subtracted with previous
-        # values.
-        self._frame._update("debug_solution", self.result)
-        for idx in reversed(list(range(1, len(self.result)))):
-            self.result[idx][29:] = (self.result[idx][29:] -
-                                     self.result[idx-1][29:]) / (
-                self.result[idx][1] - self.result[idx-1][1]
-            ) / 1000
-            # The above result[idx][1] points to the time position of
-            # the index. Previously it was pointing to 0 because the
-            # run_no value was not included.
-            secondary_array = np.array(np.sum(self.result[idx][29:]))
-            self.final_result = np.hstack([self.result[idx],
-                                           secondary_array])
-            self._frame._update("solution", self.final_result)
-        # --
 
     def start(self):
         # Create result object to store results in
@@ -149,4 +122,5 @@ class Manager:
             self._frame.inoculum.update({"value": y_dot})
             # -- Log that the simulation ended correctly.
         # --
+        self._frame._update("y_hat", self.result)
         return self._frame

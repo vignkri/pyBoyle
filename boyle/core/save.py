@@ -45,7 +45,7 @@ OUTPUT_HEADERS = dict(
 )
 
 
-def to_hdf5(path, dataset):
+def to_hdf5(path, dataset, internals=False):
     """Save the dataset to hdf5 file"""
     _out_ = h5.File(path, "w")
     # --
@@ -55,7 +55,7 @@ def to_hdf5(path, dataset):
     # --
     output_data_grp = _out_.create_group("Output")
     output_data_grp["debug"] = dataset.debug[1:]
-    output_data_grp["solution"] = array(dataset.debug_solution)
+    output_data_grp["solution"] = dataset.y_hat
     # --
     headers = _out_.create_group("Headers")
     headers["debug"] = [string_(item) for item in
@@ -63,16 +63,17 @@ def to_hdf5(path, dataset):
     headers["solution"] = [string_(item) for item in
                            OUTPUT_HEADERS.get("solution")]
     # -- save functions for process computations
-    hc = _out_.create_group("HenryConstants")
-    hc["data"] = dataset.hc_data
-    # -- mu_max dataset
-    mu_max = _out_.create_group("GrowthData")
-    for key in dataset.mu_max_data[0]:
-        payload = []
-        for row in dataset.mu_max_data:
-            payload.append(row.get(key))
-        # --
-        mu_max[key] = payload
+    if dataset.dump_internals:
+        hc = _out_.create_group("henryconstants")
+        hc["data"] = dataset.hc_data
+        # -- mu_max dataset
+        mu_max = _out_.create_group("GrowthData")
+        for key in dataset.mu_max_data[0]:
+            payload = []
+            for row in dataset.mu_max_data:
+                payload.append(row.get(key))
+            # --
+            mu_max[key] = payload
 
 
 def to_file(_path, _dset):
