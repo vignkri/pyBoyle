@@ -55,8 +55,7 @@ def to_hdf5(path, dataset):
     # --
     output_data_grp = _out_.create_group("Output")
     output_data_grp["debug"] = dataset.debug[1:]
-    output_data_grp["solution"] = dataset.solution[1:]
-    output_data_grp["debug_solution"] = array(dataset.debug_solution)
+    output_data_grp["solution"] = array(dataset.debug_solution)
     # --
     headers = _out_.create_group("Headers")
     headers["debug"] = [string_(item) for item in

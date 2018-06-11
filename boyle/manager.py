@@ -149,5 +149,4 @@ class Manager:
             self._frame.inoculum.update({"value": y_dot})
             # -- Log that the simulation ended correctly.
         # --
-        self.post_process()
         return self._frame
