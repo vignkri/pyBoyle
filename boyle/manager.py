@@ -32,11 +32,13 @@ class Manager:
         # self._frame = Dataset(self._config.get("metadata").get("data"))
         _data = from_localpath(self._config.get("metadata").get("data"))
         self._frame = Dataset(**_data)
-        self._frame._update(attrname="dump_internals", value=False)
         # -- Get simulation configuration
         self._step = self._config.get("settings").get("step_size")
         self._meta = self._config.get("metadata")
         self._sttn = self._config.get("settings")
+        # FLAGS
+        self._frame._update(attrname="dump_internals",
+                            value=self._sttn.get("dump_internals"))
         # -- solver settings
         solver = self._config.get("settings").get("solver")
         self._solver_setting = dict(
