@@ -12,7 +12,7 @@ or saving to disk for later.
 import os
 import time
 import h5py as h5
-from numpy import array, string_
+from numpy import string_
 
 
 # Splitting Header Items

@@ -271,7 +271,6 @@ def Standard(time, y0, dataset, run_no, ph_mode):
     # --------------------------------------------
     test = np.copy(yieldc.transpose())
     test[test > 0] = 0
-    dataset._update("yconst", [test @ z])
     dataset._update("debug", [run_no, time] +
                     mu[:, 0].tolist() + [pH, dataset.flow_in, flow_in] +
                     ((test) @ (z)).tolist())
