@@ -11,9 +11,9 @@ import numpy as np
 from scipy import interpolate
 
 
-def interpolateData(data, time_step=1):
+def interpolateData(data, time_col, time_step=1):
     """Interpolate the data"""
-    time = data[:, 1]
+    time = data[:, time_col]
     start_time = time.astype(int).min()
     end_time = time.astype(int).max()
     tarr = np.arange(start_time, end_time, time_step)
