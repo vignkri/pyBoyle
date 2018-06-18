@@ -66,7 +66,7 @@ class Manager:
         self._solver.set_initial_value(y=self.initial_value,
                                        t=self._initial_time)
 
-    def start(self):
+    def start(self, dense=False, relaxed=False):
         # Create result object to store results in
         self.result = []
         # -- loop through all available time-points to generate
@@ -93,8 +93,8 @@ class Manager:
             _args_ = [self._frame, idx, self._ph_settings]
             self._solver.set_f_params(*_args_)
             # -- start the solver with teh current run_no
-            _step = True
-            _relax = True
+            _step = dense  # Check if there is a requirement for dense output
+            _relax = relaxed  # Check if there is a req. for relaxed output
             try:
                 while self._solver.successful() and \
                         self._solver.t < self._end_time:
