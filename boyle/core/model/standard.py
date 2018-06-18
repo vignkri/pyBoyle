@@ -1,15 +1,14 @@
 #!/usr/bin/python
 
-import ph
 import numpy as np
-from logger import simulationLogger
+from boyle.core.computations import ph
 
 """
 Standard Computation Model
 """
 
 
-def standard(time, y0, dataset, run_no, ph_mode):
+def Standard(time, y0, dataset, run_no, ph_mode):
     """Standard Integrator Model
 
     PARAMETERS
@@ -112,22 +111,16 @@ def standard(time, y0, dataset, run_no, ph_mode):
     # TODO: Most cases, the pH fails horribly due to some external factors
     # which could either be the constants not working properly or other
     # issues that are stemming from the substrate / feed definitions.
-    if ph_mode == "newton-raphson":
+    if ph_mode.method == "newton-raphson":
         while abs(Hfunc - H) > 1e-12 or pH is None:
             H, Hfunc = ph.newton_raphson(H, Hfunc, **_data)
             pH = - np.log10(Hfunc)
-    elif ph_mode == "fsolve":
+    elif ph_mode.method == "fsolve":
         pH = ph.find_roots(data=_data)
-    elif ph_mode == "brentq":
-        try:
-            pH = ph.brent_dekker(data=_data)
-        except ValueError:
-            simulationLogger.warn("pH out of bounds in {r} at {t}".format(
-                r=run_no, t=time))
-            pH = 8
-            simulationLogger.warn("Setting pH to {}".format(8))
-    elif ph_mode == "fixed":
-        pH = 8
+    elif ph_mode.method == "brentq":
+        pH = ph.brent_dekker(data=_data)
+    elif ph_mode.method == "fixed":
+        pH = ph_mode.value
     else:
         print("Unknown method")
         raise
@@ -276,9 +269,10 @@ def standard(time, y0, dataset, run_no, ph_mode):
     #       Appendix A: Data Logging
     #
     # --------------------------------------------
-
+    test = np.copy(yieldc.transpose())
+    test[test > 0] = 0
     dataset._update("debug", [run_no, time] +
                     mu[:, 0].tolist() + [pH, dataset.flow_in, flow_in] +
-                    y_dot.tolist())
+                    ((test) @ (z)).tolist())
 
     return y_dot

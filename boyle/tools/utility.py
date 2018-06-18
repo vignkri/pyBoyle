@@ -20,3 +20,10 @@ def load_client_data(path):
     """Utility function to load client-data files"""
     return np.load(path)
 
+
+def load_data(path):
+    """Utility Function to load data components"""
+    try:
+        return np.loadtxt(path, comments="%")
+    except UnicodeDecodeError as e:
+        return np.load(path)

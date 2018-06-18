@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+.pytest_cache/
 *.py[cod]
 *$py.class
 
@@ -92,6 +93,7 @@ logs/
 
 # Local simulation files
 _sim.yaml
+reference.hdf5
 
 # Rope project settings
 .ropeproject
