@@ -71,8 +71,10 @@ def test_initialisation():
     result = manager.start()
     # -- Check if the data is within thresholds
     reference_result = interpolateData(
-        np.asarray(reference.getDataset("debug_solution")), time_step=1)
-    test_result = interpolateData(np.asarray(result.y_hat), time_step=1)
+        np.asarray(reference.getDataset("debug_solution")),
+        time_col=1, time_step=1)
+    test_result = interpolateData(np.asarray(result.y_hat), time_col=1,
+                                  time_step=1)
     testing.assert_allclose(reference_result[1:], test_result[1:],
                             rtol=1e-5, atol=1e-5)
 
