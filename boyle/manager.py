@@ -11,46 +11,54 @@ to the main application.
 
 import numpy as np
 import scipy.integrate
-from collections import namedtuple
-from boyle.core.generic import Dataset
+
+from boyle.core.generic import Dataset, pHvalue
 from boyle.core.load import from_localpath
 from boyle.core.model.standard import Standard
 
+# GENERIC SETTINGS
+STANDARD_PH = {"method": "fixed", "value": 7.5}
+STANDARD_SOLVER = {"method": "bdf", "order": 1, "nsteps": 1e6,
+                   "rtol": 1e-4, "atol": 1e-8}
+
 
 class Manager:
-    def __init__(self, config, model=Standard):
+    def __init__(self, path, ph=None, solver=None,
+                 step_size=0.5, dump_internals=False,
+                 model="standard"):
         """Initialize manager for creating a simulation
 
         PARAMETERS
         ----------
-        model : str
+        path : data
+        model_name : str
         config : dict
         """
-        self._model = model
-        # --
-        self._config = config
-        # self._frame = Dataset(self._config.get("metadata").get("data"))
-        _data = from_localpath(self._config.get("metadata").get("data"))
+        # Get data from the local path
+        _data = from_localpath(path)
         self._frame = Dataset(**_data)
+        # -- Get model information for setting model parameters
+        if model == "standard":
+            self._model = Standard
+        else:
+            print("Unknown model requested.")
+            raise(ValueError)
+        # -- Set flags for generating or outputting data
+        self.FLAG_DUMP_INTERNALS = dump_internals
+        # Get pH information from the standard solver if not provided
+        if not ph:
+            self._ph_settings = pHvalue(STANDARD_PH.get("method"),
+                                        STANDARD_PH.get("value"))
+        else:
+            self._ph_settings = pHvalue(ph.get("method"),
+                                        ph.get("value"))
+        # -- Set simulation Configuration
+        if not solver:
+            self._solver_setting = STANDARD_SOLVER
+        else:
+            self._solver_setting = solver
         # -- Get simulation configuration
-        self._step = self._config.get("settings").get("step_size")
-        self._meta = self._config.get("metadata")
-        self._sttn = self._config.get("settings")
-        # FLAGS
-        self._frame._update(attrname="dump_internals",
-                            value=self._sttn.get("dump_internals"))
-        # -- solver settings
-        solver = self._config.get("settings").get("solver")
-        self._solver_setting = dict(
-            method=solver.get("method"),
-            order=solver.get("order"),
-            rtol=solver.get("relative"),
-            atol=solver.get("absolute"),
-            nsteps=solver.get("nsteps")
-        )
-        phValue = namedtuple("pH", "method value")
-        self._ph_settings = phValue(self._sttn.get("ph").get("method"),
-                                    self._sttn.get("ph").get("value"))
+        self._step = step_size
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
