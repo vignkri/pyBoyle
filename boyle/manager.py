@@ -79,17 +79,17 @@ class Manager:
         self.result = []
         # -- loop through all available time-points to generate
         # the simulation of feeding on multiple different days.
-        for idx in range(0, len(self._frame.regulation_values["tp"])):
+        for idx in range(0, len(self._frame.feed_payload["tp"])):
             if idx == 0:
                 self._initial_time = 0
-                self._end_time = self._frame.regulation_values["tp"][idx]
+                self._end_time = self._frame.feed_payload["tp"][idx]
             else:
                 # Increase timesteps by the next timestep where there is
                 # feed. Previously, the data was structured to have dT instead
                 # of T of feed. Therefore there was an addition setup for
                 # computing end_time. That is no longer needed.
                 self._initial_time = self._end_time
-                self._end_time = self._frame.regulation_values["tp"][idx]
+                self._end_time = self._frame.feed_payload["tp"][idx]
             # --
             # -- move the io-object one index to get the required data
             self._frame.move_index_for_iteration(index=idx)

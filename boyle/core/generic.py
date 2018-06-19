@@ -93,13 +93,8 @@ class Dataset:
             self.feed.get("value")[:, 4:]
 
         # -- feed payload
-        feed_payload = dict(tp=time_periods, temp=temperatures,
-                            flows=flows, substrates=substrate)
-
-        # TODO: Rename regulation values to Feed_Payload to reflect
-        # real world phenomena
-        self.regulation_values = feed_payload
-
+        self.feed_payload = dict(tp=time_periods, temp=temperatures,
+                                 flows=flows, substrates=substrate)
         # Work with Inoculum files
         _extension = np.concatenate((self.inoculum.get("value"),
                                      np.zeros(4, )))
@@ -108,11 +103,6 @@ class Dataset:
 
     def __recompute_mu_max(self, temp):
         """Compute Temperature Dependent Constants"""
-        # TODO: Clean up this function. This function should
-        # return arrays instead of the currently returned
-        # dictionaries. This would cause downstream issues since
-        # dictionaries are complicated to be brief enough for
-        # future changes.
         payload, mmax = mu_max_standard(self.Const1.get("value"),
                                         temp=temp)
         setattr(self, "mu_max", mmax)
@@ -131,10 +121,10 @@ class Dataset:
     def move_index_for_iteration(self, index):
         """Process the imported dataset and update the values."""
         # -- substrate flow information
-        temp = self.regulation_values["temp"][index]
-        self.flow_in = self.regulation_values["flows"][index, 0]
-        self.flow_out = self.regulation_values["flows"][index, 1]
-        self.substrate_flow = self.regulation_values["substrates"][index]
+        temp = self.feed_payload["temp"][index]
+        self.flow_in = self.feed_payload["flows"][index, 0]
+        self.flow_out = self.feed_payload["flows"][index, 1]
+        self.substrate_flow = self.feed_payload["substrates"][index]
         # -- Update functions
         self.__recompute_mu_max(temp=temp)
         self.__recompute_hconstants(temp=temp)
