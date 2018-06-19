@@ -43,8 +43,6 @@ class Manager:
         else:
             print("Unknown model requested.")
             raise(ValueError)
-        # -- Set flags for generating or outputting data
-        self.FLAG_DUMP_INTERNALS = dump_internals
         # Get pH information from the standard solver if not provided
         if not ph:
             self._ph_settings = pHvalue(STANDARD_PH.get("method"),
@@ -59,6 +57,7 @@ class Manager:
             self._solver_setting = solver
         # -- Get simulation configuration
         self._step = step_size
+        self.integrator_name = "vode"
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
@@ -71,6 +70,7 @@ class Manager:
         else:
             e = "ValueError: Unknown Solver provide"
             raise(e)
+        # --
         self._solver.set_initial_value(y=self.initial_value,
                                        t=self._initial_time)
 
@@ -96,7 +96,7 @@ class Manager:
             # -- get new inoculum value from the io-object
             self.initial_value = self._frame.inoculum.get("value")
             # -- initialise the solver and the details of the solver
-            self.initialize_solver(iname="vode")
+            self.initialize_solver(iname=self.integrator_name)
             # -- set up function parameters for a particular run_no
             _args_ = [self._frame, idx, self._ph_settings]
             self._solver.set_f_params(*_args_)
@@ -110,8 +110,6 @@ class Manager:
                         y_dot = self._solver.integrate(
                             self._solver.t + self._step, step=_step,
                             relax=_relax)
-                    # self._data_output._update("result",
-                    # [self._solver.t] + list(y_dot))
                         row = np.hstack(
                             [np.array([idx, self._solver.t]), y_dot])
                         self.result.append(row)
@@ -128,9 +126,7 @@ class Manager:
             # The result chooses the elements from the
             # start of y_dot instead of the initial value set.
             # Forcing to use the result setup is probably not useful
-            # self._frame.inoculum.update({"value": self.result[-1][2:]})
             self._frame.inoculum.update({"value": y_dot})
-            # -- Log that the simulation ended correctly.
         # --
         self._frame._update("y_hat", self.result)
         return self._frame
