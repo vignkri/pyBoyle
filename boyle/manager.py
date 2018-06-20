@@ -27,11 +27,54 @@ class Manager:
                  step_size=0.5, model="standard"):
         """Initialize manager for creating a simulation
 
+        The manager provides interfaces to set up the solver
+        and the datasets for beginning the solver. This class
+        takes a set of parameters that defines the solver
+        to be used along with the settings aside from the data
+        to the solver.
+
         PARAMETERS
         ----------
-        path : data
-        model_name : str
-        config : dict
+        source : str / boyle.core.generic.Dataset
+            The source defines the path of the dataset or the
+            source of the model dataset. If a boyle.Dataset object
+            is passed to the manager, the data is immediately
+            assigned. If not, the path is processed for data and
+            the required data object is built.
+        ph : dict
+            The ph dictionary is the definition of the type of
+            method to be utilised by the model for performing
+            the simulation. The dictionary is to be built as
+            follows:
+                {"method": "fixed" | "brentq" | "newton-raphson",
+                 "value": 8 | None | None | None}
+            The value and the method data are mapped together. If
+            the method is given as 'fixed' it is required to provide
+            a value to assume fixed for the whole simulation. For
+            other methods, it is not required to provide the value
+            for the key "value".
+        solver : dict
+            The solver dictionary is the definition of the settings
+            for the solver to utilise. This argument is an optional
+            argument in case the solver settings need to be tweaked,
+            and therefore a standard sample is provided:
+                {"method": "bdf", "order": 1, "nsteps": 1e6,
+                 "rtol": 1e-4, "atol": 1e-8}
+            The parameters depending on the solver can be obtained
+            from the Scipy.Integrate documentation [1].
+        step_size : float : 0.5
+            Provides the step size at which the outputs are required
+            from the solver. This is also optional with the default
+            being 0.5 with units in `hours`.
+        model : str : "standard"
+            A string to define the model function being used for the
+            simulation. The list of available models:
+                - standard
+
+        REFERENCES
+        ----------
+        [1] Documentation for the scipy.integrate module:
+            https://docs.scipy.org/doc/scipy/reference/integrate.html
         """
         # Get data from the local path
         if isinstance(source, Dataset):
