@@ -102,7 +102,33 @@ class Manager:
         self.integrator_name = "vode"
 
     def initialize_solver(self, iname):
-        """Initialize the solver for computation"""
+        """Initialise the solver for computation
+
+        Initialises the solver function within the scipy.integrate
+        module by wrapping the `scipy.integrate.ode` function and the
+        `scipy.integrate.ode.set_integrator` method. This function helps
+        in wrapping the `integrator name` and the solver settings
+        together.
+
+        PARAMETERS
+        ----------
+        iname : str
+            A string is passed in order to set the name of the
+            integrator for the solver. There are two solver which
+            have been tested:
+                - vode
+                - lsoda
+            Additional solvers are yet to be implemented.[1]
+
+        RETURNS
+        -------
+        None
+
+        REFERENCES
+        ----------
+        [1] Documentation for the module `scipy.integrate.ode`
+        https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.ode.html
+        """
         if iname == "vode":
             self._solver = scipy.integrate.ode(self._model) \
                 .set_integrator(iname, **self._solver_setting)
@@ -117,6 +143,36 @@ class Manager:
                                        t=self._initial_time)
 
     def start(self, dense=False, relaxed=False):
+        """Start the solver for performing simulation
+
+        PARAMETERS
+        ----------
+        dense : boolean : False
+            Flag for requesting dense output from the solver
+            if required for exposing the internals and verifying
+            solution.
+        relaxed : boolean : False
+            Flag for setting the relaxation parameter within the
+            integrator such that the integration would go until
+            t_1 >= t and then return the results. If the dense output
+            is set to True, this is not referenced. [1]
+
+        RETURNS
+        -------
+        boyle.core.generic.Dataset::
+            Boyle.Dataset object which contains all the data provided
+            at the feed, the constants utilised and the results of the
+            simulation. The results are stored under the attributes:
+                - `y_hat` is the output of the scipy.integrate() function
+                for each specified time point.
+                - 'debug' is the internal output from the integration
+                function with the datasets that are not obtained through
+                the result object. This contains data for the pH and the
+                BMP computation.
+
+        REFERENCES
+        ----------
+        """
         # Create result object to store results in
         self.result = []
         # -- loop through all available time-points to generate
