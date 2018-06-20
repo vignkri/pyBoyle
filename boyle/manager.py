@@ -23,9 +23,8 @@ STANDARD_SOLVER = {"method": "bdf", "order": 1, "nsteps": 1e6,
 
 
 class Manager:
-    def __init__(self, source, ph=None, solver=None,
-                 step_size=0.5, dump_internals=False,
-                 model="standard"):
+    def __init__(self, source, ph=None, solver=STANDARD_SOLVER,
+                 step_size=0.5, model="standard"):
         """Initialize manager for creating a simulation
 
         PARAMETERS
@@ -54,10 +53,7 @@ class Manager:
             self._ph_settings = pHvalue(ph.get("method"),
                                         ph.get("value"))
         # -- Set simulation Configuration
-        if not solver:
-            self._solver_setting = STANDARD_SOLVER
-        else:
-            self._solver_setting = solver
+        self._solver_setting = solver
         # -- Get simulation configuration
         self._step = step_size
         self.integrator_name = "vode"
