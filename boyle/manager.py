@@ -23,7 +23,7 @@ STANDARD_SOLVER = {"method": "bdf", "order": 1, "nsteps": 1e6,
 
 
 class Manager:
-    def __init__(self, path, ph=None, solver=None,
+    def __init__(self, source, ph=None, solver=None,
                  step_size=0.5, dump_internals=False,
                  model="standard"):
         """Initialize manager for creating a simulation
@@ -35,8 +35,11 @@ class Manager:
         config : dict
         """
         # Get data from the local path
-        _data = from_localpath(path)
-        self._frame = Dataset(**_data)
+        if isinstance(source, Dataset):
+            self._frame = source
+        else:
+            _data = from_localpath(source)
+            self._frame = Dataset(**_data)
         # -- Get model information for setting model parameters
         if model == "standard":
             self._model = Standard
