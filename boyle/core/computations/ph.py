@@ -56,6 +56,11 @@ def newton_raphson(H, Hfunc, i=0, **kwargs):
 
 
 def calculate(H, *args):
+    """Calculation function for computing the pH
+
+    Utility function that is used for computing the pH of
+    data from the available input values from the model.
+    """
     # -- set up variables
     arg = args[0]
     # -- get data from args
@@ -84,7 +89,22 @@ def calculate(H, *args):
 
 
 def brent_dekker(data, guesses=(1e-4, 1e-10)):
-    """Compute pH using brent-dekker method"""
+    """Compute pH using brent-dekker method
+
+    Computation of the pH using the Brent-Dekker root-finding
+    method implementation in scipy package.
+
+    PARAMETERS
+    ----------
+    data : numpy.array ::
+        numpy array data.
+
+    RETURNS
+    -------
+    pH : float ::
+        the computed pH for the input data from the simulation
+        and the simulation manager.
+    """
     _a, _b = guesses
     # TODO: Fix brentq ValueError: f(a) and f(b) must have
     # different signs
@@ -94,7 +114,22 @@ def brent_dekker(data, guesses=(1e-4, 1e-10)):
 
 
 def find_roots(data, guess=1e-8):
-    """Compute pH using standard root-finding method"""
+    """Compute pH using standard root-finding method
+
+    Standard root-finding function wrapper for computing the
+    pH using the data from the integration model.
+
+    PARAMETERS
+    ----------
+    data : numpy.array ::
+        numpy array data.
+
+    RETURNS
+    -------
+    pH : float ::
+        the computed pH for the input data from the simulation
+        and the simulation manager.
+    """
     x_H = fsolve(calculate, x0=guess, args=data)
     # TODO: Negative values in the pH indicates some sort of failure
     # in the computation engine for pH.
