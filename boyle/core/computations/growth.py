@@ -15,7 +15,32 @@ import numpy as np
 
 
 def mu_max_standard(arr, temp):
-    """Standard function to compute the mu_max"""
+    """Standard function to compute the mu_max
+
+    Function for computing the mu_max and growth data
+    from the constants file using the iterative temperature
+    value obtained from the feed data.
+
+    PARAMETERS
+    ----------
+    arr : numpy.array ::
+        The numpy array consisting of the Kinetic Constants
+        data from the source data folder.
+
+    temp : int / float ::
+        The integer or float values of the iterative temperature
+        value from the feed data for computing the mu_max
+        and growth data
+
+    RETURNS
+    -------
+    dict : Keys("params", "value") ::
+        A dictionary consisting of the computed params
+        and values from the Kinetic Constants with the keys:
+            - params: a pyaload consisting of specific
+            constants
+            - values: an array containing the mu_max values
+    """
     const1 = arr
     mu_max = np.zeros((10, 1))
     mu_max_t0 = np.zeros((10, 1))

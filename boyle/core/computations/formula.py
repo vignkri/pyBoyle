@@ -10,7 +10,27 @@ names for categorisation
 
 
 def computeHenryConstant(arr, temp):
-    """Compute HenryConstants with provided array"""
+    """Compute HenryConstants with provided array
+
+    The henry constants are computed with new iteration
+    temperature from the Const2 file.
+
+    PARAMETERS
+    ----------
+    arr : numpy.array ::
+        Numpy array containing the Acid Constants data
+        as the data source.
+
+    temp : int / float ::
+        Integer or float value for the iterative temperature
+        from the feed data.
+
+    RETURNS
+    -------
+    tuple : (dict, numpy.array)::
+        Returns a tuple consisting of the dictionary and
+        the numpy.array computed from the AcidConstant data.
+    """
     const2 = arr
     delta_temp = temp - const2["t0"]
     # Uses the following columns: X(T0), a, b, c
