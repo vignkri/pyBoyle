@@ -77,7 +77,25 @@ def to_hdf5(path, dataset, internals=False):
 
 
 def to_file(_path, _dset):
-    """Save as file function for sending it to file."""
+    """Function to save the dataset as a file
+
+    PARAMETERS
+    ----------
+    _path : str ::
+        Path of the file where the dataset is to be saved
+        for analysis after the simulation is complete.
+
+    _dset : boyle.core.generic.Dataset ::
+        Dataset object output from the boyle.Manager after
+        the simulation is completed.
+
+    RETURNS
+    -------
+    STATUS CODE : str ::
+        Status code regarding the condition of operation
+        after saving. The parameters are either `SUCCESS`
+        or `FAIL`.
+    """
     output_time = time.gmtime()
     # - get identifiers from the values.
     _year = output_time.tm_year

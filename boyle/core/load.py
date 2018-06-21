@@ -19,7 +19,30 @@ SUPPORTED_EXTENSIONS = ("npy", "npz", "constant")
 
 
 def from_localpath(path):
-    """Load files from local file path"""
+    """Load files from local file path
+
+    Loads the different data files from a local path
+    in to the Dataset generic by passing them through
+    the internal data models.
+
+    PARAMETERS
+    ----------
+    path : str
+        The path of the folder where the data is stored
+        for the simulation model.
+
+    RETURNS
+    -------
+    dict ::
+        A dictionary object consisting of the different
+        input files for the simulation model. The dictionary
+        keys are taken from the name of the files:
+            - Const1
+            - Const2
+            - yieldc
+            - feed
+            - inoculum
+    """
     if not os.path.exists(path):
         _e = "Folder does not exist"
         raise IOError(_e)
@@ -49,7 +72,23 @@ def from_localpath(path):
 
 
 def fromHDF5(path):
-    """Load result file from local file path"""
+    """Load result file from local file path
+
+    Loads the result HDF5 file from the local path for
+    analysis of the result objects. The output object
+
+    PARAMETERS
+    ----------
+    path : str ::
+        The path string for the HDF5 file and the data
+        from the simulation object.
+
+    RETURNS
+    -------
+    out_ : h5py.File ::
+        The hdf5py file object containing the input and
+        the output data from the simulation model.
+    """
     if not os.path.exists(path):
         _e = "Folder does not exist"
         raise IOError(_e)
