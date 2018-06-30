@@ -41,7 +41,7 @@ def createSampledComposition(df, _method="lhs", sample_size=100):
     if _method == "lhs":
         normal_ = createNormalDistribution(normable.values)
         out_sampler = sampleLHS(data=normal_, shape=normable.shape[0],
-                                samples=sample_size)
+                                _samples=sample_size)
         sampled_ = tuple(zip(idx_norm, out_sampler.T))
     else:
         pass
