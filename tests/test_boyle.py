@@ -11,7 +11,7 @@ dataset = None
 
 
 def test_version():
-    assert __version__ == '0.6.2'
+    assert __version__ == '0.6.3'
 
 
 def checkConstants(ds, raw):
