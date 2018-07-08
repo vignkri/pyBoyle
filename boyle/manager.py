@@ -11,46 +11,52 @@ to the main application.
 
 import numpy as np
 import scipy.integrate
-from collections import namedtuple
-from boyle.core.generic import Dataset
+
+from boyle.core.generic import Dataset, pHvalue
 from boyle.core.load import from_localpath
 from boyle.core.model.standard import Standard
 
+# GENERIC SETTINGS
+STANDARD_PH = {"method": "fixed", "value": 7.5}
+STANDARD_SOLVER = {"method": "bdf", "order": 1, "nsteps": 1e6,
+                   "rtol": 1e-4, "atol": 1e-8}
+
 
 class Manager:
-    def __init__(self, config, model=Standard):
+    def __init__(self, source, ph=None, solver=STANDARD_SOLVER,
+                 step_size=0.5, model="standard"):
         """Initialize manager for creating a simulation
 
         PARAMETERS
         ----------
-        model : str
+        path : data
+        model_name : str
         config : dict
         """
-        self._model = model
-        # --
-        self._config = config
-        # self._frame = Dataset(self._config.get("metadata").get("data"))
-        _data = from_localpath(self._config.get("metadata").get("data"))
-        self._frame = Dataset(**_data)
+        # Get data from the local path
+        if isinstance(source, Dataset):
+            self._frame = source
+        else:
+            _data = from_localpath(source)
+            self._frame = Dataset(**_data)
+        # -- Get model information for setting model parameters
+        if model == "standard":
+            self._model = Standard
+        else:
+            print("Unknown model requested.")
+            raise(ValueError)
+        # Get pH information from the standard solver if not provided
+        if not ph:
+            self._ph_settings = pHvalue(STANDARD_PH.get("method"),
+                                        STANDARD_PH.get("value"))
+        else:
+            self._ph_settings = pHvalue(ph.get("method"),
+                                        ph.get("value"))
+        # -- Set simulation Configuration
+        self._solver_setting = solver
         # -- Get simulation configuration
-        self._step = self._config.get("settings").get("step_size")
-        self._meta = self._config.get("metadata")
-        self._sttn = self._config.get("settings")
-        # FLAGS
-        self._frame._update(attrname="dump_internals",
-                            value=self._sttn.get("dump_internals"))
-        # -- solver settings
-        solver = self._config.get("settings").get("solver")
-        self._solver_setting = dict(
-            method=solver.get("method"),
-            order=solver.get("order"),
-            rtol=solver.get("relative"),
-            atol=solver.get("absolute"),
-            nsteps=solver.get("nsteps")
-        )
-        phValue = namedtuple("pH", "method value")
-        self._ph_settings = phValue(self._sttn.get("ph").get("method"),
-                                    self._sttn.get("ph").get("value"))
+        self._step = step_size
+        self.integrator_name = "vode"
 
     def initialize_solver(self, iname):
         """Initialize the solver for computation"""
@@ -63,6 +69,7 @@ class Manager:
         else:
             e = "ValueError: Unknown Solver provide"
             raise(e)
+        # --
         self._solver.set_initial_value(y=self.initial_value,
                                        t=self._initial_time)
 
@@ -71,24 +78,24 @@ class Manager:
         self.result = []
         # -- loop through all available time-points to generate
         # the simulation of feeding on multiple different days.
-        for idx in range(0, len(self._frame.regulation_values["tp"])):
+        for idx in range(0, len(self._frame.feed_payload["tp"])):
             if idx == 0:
                 self._initial_time = 0
-                self._end_time = self._frame.regulation_values["tp"][idx]
+                self._end_time = self._frame.feed_payload["tp"][idx]
             else:
                 # Increase timesteps by the next timestep where there is
                 # feed. Previously, the data was structured to have dT instead
                 # of T of feed. Therefore there was an addition setup for
                 # computing end_time. That is no longer needed.
                 self._initial_time = self._end_time
-                self._end_time = self._frame.regulation_values["tp"][idx]
+                self._end_time = self._frame.feed_payload["tp"][idx]
             # --
             # -- move the io-object one index to get the required data
             self._frame.move_index_for_iteration(index=idx)
             # -- get new inoculum value from the io-object
             self.initial_value = self._frame.inoculum.get("value")
             # -- initialise the solver and the details of the solver
-            self.initialize_solver(iname="vode")
+            self.initialize_solver(iname=self.integrator_name)
             # -- set up function parameters for a particular run_no
             _args_ = [self._frame, idx, self._ph_settings]
             self._solver.set_f_params(*_args_)
@@ -102,8 +109,6 @@ class Manager:
                         y_dot = self._solver.integrate(
                             self._solver.t + self._step, step=_step,
                             relax=_relax)
-                    # self._data_output._update("result",
-                    # [self._solver.t] + list(y_dot))
                         row = np.hstack(
                             [np.array([idx, self._solver.t]), y_dot])
                         self.result.append(row)
@@ -120,9 +125,7 @@ class Manager:
             # The result chooses the elements from the
             # start of y_dot instead of the initial value set.
             # Forcing to use the result setup is probably not useful
-            # self._frame.inoculum.update({"value": self.result[-1][2:]})
             self._frame.inoculum.update({"value": y_dot})
-            # -- Log that the simulation ended correctly.
         # --
         self._frame._update("y_hat", self.result)
         return self._frame

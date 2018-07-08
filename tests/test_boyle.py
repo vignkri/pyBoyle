@@ -11,7 +11,7 @@ dataset = None
 
 
 def test_version():
-    assert __version__ == '0.6.2'
+    assert __version__ == '0.6.3'
 
 
 def checkConstants(ds, raw):
@@ -23,23 +23,17 @@ def test_initialisation():
     # --
     data_path = "data/"
     # -- Create sample dataset
-    _metadata_ = {"name": "Pytesting Data",
-                  "data": data_path, "description": "test description",
-                  "tags": "sample, tag, setup"}
-    _settings_ = {"process": "debug",
-                  "constants": "standard", "step_size": 0.5,
-                  "ph": {"method": "fixed", "value": 8},
-                  "solver": {"method": "bdf", "order": 1,
-                             "nsteps": 2, "relative": 1e-4,
-                             "absolute": 1e-8}}
+    standard_ph = {"method": "fixed", "value": 7.5}
+    standard_solver = {"method": "bdf", "order": 1,
+                       "nsteps": 1e6, "rtol": 1e-4,
+                       "atol": 1e-8}
+    standard_step_size = 0.5
     # --
     phValue = namedtuple("pH", "method value")
-    _ph_settings = phValue(_settings_.get("ph").get("method"),
-                           _settings_.get("ph").get("value"))
-    _config_ = {"metadata": _metadata_, "settings": _settings_}
+    _ph_settings = phValue(standard_ph.get("method"), standard_ph.get("value"))
     # --
     global dataset
-    manager = Manager(_config_)
+    manager = Manager(path=data_path)
     dataset = manager._frame
     # --
     const_one = load_data("data/Const1.constant")
@@ -50,21 +44,11 @@ def test_initialisation():
     # -- Assert values stored as solver settings data
     assert manager._ph_settings.method == _ph_settings.method
     assert manager._ph_settings.value == _ph_settings.value
-    for k in _settings_.get("solver").keys():
-        if k == "relative":
-            dk = "rtol"
-            assert manager._solver_setting.get(dk) == \
-                _settings_.get("solver").get(k)
-        elif k == "absolute":
-            dk = "atol"
-            assert manager._solver_setting.get(dk) == \
-                _settings_.get("solver").get(k)
-        else:
-            assert manager._solver_setting.get(k) == \
-                _settings_.get("solver").get(k)
+    for k in manager._solver_setting.keys():
+        assert manager._solver_setting.get(k) == \
+                standard_solver.get(k)
     # -- Assert values stored as simulation configuration data
-    assert manager._step == _settings_.get("step_size")
-    assert manager._meta.get("name") == _metadata_.get("name")
+    assert manager._step == standard_step_size
     # -- load reference output
     _path = "data/reference.hdf5"
     reference = SimulationResult(load.fromHDF5(_path))
