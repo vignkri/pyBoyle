@@ -1,6 +1,6 @@
 # Boyle - Python
 
-Computation agent for Boyle made using python-scipy. The model is built based on the Anaerobic Digestion model for computing the gaseous fraction of the methane produced from the digestion process.
+The model is built based on the Anaerobic Digestion model for computing the gaseous fraction of the methane produced from the digestion process.
 
 ## Version Changelog
 
